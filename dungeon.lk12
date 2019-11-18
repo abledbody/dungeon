@@ -1,13 +1,15 @@
 LK12;OSData;DiskOS;DiskGame;V4;API_2;192x128;C:none;CLvl:0;
 ___luacode___
+dofile("D:/dungeon/Rayleigh.lua")
+
 local class = Library("class")
-dofile("D:/APIs/amath.lua")
+dofile("D:/dungeon/amath.lua")
 local abs = math.abs
 local round = math.round
 local min = math.min
 local max = math.max
 local sin = math.sin
-local anim = dofile("D:/APIs/anim.lua")
+local anim = dofile("D:/dungeon/anim.lua")
 local adat = dofile("D:/dungeon/adat.lua")
 
 
