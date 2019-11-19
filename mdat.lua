@@ -6,15 +6,22 @@ local r = {}
 
 --Entry--
 
+--Actual room position and scale, used for room switching
 r.x,r.y = 54,0
 r.w,r.h = 12,11
 
+--The chunk of tilemap revealed when the room is entered
 r.rx,r.ry = 54,0
 r.rw,r.rh = 12,12
 
+--The center of the room for camera positioning
 r.cx,r.cy = 6,6
 
+--The connected rooms
 r.con = {2}
+
+--Things and mobs have a class name, an x and y coordinate, and a table of data for spawning,
+--which works like   thatClass:new(unpack(thatTable))
 r.things = {
  {"RobeStat",5,4,{}}
 }
