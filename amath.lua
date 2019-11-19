@@ -1,7 +1,9 @@
 math.tau = 6.2831853071796
 
+local math_min, math_max = math.min, math.max
+
 function math.clamp(value, min, max)
- return math.min(math.max(value, min), max)
+ return math_min(math_max(value, min), max)
 end
 
 function math.round(value)

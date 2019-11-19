@@ -1,3 +1,6 @@
+--Animation Data
+--This file stores the timing and sprite data for each kind of animation
+
 local adat = {}
 
 --Timings--

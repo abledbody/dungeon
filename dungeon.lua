@@ -1,15 +1,26 @@
+--Dungeon game by Albedbody
+
+--Apply the custom Rayleigh palette
 dofile("D:/dungeon/Rayleigh.lua")
 
+--== Load third-party libraries ==--
+
 local class = Library("class")
-dofile("D:/dungeon/amath.lua")
-local abs = math.abs
-local round = math.round
-local min = math.min
-local max = math.max
-local sin = math.sin
+
+--== Load external libraries ==--
+
 local anim = dofile("D:/dungeon/anim.lua")
+dofile("D:/dungeon/amath.lua")
+
+--== Load external files ==--
+
 local adat = dofile("D:/dungeon/adat.lua")
 
+--== Localize some functions ==--
+
+local min, max, abs, sin = math.min, math.max, math.abs, math.sin
+--amath extensions
+local round = math.round
 
 ---------------General----------------
 
