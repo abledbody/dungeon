@@ -23,7 +23,7 @@ r.con = {2}
 --Things and mobs have a class name, an x and y coordinate, and a table of data for spawning,
 --which works like   thatClass:new(unpack(thatTable))
 r.things = {
- {"RobeStat",5,4,{}}
+	{"RobeStat",5,4,{}}
 }
 r.mobs = {}
 
@@ -57,7 +57,7 @@ r.rw,r.rh = 8,6
 r.cx,r.cy = 4,3
 r.con = {2}
 r.things = {
- {"ExTile",1,0,{{"Note to Joffrey: Please do not let\nthe slimes roam the dungeon. They\nneed to be kept in the traps where\nthey will not attack the staff.","It's been physically\nchiseled into the wall.","Note to Joffrey: Please do not let\nthe slimes roam the dungeon. They\nneed to be kept in the traps where\nthey will not attack the staff."}}}
+	{"ExTile",1,0,{{"Note to Joffrey: Please do not let\nthe slimes roam the dungeon. They\nneed to be kept in the traps where\nthey will not attack the staff.","It's been physically\nchiseled into the wall.","Note to Joffrey: Please do not let\nthe slimes roam the dungeon. They\nneed to be kept in the traps where\nthey will not attack the staff."}}}
 }
 r.mobs = {}
 
@@ -76,7 +76,7 @@ r.cx,r.cy = 7,4
 r.con = {2,6}
 r.things = {}
 r.mobs = {
- {"Slime",7,2,{}}
+	{"Slime",7,2,{}}
 }
 
 rooms[4] = r
