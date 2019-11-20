@@ -5,16 +5,22 @@ dofile("D:/dungeon/Rayleigh.lua")
 
 --== Load third-party libraries ==--
 
+--Middleclass library
 local class = Library("class")
 
 --== Load external libraries ==--
 
+--Animation system
 local anim = dofile("D:/dungeon/anim.lua")
+--Extended math library
 dofile("D:/dungeon/amath.lua")
+
 
 --== Load external files ==--
 
-local adat = dofile("D:/dungeon/adat.lua")
+--Animation data
+local aData = dofile("D:/dungeon/adat.lua")
+
 
 --== Localize some functions ==--
 
@@ -26,10 +32,12 @@ local round = math.round
 
 
 --Modules--
-local diBox = {}
-local gMap = {}
-local mobs = {}
-local things = {}
+--These are all forward declarations of modules defined later,
+--so Lua can refer to these tables without needing to know what's in them.
+local diBox = {} --Dialogue box
+local gMap = {} --Game map
+local mobs = {} --Enemies, player, ect.
+local things = {} --Non-map objects within the game
 
 --Parameters--
 local camSmooth = 0.16
@@ -534,7 +542,7 @@ end
 local Slime = class("Slime")
 
 function Slime:initialize(x,y)
-	local mob = Mob:new(x,y,adat.slime)
+	local mob = Mob:new(x,y,aData.slime)
 	
 	mob.x,mob.y = x,y
 	
@@ -674,7 +682,7 @@ end
 
 --Game start--
 gMap.switchRoom(1)
-pl = mobs.Mob:new(59,1,adat.player)
+pl = mobs.Mob:new(59,1,aData.player)
 
 function pl:onMove()
 	gMap.plMoved(self.x,self.y)
