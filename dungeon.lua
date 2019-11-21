@@ -1,4 +1,4 @@
---Dungeon game by Albedbody
+--Dungeon game by abledbody
 
 --Apply the custom Rayleigh palette
 dofile("D:/dungeon/Rayleigh.lua")
@@ -20,13 +20,20 @@ dofile("D:/dungeon/amath.lua")
 
 --Animation data
 local aData = dofile("D:/dungeon/adat.lua")
+--Game constants
+const = dofile("D:/dungeon/gameConsts.lua")
 
 
---== Localize some functions ==--
+--== Localize some variables ==--
 
+--math
 local min, max, abs, sin = math.min, math.max, math.abs, math.sin
 --amath extensions
 local round = math.round
+
+--Constants
+local HSW,HSH = const.HSW,const.HSH
+local DIRX,DIRY = const.DIRX,const.DIRY
 
 ---------------General----------------
 
@@ -41,13 +48,6 @@ things = {} --Non-map objects within the game
 
 --Parameters--
 local camSmooth = 0.16
-
---Constants--
-SW,SH = screenSize()
-HSW,HSH =
-	SW/2,SH/2
-DIRX = {-1,1,0,0}
-DIRY = {0,0,-1,1}
 
 --Variables--
 time = 0

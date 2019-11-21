@@ -1,5 +1,5 @@
-local max = math.max
-local min = math.min
+local max,min = math.max,math.min
+local HSW,HSH = const.HSW,const.HSH
 
 --Parameters
 local boxTime = 1/20 --Should open in a 20th of a second.
