@@ -10,21 +10,10 @@ local function doAll(method,...)
 	end
 end
 
---Mob class--
-local Mob = dofile("D:/dungeon/Classes/Mob.lua")
+--Classes--
+local Mob = dofile("D:/dungeon/Mobs/Mob.lua")
 
---MOVEME--
-local Slime = class("Slime")
-
-function Slime:initialize(x,y)
-	local mob = Mob:new(x,y,aData.slime)
-	
-	mob.x,mob.y = x,y
-	
-	self.mob = mob
-end
-
-types.Slime = Slime
+types.Slime = dofile("D:/dungeon/Mobs/Slime.lua")
 
 --Module--
 local mobs = {}

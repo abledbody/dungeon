@@ -18,9 +18,7 @@ local xCamTarget,yCamTarget = 0,0
 local lastLook = nil
 local lookCount = 1
 
---Available game loops
-local updates = {}
-local draws = {}
+local classPath = path.."Game/"
 
 --Functions--
 --Returns the first position, but slightly closer to the
@@ -75,7 +73,7 @@ end
 --State--
 local function update(dt)
 	time = time+dt
-	things.indicatorY = sin(time*7)+0.5
+	things.indicatorY(sin(time*7)+0.5)
 	
 	--Camera--
 	local _roomX,_roomY =
@@ -145,6 +143,6 @@ game.time = getTime
 game.setCamTarget = setCamTarget
 game.spawnPlayer = spawnPlayer
 
-game.Timer = dofile("D:/dungeon/classes/Timer.lua")
+game.Timer = dofile(classPath.."Timer.lua")
 
 return game
