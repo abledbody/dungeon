@@ -47,7 +47,7 @@ local function show(m)
 	--We keep a screenshot of the game to display behind the text box.
 	local imgDat = screenshot()
 	scrImage = imgDat:image()
-	setState("diBox")
+	main.setState("diBox")
 	
 	SFX(9)
 	
@@ -62,11 +62,16 @@ local function show(m)
 end
 
 local function update(dt)
-	size = 
-		min(size+dt*boxSpeed,targetSize)
+	size = min(size+dt*boxSpeed,targetSize)
+	
+	if btn(5) then
+		main.setState("game")
+	end
 end
 
 local function draw()
+	clear()
+	
 	scrImage:draw()
 
 	local x = HSW+0.5-boxWidth/2
@@ -87,8 +92,13 @@ local function draw()
 	end
 end
 
+--Loop calls--
+main.updates.diBox = update
+main.draws.diBox = draw
+
 --Module--
-local diBox = diBox
+local diBox = {}
+
 diBox.show = show
 diBox.update = update
 diBox.draw = draw

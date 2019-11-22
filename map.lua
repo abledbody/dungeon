@@ -88,7 +88,7 @@ local function switchRoom(r)
 		reveal()
 	end
 	
-	roomX,roomY = x+room.cx,y+room.cy
+	game.setCamTarget(x + room.cx, y + room.cy)
 end
 
 local function inBounds(xT,yT,room)
