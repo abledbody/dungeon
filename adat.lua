@@ -3,7 +3,7 @@
 
 local aData = {}
 
---Timings--
+	--Timings--
 local timings = {}
 --Used for player idle animation
 timings.bob =		{0.6,	0.06,	0.6,	0.06}
@@ -11,9 +11,8 @@ timings.bob =		{0.6,	0.06,	0.6,	0.06}
 timings.strike =	{0.07,	0.08,	0.2}
 timings.twoIdle =	{0.5,	0.5}
 
---Frames data--
-
---Player--
+	--Frames data--
+--Player
 aData.player = {
     --Default player state
     idle = {
@@ -29,7 +28,7 @@ aData.player = {
     },
 }
 
---Slime--
+--Slime
 aData.slime = {
 	idle = {
 		spr = {202,203},

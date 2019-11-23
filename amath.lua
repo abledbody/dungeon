@@ -17,15 +17,6 @@ function math.sign(value)
 		value < 0 and -1 or 0
 end
 
---Short for "better atan2",
---because Lua's atan2 is offset by
---90 degrees from cos and sin,
---AND BACKWARDS.
---Are you freaking kidding me?!
-function math.bat(x,y)
-	return (-math.atan2(x,y)+math.pi/2)%math.tau
-end
-
 function math.between(val,min,max)
 	return val >= min and val <= max
 end

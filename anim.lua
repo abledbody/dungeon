@@ -1,4 +1,4 @@
---Functions--
+	--Functions--
 local function fetch(frame,offset,timing)
 	local fCount = #timing
 	local ended = false
@@ -17,7 +17,7 @@ local function fetch(frame,offset,timing)
 	return frame,offset,ended
 end
 
---Module--
+	--Module--
 local anim = {}
 anim.fetch = fetch
 
