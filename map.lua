@@ -1,9 +1,9 @@
-local mdat = dofile("D:/dungeon/mdat.lua")
+local mdat = dofile(PATH.."mdat.lua")
 
---Localization--
+	--Localization--
 local band = bit.band
 
---Variables--
+	--Variables--
 local sheetImage = SpriteMap:image()
 local bg = sheetImage:batch()
 
@@ -15,7 +15,7 @@ local blocked = {}
 local iacts = {}
 
 
---Functions--
+	--Functions--
 local function checkBit(flag,n)
 	n = (n==0) and 1 or (2^n)
 	return band(flag,n) == n
@@ -123,7 +123,7 @@ local function draw()
 	bg:draw()
 end
 
---Module--
+	--Module--
 local gMap = {}
 
 gMap.switchRoom = switchRoom

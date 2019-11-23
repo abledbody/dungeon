@@ -1,8 +1,11 @@
---Variables--
+	--Constants--
+local CLASSPATH = PATH.."Mobs/"
+
+	--Variables--
 local all = {}
 local types = {}
 
---Functions--
+	--Functions--
 local function doAll(method,...)
 	for i = 1, #all do
 		local mob = all[i]
@@ -10,12 +13,12 @@ local function doAll(method,...)
 	end
 end
 
---Classes--
-local Mob = dofile("D:/dungeon/Mobs/Mob.lua")
+	--Classes--
+local Mob = dofile(CLASSPATH.."Mob.lua")
 
-types.Slime = dofile("D:/dungeon/Mobs/Slime.lua")
+types.Slime = dofile(CLASSPATH.."Slime.lua")
 
---Module--
+	--Module--
 local mobs = {}
 
 mobs.Mob = Mob

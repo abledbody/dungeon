@@ -1,10 +1,10 @@
 --Dungeon game by abledbody, 2019
 
 
---Define path (Used for loading)
-path = ("D:/dungeon/")
+--Define PATH (Used for loading)
+PATH = ("D:/dungeon/")
 --Apply the custom Rayleigh palette
-dofile(path.."Rayleigh.lua")
+dofile(PATH.."Rayleigh.lua")
 
 --== Load third-party libraries ==--
 
@@ -14,17 +14,17 @@ class = Library("class")
 --== Load external libraries ==--
 
 --Animation system
-anim = dofile(path.."anim.lua")
+anim = dofile(PATH.."anim.lua")
 --Extended math library
-dofile(path.."amath.lua")
+dofile(PATH.."amath.lua")
 
 
 --== Load external files ==--
 
 --Animation data
-aData = dofile(path.."adat.lua")
+aData = dofile(PATH.."adat.lua")
 --Game constants
-const = dofile(path.."gameConsts.lua")
+const = dofile(PATH.."gameConsts.lua")
 
 --== Load game modules ==--
 
@@ -37,12 +37,12 @@ gMap = nil --Game map
 mobs = nil --Enemies, player, ect.
 things = nil --Non-map objects within the game
 
-main = dofile(path.."main.lua")
-game = dofile(path.."game.lua")
-diBox = dofile(path.."diBox.lua")
-gMap = dofile(path.."map.lua")
-mobs = dofile(path.."mobs.lua")
-things = dofile(path.."things.lua")
+main = dofile(PATH.."main.lua")
+game = dofile(PATH.."game.lua")
+diBox = dofile(PATH.."diBox.lua")
+gMap = dofile(PATH.."map.lua")
+mobs = dofile(PATH.."mobs.lua")
+things = dofile(PATH.."things.lua")
 
 
 --== Start the program ==--

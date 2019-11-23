@@ -1,15 +1,15 @@
---Variables--
+	--Variables--
 local updates = {}
 local draws = {}
 
---Functions--
+	--Functions--
 --Just to change _update and _draw in the same line
 local function setState(state)
 	_update = updates[state]
 	_draw = draws[state]
 end
 
---Module--
+	--Module--
 local main = {}
 
 main.updates = updates

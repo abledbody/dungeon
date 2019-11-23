@@ -1,10 +1,10 @@
 local max,min = math.max,math.min
 local HSW,HSH = const.HSW,const.HSH
 
---Parameters
+	--Parameters--
 local boxTime = 1/20 --Should open in a 20th of a second.
 
---Variables--
+	--Variables--
 local size = 0
 local targetSize = 6
 --Box vertical size increment in pixels per second
@@ -14,7 +14,7 @@ local message = {}
 
 local scrImage
 
---Functions--
+	--Functions--
 --Returns an array of strings split up by newlines.
 local function lineSplit(text)
 	local lns = {}
@@ -61,7 +61,8 @@ local function show(m)
 	boxSpeed = targetSize/boxTime
 end
 
-local function update(dt)
+	--States--
+function main.updates.diBox(dt)
 	size = min(size+dt*boxSpeed,targetSize)
 	
 	if btn(5) then
@@ -69,7 +70,7 @@ local function update(dt)
 	end
 end
 
-local function draw()
+function main.draws.diBox()
 	clear()
 	
 	scrImage:draw()
@@ -92,11 +93,7 @@ local function draw()
 	end
 end
 
---Loop calls--
-main.updates.diBox = update
-main.draws.diBox = draw
-
---Module--
+	--Module--
 local diBox = {}
 
 diBox.show = show

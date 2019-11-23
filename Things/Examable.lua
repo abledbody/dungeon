@@ -1,4 +1,3 @@
---Classes--
 local Examable = class("Examinable")
 
 Examable.dat = {

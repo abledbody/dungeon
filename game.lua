@@ -1,11 +1,14 @@
---Localization--
+	--Localization--
 local sin,abs,round,min = math.sin,math.abs,math.round,math.min
 local HSW,HSH,DIRX,DIRY = const.HSW,const.HSH,const.DIRX,const.DIRY
 
---Parameters--
+	--Constants--
+local CLASSPATH = PATH.."Game/"
+
+	--Parameters--
 local camSmooth = 0.16
 
---Variables--
+	--Variables--
 local time = 0
 local pl = nil --Player mob
 
@@ -18,9 +21,7 @@ local xCamTarget,yCamTarget = 0,0
 local lastLook = nil
 local lookCount = 1
 
-local classPath = path.."Game/"
-
---Functions--
+	--Functions--
 --Returns the first position, but slightly closer to the
 --second position. Used repeatedly, slowly decelerates until
 --the position is within half a pixel of the destination.
@@ -70,8 +71,8 @@ local function spawnPlayer(x,y)
 	end
 end
 
---State--
-local function update(dt)
+	--States--
+function main.updates.game(dt)
 	time = time+dt
 	things.indicatorY(sin(time*7)+0.5)
 	
@@ -104,7 +105,7 @@ local function update(dt)
 	mobs.doAll("update",dt)
 end
 
-local function draw()
+function main.draws.game()
 	clear()
 	
 	pushMatrix()
@@ -128,13 +129,9 @@ local function draw()
 	end
 	
 	popMatrix()
-end   
+end
 
---Loop calls--
-main.updates.game = update
-main.draws.game = draw
-
---Module--
+	--Module--
 local game = {}
 
 game.smoove = smoove
@@ -143,6 +140,6 @@ game.time = getTime
 game.setCamTarget = setCamTarget
 game.spawnPlayer = spawnPlayer
 
-game.Timer = dofile(classPath.."Timer.lua")
+game.Timer = dofile(CLASSPATH.."Timer.lua")
 
 return game

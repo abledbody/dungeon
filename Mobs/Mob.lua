@@ -1,8 +1,7 @@
---Localization--
+	--Localization--
 local DIRX,DIRY = const.DIRX,const.DIRY
 
---Class--
-
+	--Class--
 local Mob = class("Mob")
 
 function Mob:initialize(x,y,aSet)

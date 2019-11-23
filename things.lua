@@ -1,15 +1,14 @@
+	--Constants--
+local CLASSPATH = PATH.."Things/"
 
-
---Variables--
+	--Variables--
 local all = {}
 local types = {}
-
-local classPath = path.."Things/"
 
 --Interaction indicator vertical position
 local indicatorY = 0
 
---Functions--
+	--Functions--
 local function doAll(method,...)
 	for i = 1, #all do
 		all[i][method](all[i],...)
@@ -21,13 +20,13 @@ local function indicatorY_prop(x)
 	return indicatorY
 end
 
---Classes--
-local Examable = dofile(classPath.."Examable.lua")
+	--Classes--
+local Examable = dofile(CLASSPATH.."Examable.lua")
 
-types.RobeStat = dofile(classPath.."RobeStat.lua")
-types.ExTile = dofile(classPath.."ExTile.lua")
+types.RobeStat = dofile(CLASSPATH.."RobeStat.lua")
+types.ExTile = dofile(CLASSPATH.."ExTile.lua")
 
---Module--
+	--Module--
 local things = {}
 
 things.RobeStat = RobeStat

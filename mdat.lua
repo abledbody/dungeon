@@ -4,7 +4,7 @@ local rooms = {}
 
 local r = {}
 
---Entry--
+--Entry
 
 --Actual room position and scale, used for room switching
 r.x,r.y = 54,0
@@ -29,7 +29,7 @@ r.mobs = {}
 
 rooms[1] = r
 
---EntryHall--
+--EntryHall
 
 r = {}
 r.x,r.y = 58,11
@@ -45,7 +45,7 @@ r.mobs = {}
 
 rooms[2] = r
 
---Text room--
+--Text room
 
 r = {}
 r.x,r.y = 62,15
@@ -63,7 +63,7 @@ r.mobs = {}
 
 rooms[3] = r
 
---Slime room--
+--Slime room
 
 r = {}
 r.x,r.y = 44,11
@@ -83,7 +83,7 @@ rooms[4] = r
 
 mdat.rooms = rooms
 
---Lava bridge--
+--Lava bridge
 
 r = {}
 r.x,r.y = 52,18
@@ -99,7 +99,7 @@ r.mobs = {}
 
 rooms[5] = r
 
---Lava cave--
+--Lava cave
 
 r = {}
 r.x,r.y = 44,18
