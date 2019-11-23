@@ -141,5 +141,6 @@ game.setCamTarget = setCamTarget
 game.spawnPlayer = spawnPlayer
 
 game.Timer = dofile(CLASSPATH.."Timer.lua")
+game.Health = dofile(CLASSPATH.."Health.lua")
 
 return game
