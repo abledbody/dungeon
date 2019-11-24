@@ -7,41 +7,25 @@ local Mob = class("Mob")
 function Mob:initialize(x,y,aSet)
 	self.x,self.y = x,y
 	self.sx,self.sy = x*8,y*8
-	self.anim_i = 1
-	self.anim_o = 0 
-	self.states = aSet
-	self:setState("idle")
+	self.smooveRate = 0.06
 	self.t_move = game.Timer:new(0.22)
 	self.t_attack = game.Timer:new(0.4)
-	self.smooveRate = 0.06
+
+	local function attackEndWrapper() Mob.attackAnimEnd(self) end
+	self.animator = game.Animator:new(aSet,"idle",{attack = attackEndWrapper})
 	
 	table.insert(mobs.all,self)
 end
 
-function Mob:setState(state)
-	self.anim_state = state
-	local a = self.states[state]
-	if not a then
-		error("No such animation state "..state)
-	end
-	
-	self.anim_o = a.timing[1]
-	self.a,self.anim_i = a,1
+function Mob:attackAnimEnd()
+	self.animator:setState("idle")
 end
 
 function Mob:update(dt)
-	local anim_i,anim_o,a,x,y,sx,sy,t_move,t_attack,anim_state,smooveRate = self.anim_i,self.anim_o,self.a,self.x,self.y,self.sx,self.sy,self.t_move,self.t_attack,self.anim_state,self.smooveRate
+	local animator,x,y,sx,sy,t_move,t_attack,smooveRate = self.animator,self.x,self.y,self.sx,self.sy,self.t_move,self.t_attack,self.smooveRate
 	
 	--Animation--
-	anim_i,anim_o,aEnd =
-		anim.fetch(anim_i,anim_o,a.timing)
-	anim_o = anim_o-dt
-	
-	self.anim_i,self.anim_o = anim_i,anim_o
-	
-	if aEnd and anim_state == "attack" then
-		self:setState("idle")
-	end
+	animator:update(dt)
 	
 	--Other--
 	sx,sy = game.smoove(sx,sy,x*8,y*8,smooveRate/dt)
@@ -89,7 +73,7 @@ function Mob:attack(dir)
 	if t_attack:check() then
 		x,y = x+xM,y+yM
 		
-		self:setState("attack")
+		self.animator:setState("attack")
 		
 		if gMap.isBlocked(x,y) then
 			SFX(6)
@@ -119,14 +103,13 @@ function Mob:interact(dir)
 end
 
 function Mob:draw()
-	local a,anim_i,sx,sy,f = self.a,self.anim_i,self.sx,self.sy,self.flip
-	local spr = a.spr[anim_i]
+	local animator,sx,sy,f = self.animator,self.sx,self.sy,self.flip
+	local spr = animator:fetch("spr")
 	
 	local sxScale = f and -1 or 1
 	
-	--Checking to see if our animation data has a sprite x offset.
-	if a.offX then
-		local offX = a.offX[anim_i]
+	local offX = animator:fetch("offX")
+	if offX then
 		--Apply to sprite x offset.
 		sx = sx+offX*sxScale
 	end   

@@ -142,5 +142,6 @@ game.spawnPlayer = spawnPlayer
 
 game.Timer = dofile(CLASSPATH.."Timer.lua")
 game.Health = dofile(CLASSPATH.."Health.lua")
+game.Animator = dofile(CLASSPATH.."Animator.lua")
 
 return game
