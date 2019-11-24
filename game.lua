@@ -66,8 +66,8 @@ end
 local function spawnPlayer(x,y)
 	pl = mobs.Mob:new(x,y,aData.player)
 
-	function pl:onMove()
-		gMap.plMoved(self.x,self.y)
+	function pl:move(dir)
+		if mobs.Mob.move(self,dir) then gMap.plMoved(self.x,self.y) end
 	end
 end
 

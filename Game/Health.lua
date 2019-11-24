@@ -4,7 +4,7 @@ local clamp = math.clamp
 	--Class--
 local Health = class("Health")
 
-function Health:initialize(maxHP, damageCalls, killCalls)
+function Health:initialize(maxHP,damageCalls,killCalls)
 	maxHP = maxHP or 5
 	self.maxHP = maxHP
 	self.hp = maxHP

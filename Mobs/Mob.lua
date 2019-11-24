@@ -45,6 +45,7 @@ end
 function Mob:move(dir)
 	local x,y,t_move = self.x,self.y,self.t_move
 	
+	local couldMove = false
 	local xM,yM = DIRX[dir],DIRY[dir]
 	
 	if t_move:check() then
@@ -56,13 +57,13 @@ function Mob:move(dir)
 			t_move:trigger()
 			self.x,self.y = x,y
 			SFX(7)
-			if self.onMove then
-				self:onMove()
-			end
+			couldMove = true
 		end
 		
 		self:flipCheck(xM)
 	end
+
+	return couldMove
 end
 
 function Mob:attack(dir)
@@ -103,21 +104,21 @@ function Mob:interact(dir)
 end
 
 function Mob:draw()
-	local animator,sx,sy,f = self.animator,self.sx,self.sy,self.flip
+	local animator,x,y,flip = self.animator,self.sx,self.sy,self.flip
+
+	local xScale = flip and -1 or 1
+
 	local spr = animator:fetch("spr")
-	
-	local sxScale = f and -1 or 1
-	
 	local offX = animator:fetch("offX")
 	if offX then
 		--Apply to sprite x offset.
-		sx = sx+offX*sxScale
-	end   
+		x = x+offX*xScale
+	end
 	
 	--If the sprite is flipped, we need to account for the fact that the origin is on the upper left corner.
-	sx = f and sx+8 or sx
+	x = flip and x+8 or x
 	
-	Sprite(spr,sx,sy,0,sxScale)
+	Sprite(spr,x,y,0,xScale)
 end
 
 return Mob
