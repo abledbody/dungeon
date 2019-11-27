@@ -13,15 +13,14 @@ local function doAll(method,...)
 	end
 end
 
-	--Classes--
-local Mob = dofile(CLASSPATH.."Mob.lua")
-
+	--Types--
 types.Slime = dofile(CLASSPATH.."Slime.lua")
 
 	--Module--
 local mobs = {}
 
-mobs.Mob = Mob
+mobs.Mob = dofile(CLASSPATH.."Mob.lua")
+
 mobs.all = all
 mobs.doAll = doAll
 mobs.types = types

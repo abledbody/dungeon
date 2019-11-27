@@ -1,5 +1,31 @@
 local mdat = dofile(PATH.."mdat.lua")
 
+	--Map data verification--
+for i = 1, #mdat.rooms do
+	local con = mdat.rooms[i].con
+	--In each of the connected rooms of this room
+	for j = 1, #con do
+		local otherIndex = con[j]
+		local otherRoom = mdat.rooms[otherIndex]
+		local otherCon = otherRoom.con
+		
+		local isConnected = false
+		--We look for this room in the connections of the connected room
+		for k = 1, #otherCon do
+			local checkIndex = otherCon[k]
+
+			if checkIndex == i then
+				isConnected = true
+				break
+			end
+		end
+
+		if not isConnected then
+			error("Room ["..otherIndex.."] is not connected to room ["..i.."]")
+		end
+	end
+end
+
 	--Localization--
 local band = bit.band
 

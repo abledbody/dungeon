@@ -10,6 +10,8 @@ function Mob:initialize(x,y,aSet)
 	self.smooveRate = 0.06
 	self.t_move = game.Timer:new(0.22)
 	self.t_attack = game.Timer:new(0.4)
+	
+	self.movable = mapEnts.Movable:new(self)
 
 	local function attackEndWrapper() Mob.attackAnimEnd(self) end
 	self.animator = game.Animator:new(aSet,"idle",{attack = attackEndWrapper})
@@ -43,21 +45,18 @@ function Mob:flipCheck(xM)
 end
 
 function Mob:move(dir)
-	local x,y,t_move = self.x,self.y,self.t_move
+	local movable,t_move = self.movable,self.t_move
 	
-	local couldMove = false
 	local xM,yM = DIRX[dir],DIRY[dir]
 	
+	local couldMove = false
+
 	if t_move:check() then
-		--Even if x and y are never modified, we still need the position for the block check.
-		--If it passes, then we'll delocalize it.
-		x,y = x+xM,y+yM
-		
-		if not gMap.isBlocked(x,y) then
-			t_move:trigger()
-			self.x,self.y = x,y
+		couldMove = movable:move(xM,yM)
+
+		if couldMove then
 			SFX(7)
-			couldMove = true
+			t_move:trigger()
 		end
 		
 		self:flipCheck(xM)
@@ -84,7 +83,7 @@ function Mob:attack(dir)
 		
 		self:flipCheck(xM)  
 		
-		t_attack:trigger()                
+		t_attack:trigger()
 	end
 end
 

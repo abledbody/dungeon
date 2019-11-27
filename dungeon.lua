@@ -34,6 +34,7 @@ main = nil --General systems
 game = nil --Gameplay-specific functionality
 diBox = nil --Dialogue box
 gMap = nil --Game map
+mapEnts = nil --Entities in the game
 mobs = nil --Enemies, player, ect.
 things = nil --Non-map objects within the game
 
@@ -41,6 +42,7 @@ main = dofile(PATH.."main.lua")
 game = dofile(PATH.."game.lua")
 diBox = dofile(PATH.."diBox.lua")
 gMap = dofile(PATH.."map.lua")
+mapEnts = dofile(PATH.."mapEntities.lua")
 mobs = dofile(PATH.."mobs.lua")
 things = dofile(PATH.."things.lua")
 
