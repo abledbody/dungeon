@@ -1,7 +1,7 @@
 local ExTile = class("ExTile")
 
 function ExTile:initialize(x,y,dat)
-	gMap.addIact(self,x,y)
+	gMap.setSquare(x,y,"interactable",self)
 	
 	local examable = things.Examable:new()
 	examable.dat = dat

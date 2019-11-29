@@ -13,8 +13,8 @@ RobeStat.dat = {
 function RobeStat:initialize(x,y)
 	for i = x, x+1 do
 		for j = y+1, y+2 do
-			gMap.block(i,j)
-			gMap.addIact(self,i,j)
+			gMap.setSquare(i,j,"blocked",true)
+			gMap.setSquare(i,j,"interactable",self)
 		end
 	end
 	

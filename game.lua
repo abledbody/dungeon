@@ -122,7 +122,7 @@ function main.draws.game()
 	for i = 1, 4 do
 		xCheck = pl.x + DIRX[i]
 		yCheck = pl.y + DIRY[i]
-		local iact = gMap.isIact(xCheck, yCheck)
+		local iact = gMap.getSquare(xCheck,yCheck,"interactable")
 		if iact then
 			iact:drawIndicator()
 		end

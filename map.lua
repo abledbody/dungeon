@@ -35,10 +35,12 @@ local bg = sheetImage:batch()
 
 local room = nil
 
---These tables are for checking grid positions for certain kinds of occupants.
---Their indeces are written as [x.." "..y]
-local blocked = {}
-local iacts = {}
+--This table is for checking grid positions for certain kinds of occupants.
+--Their position indeces are written as [x.." "..y]
+local gridData = {
+	blocked = {},
+	interactable = {},
+}
 
 
 	--Functions--
@@ -47,20 +49,32 @@ local function checkBit(flag,n)
 	return band(flag,n) == n
 end
 
-local function block(x,y)
-	blocked[x.." "..y] = true
+local function setSquare(x,y,key,state)
+	local dataset = gridData[key]
+
+	if not dataset then
+		error("No such grid key \""..key.."\"")
+	end
+
+	dataset[x.." "..y] = state
 end
 
-local function addIact(o,x,y)
-	iacts[x.." "..y] = o
+local function getSquare(x,y,key)
+	local dataset = gridData[key]
+
+	if not dataset then
+		error("No such grid key \""..key.."\"")
+	end
+
+	return dataset[x.." "..y]
 end
 
-local function isBlocked(x,y)
-	return blocked[x.." "..y]
-end
-
-local function isIact(x,y)
-	return iacts[x.." "..y]
+local function bulk(obj,x,y,w,h,action)
+	for i = x, x+w do
+		for j = y, y+h do
+			action(i,j,obj)
+		end
+	end
 end
 
 local function spawnInRoom(datTab,classTab,x,y)
@@ -86,7 +100,7 @@ local function tileIter(x,y,spr)
 		local flags = fget(spr)
 		
 		if checkBit(flags,0) then
-			block(x,y)
+			setSquare(x,y,"blocked",true)
 		end
 	end
 end
@@ -152,14 +166,12 @@ end
 	--Module--
 local gMap = {}
 
-gMap.switchRoom = switchRoom
 gMap.plMoved = plMoved
+gMap.switchRoom = switchRoom
+gMap.setSquare = setSquare
+gMap.getSquare = getSquare
 
 gMap.draw = draw
 
-gMap.block = block
-gMap.addIact = addIact
-gMap.isBlocked = isBlocked    
-gMap.isIact = isIact
 
 return gMap

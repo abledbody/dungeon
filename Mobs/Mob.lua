@@ -12,6 +12,7 @@ function Mob:initialize(x,y,aSet)
 	self.t_attack = game.Timer:new(0.4)
 	
 	self.movable = mapEnts.Movable:new(self)
+	self.melee = mapEnts.Melee:new()
 
 	local function attackEndWrapper() Mob.attackAnimEnd(self) end
 	self.animator = game.Animator:new(aSet,"idle",{attack = attackEndWrapper})
@@ -66,23 +67,17 @@ function Mob:move(dir)
 end
 
 function Mob:attack(dir)
-	local x,y,t_attack = self.x,self.y,self.t_attack
-	
-	local xM,yM = DIRX[dir],DIRY[dir]
-	
+	local t_attack = self.t_attack
+
 	if t_attack:check() then
-		x,y = x+xM,y+yM
-		
+		local melee = self.melee
+		local xM,yM = DIRX[dir],DIRY[dir]
+		local x,y = self.x+xM,self.y+yM
+
+		melee:trigger(x,y)
 		self.animator:setState("attack")
-		
-		if gMap.isBlocked(x,y) then
-			SFX(6)
-		else
-			SFX(0)
-		end
-		
-		self:flipCheck(xM)  
-		
+		self:flipCheck(xM)
+
 		t_attack:trigger()
 	end
 end
@@ -95,7 +90,7 @@ function Mob:interact(dir)
 	
 	self:flipCheck(xM)
 	
-	local iact = gMap.isIact(x,y)
+	local iact = gMap.getSquare(x,y,"interactable")
 	
 	if iact then
 		iact:interact(self)
