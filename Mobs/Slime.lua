@@ -10,6 +10,7 @@ function Slime:initialize(x,y)
 	
 	mob.x,mob.y = x,y
 	mob.t_move.length = 1
+	mob.t_attack.length = 0.7
 	
 	self.mob = mob
 end

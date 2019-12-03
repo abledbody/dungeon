@@ -29,25 +29,33 @@ function SlimeAI:update()
 	
 
 	if target then
-		targetDist = targetDist or gMap.dist(x,y,target.x,target.y)
+		local xTarget,yTarget = target.x,target.y
+		local xDelta,yDelta = xTarget-x,yTarget-y
+
+		local xSign,ySign = sign(xDelta),sign(yDelta)
+
+		local xDir,yDir =
+			xSign > 0 and 2 or 1,
+			ySign > 0 and 4 or 3
+		
+		local yGreater = abs(yDelta) >= abs(xDelta)
+
+		targetDist = targetDist or gMap.dist(x,y,xTarget,yTarget)
 
 		--Chasing--
 		if targetDist > 1 then
-			local xTarget,yTarget = target.x,target.y
-			local xDelta,yDelta = xTarget-x,yTarget-y
-
-			local xSign,ySign = sign(xDelta),sign(yDelta)
-
-			local xDir,yDir =
-				xSign > 0 and 2 or 1,
-				ySign > 0 and 4 or 3
 			
-			local yGreater = abs(yDelta) >= abs(xDelta)
 			
 			if yGreater then
 				local _ = mob:move(yDir) or (xSign == 0 or mob:move(xDir))
 			else
 				local _ = mob:move(xDir) or (ySign == 0 or mob:move(yDir))
+			end
+		else --Attacking--
+			if yGreater then
+				mob:attack(yDir)
+			else
+				mob:attack(xDir)
 			end
 		end
 	end
