@@ -76,7 +76,11 @@ r.cx,r.cy = 7,4
 r.con = {2,6}
 r.things = {}
 r.mobs = {
-	{"Slime",7,2,{}}
+	{"Slime",7,2,{}},
+	{"Slime",8,2,{}},
+	{"Slime",7,3,{}},
+	{"Slime",8,3,{}},
+	{"Slime",9,3,{}}
 }
 
 rooms[4] = r

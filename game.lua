@@ -59,6 +59,11 @@ local function getTime()
 	return time
 end
 
+local function pl_prop(value)
+	if value then pl = value end
+	return pl
+end
+
 local function setCamTarget(x,y)
 	xCamTarget,yCamTarget = x,y
 end
@@ -139,6 +144,7 @@ game.examine = examine
 game.time = getTime
 game.setCamTarget = setCamTarget
 game.spawnPlayer = spawnPlayer
+game.pl = pl_prop
 
 game.Timer = dofile(CLASSPATH.."Timer.lua")
 game.Animator = dofile(CLASSPATH.."Animator.lua")

@@ -1,9 +1,15 @@
+--FIXME
+local SlimeAI = dofile(PATH.."Mobs/AI/SlimeAI.lua")
+
 local Slime = class("Slime")
 
 function Slime:initialize(x,y)
-	local mob = mobs.Mob:new(x,y,aData.slime)
+	local ai = SlimeAI:new()
+	local mob = mobs.Mob:new(x,y,aData.slime,ai)
+	ai.mob = mob
 	
 	mob.x,mob.y = x,y
+	mob.t_move.length = 1
 	
 	self.mob = mob
 end

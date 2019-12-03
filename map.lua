@@ -28,6 +28,7 @@ end
 
 	--Localization--
 local band = bit.band
+local abs = math.abs
 
 	--Variables--
 local sheetImage = SpriteMap:image()
@@ -44,6 +45,13 @@ local gridData = {
 
 
 	--Functions--
+local function dist(x1,y1,x2,y2)
+	local dx = abs(x2-x1)
+	local dy = abs(y2-y1)
+
+	return dx+dy
+end
+
 local function checkBit(flag,n)
 	n = (n==0) and 1 or (2^n)
 	return band(flag,n) == n
@@ -170,6 +178,7 @@ gMap.plMoved = plMoved
 gMap.switchRoom = switchRoom
 gMap.setSquare = setSquare
 gMap.getSquare = getSquare
+gMap.dist = dist
 
 gMap.draw = draw
 

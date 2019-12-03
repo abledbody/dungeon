@@ -4,9 +4,10 @@ local DIRX,DIRY = const.DIRX,const.DIRY
 	--Class--
 local Mob = class("Mob")
 
-function Mob:initialize(x,y,aSet)
+function Mob:initialize(x,y,aSet,ai)
 	self.x,self.y = x,y
 	self.sx,self.sy = x*8,y*8
+	self.ai = ai
 	self.smooveRate = 0.06
 	self.t_move = game.Timer:new(0.22)
 	self.t_attack = game.Timer:new(0.4)
@@ -25,7 +26,7 @@ function Mob:attackAnimEnd()
 end
 
 function Mob:update(dt)
-	local animator,x,y,sx,sy,t_move,t_attack,smooveRate = self.animator,self.x,self.y,self.sx,self.sy,self.t_move,self.t_attack,self.smooveRate
+	local animator,x,y,sx,sy,t_move,t_attack,smooveRate,ai = self.animator,self.x,self.y,self.sx,self.sy,self.t_move,self.t_attack,self.smooveRate,self.ai
 	
 	--Animation--
 	animator:update(dt)
@@ -35,6 +36,7 @@ function Mob:update(dt)
 	
 	t_move:update(dt)
 	t_attack:update(dt)
+	if ai then ai:update(dt) end
 	
 	self.sx,self.sy = sx,sy
 end
