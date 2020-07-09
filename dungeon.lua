@@ -51,6 +51,6 @@ things = dofile(PATH.."things.lua")
 
 function _init()
 	main.setState("game")
-	gMap.switchRoom(1)
+	gMap.switchRoom("entry")
 	game.spawnPlayer(59,1)
 end

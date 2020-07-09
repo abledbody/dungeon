@@ -2,122 +2,117 @@ local mdat = {}
 
 local rooms = {}
 
-local r = {}
+rooms.entry = {
+	--Actual room position and scale, used for room switching
+	x = 54, y = 0,
+	w = 12, h =11,
 
---Entry
+	--The chunk of tilemap revealed when the room is entered
+	rx = 54, ry = 0,
+	rw = 12, rh = 12,
 
---Actual room position and scale, used for room switching
-r.x,r.y = 54,0
-r.w,r.h = 12,11
+	--The center of the room for camera positioning
+	cx = 6, cy = 6,
 
---The chunk of tilemap revealed when the room is entered
-r.rx,r.ry = 54,0
-r.rw,r.rh = 12,12
-
---The center of the room for camera positioning
-r.cx,r.cy = 6,6
-
---The connected rooms
-r.con = {2}
-
---Things and mobs have a class name, an x and y coordinate, and a table of data for spawning,
---which works like   thatClass:new(unpack(thatTable))
-r.things = {
-	{"RobeStat",5,4,{}}
-}
-r.mobs = {}
-
-rooms[1] = r
-
---EntryHall
-
-r = {}
-r.x,r.y = 58,11
-r.w,r.h = 4,7
-
-r.rx,r.ry = 58,11
-r.rw,r.rh = 4,7
-
-r.cx,r.cy = 2,3
-r.con = {1,3,4,5}
-r.things = {}
-r.mobs = {}
-
-rooms[2] = r
-
---Text room
-
-r = {}
-r.x,r.y = 62,15
-r.w,r.h = 8,6
-
-r.rx,r.ry = 62,15
-r.rw,r.rh = 8,6
-
-r.cx,r.cy = 4,3
-r.con = {2}
-r.things = {
-	{"ExTile",1,0,{{"Note to Joffrey: Please do not let\nthe slimes roam the dungeon. They\nneed to be kept in the traps where\nthey will not attack the staff.","It's been physically\nchiseled into the wall.","Note to Joffrey: Please do not let\nthe slimes roam the dungeon. They\nneed to be kept in the traps where\nthey will not attack the staff."}}}
-}
-r.mobs = {}
-
-rooms[3] = r
-
---Slime room
-
-r = {}
-r.x,r.y = 44,11
-r.w,r.h = 14,7
-
-r.rx,r.ry = 44,11
-r.rw,r.rh = 15,7
-
-r.cx,r.cy = 7,4
-r.con = {2,6}
-r.things = {}
-r.mobs = {
-	{"Slime",7,2,{}},
-	{"Slime",8,2,{}},
-	{"Slime",7,3,{}},
-	{"Slime",8,3,{}},
-	{"Slime",9,3,{}}
+	--Things and mobs have a class name, an x and y coordinate, and a table of data for spawning,
+	--which works like   thatClass:new(unpack(thatTable))
+	things = {
+		{"RobeStat",5,4,{}}
+	},
+	mobs = {},
 }
 
-rooms[4] = r
+rooms.entryHall = {
+	x = 58, y = 11,
+	w = 4, h = 7,
 
-mdat.rooms = rooms
+	rx = 58, ry = 11,
+	rw = 4, rh = 7,
 
---Lava bridge
+	cx = 2, cy = 3,
+	things = {},
+	mobs = {},
+}
 
-r = {}
-r.x,r.y = 52,18
-r.w,r.h = 10,13
+rooms.text = {
+	x = 62,	y = 15,
+	w = 8, h = 6,
 
-r.rx,r.ry = 52,18
-r.rw,r.rh = 10,13
+	rx = 62, ry = 15,
+	rw = 8, rh = 6,
 
-r.cx,r.cy = 5,7
-r.con = {2,6}
-r.things = {}
-r.mobs = {}
+	cx = 4, cy = 3,
+	things = {
+		{"ExTile",1,0,{{"Note to Joffrey: Please do not let\nthe slimes roam the dungeon. They\nneed to be kept in the traps where\nthey will not attack the staff.","It's been physically\nchiseled into the wall.","Note to Joffrey: Please do not let\nthe slimes roam the dungeon. They\nneed to be kept in the traps where\nthey will not attack the staff."}}}
+	},
+	mobs = {},
+}
 
-rooms[5] = r
+rooms.slime = {
+	x = 44, y = 11,
+	w = 14, h = 7,
 
---Lava cave
+	rx = 44, ry = 11,
+	rw = 15, rh = 7,
 
-r = {}
-r.x,r.y = 44,18
-r.w,r.h = 8,8
+	cx = 7, cy = 4,
+	things = {},
+	mobs = {
+		{"Slime",7,2,{}},
+		{"Slime",8,2,{}},
+		{"Slime",7,3,{}},
+		{"Slime",8,3,{}},
+		{"Slime",9,3,{}}
+	},
+}
 
-r.rx,r.ry = 44,18
-r.rw,r.rh = 9,8
+rooms.lavaBridge = {
+	x = 52, y = 18,
+	w = 10, h = 13,
 
-r.cx,r.cy = 4,4
-r.con = {4,5}
-r.things = {}
-r.mobs = {}
+	rx = 52, ry = 18,
+	rw = 10, rh = 13,
 
-rooms[6] = r
+	cx = 5, cy = 7,
+	things = {},
+	mobs = {},
+}
+
+rooms.lavaCave = {
+	x = 44, y = 18,
+	w = 8, h = 8,
+
+	rx = 44, ry = 18,
+	rw = 9, rh = 8,
+
+	cx = 4, cy = 4,
+	things = {},
+	mobs = {},
+}
+
+--Connections
+
+local connections = {
+	{"entry", "entryHall"},
+	{"entryHall", "text"},
+	{"entryHall", "slime"},
+	{"entryHall", "lavaBridge"},
+	{"slime", "lavaCave"},
+	{"lavaBridge", "lavaCave"}
+}
+
+--Moving the connection data to the rooms themselves.
+
+for k,v in ipairs(connections) do
+	local room_a = v[1]
+	local room_b = v[2]
+
+	rooms[room_a].con = rooms[room_a].con or {}
+	rooms[room_b].con = rooms[room_b].con or {}
+
+	table.insert(rooms[room_a].con, room_b)
+	table.insert(rooms[room_b].con, room_a)
+end
 
 mdat.rooms = rooms
 

@@ -41,6 +41,7 @@ local room = nil
 local gridData = {
 	blocked = {},
 	interactable = {},
+	mobs = {},
 }
 
 
