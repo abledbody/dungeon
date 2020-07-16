@@ -37,6 +37,7 @@ gMap = nil --Game map
 mapEnts = nil --Entities in the game
 mobs = nil --Enemies, player, ect.
 things = nil --Non-map objects within the game
+particleSys = nil --The particle system
 
 main = dofile(PATH.."main.lua")
 game = dofile(PATH.."game.lua")
@@ -45,6 +46,7 @@ gMap = dofile(PATH.."map.lua")
 mapEnts = dofile(PATH.."mapEntities.lua")
 mobs = dofile(PATH.."mobs.lua")
 things = dofile(PATH.."things.lua")
+particleSys = dofile(PATH.."particles.lua")
 
 
 --== Start the program ==--

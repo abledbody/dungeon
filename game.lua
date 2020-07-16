@@ -108,6 +108,8 @@ function main.updates.game(dt)
 	end
 	--Mobs--
 	mobs.doAll("update",dt)
+
+	particleSys.update(dt)
 end
 
 function main.draws.game()
@@ -119,6 +121,7 @@ function main.draws.game()
 		round(-yCam+HSH))
 	
 	gMap.draw()
+	particleSys.draw()
 	mobs.doAll("draw")
 	things.doAll("draw")
 	

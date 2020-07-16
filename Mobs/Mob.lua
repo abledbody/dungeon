@@ -1,3 +1,5 @@
+local rand = math.random
+
 	--Localization--
 local DIRX,DIRY = const.DIRX,const.DIRY
 
@@ -81,6 +83,12 @@ function Mob:attack(dir)
 		self:flipCheck(xM)
 
 		t_attack:trigger()
+	end
+end
+
+function Mob:hit(dir)
+	for i = 1, 4 do
+		particleSys.newParticle(self.x*8,self.y*8,4,rand()*4-2,rand()*4-2,10,8,0)
 	end
 end
 
