@@ -1,0 +1,25 @@
+{
+    "Lua.diagnostics.globals": [
+        "Sprite",
+        "colorPalette",
+        "color",
+        "point",
+        "SpriteMap",
+        "fget",
+        "TileMap",
+        "screenSize",
+        "SFX",
+        "screenshot",
+        "clear",
+        "rect",
+        "btn",
+        "Library",
+        "pushMatrix",
+        "cam",
+        "popMatrix",
+        "SpriteGroup"
+    ],
+    "Lua.diagnostics.disable": [
+        "lowercase-global"
+    ]
+}

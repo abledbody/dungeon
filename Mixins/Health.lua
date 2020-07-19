@@ -23,7 +23,7 @@ function Health:damage(dmg)
 		self:kill()
 	end
 
-	self.hp = clamp(hp,0,maxHP)
+	self.hp = clamp(hp,0,self.maxHP)
 end
 
 function Health:kill()

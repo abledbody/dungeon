@@ -1,5 +1,5 @@
 	--Constants--
-local CLASSPATH = PATH.."Mobs/"
+MOBS_PATH = PATH.."Mobs/"
 
 	--Variables--
 local all = {}
@@ -14,12 +14,13 @@ local function doAll(method,...)
 end
 
 	--Types--
-types.Slime = dofile(CLASSPATH.."Slime.lua")
+types.Player = dofile(MOBS_PATH.."Player.lua")
+types.Slime = dofile(MOBS_PATH.."Slime.lua")
 
 	--Module--
 local mobs = {}
 
-mobs.Mob = dofile(CLASSPATH.."Mob.lua")
+mobs.Mob = dofile(MOBS_PATH.."Mob.lua")
 
 mobs.all = all
 mobs.doAll = doAll

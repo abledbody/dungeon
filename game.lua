@@ -69,11 +69,7 @@ local function setCamTarget(x,y)
 end
 
 local function spawnPlayer(x,y)
-	pl = mobs.Mob:new(x,y,aData.player)
-
-	function pl:move(dir)
-		if mobs.Mob.move(self,dir) then gMap.plMoved(self.x,self.y) end
-	end
+	pl = dofile(MOBS_PATH.."Player.lua"):new(x,y)
 end
 
 	--States--
@@ -97,7 +93,7 @@ function main.updates.game(dt)
 	for i = 1, 4 do
 		if btn(i) then
 			if attack then
-				pl:attack(i)
+				pl:melee_attack(i)
 			elseif interact then
 				pl:interact(i)
 			else

@@ -29,7 +29,6 @@ types.ExTile = dofile(CLASSPATH.."ExTile.lua")
 	--Module--
 local things = {}
 
-things.RobeStat = RobeStat
 things.types = types
 things.all = all
 things.doAll = doAll

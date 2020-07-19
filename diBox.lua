@@ -97,7 +97,5 @@ end
 local diBox = {}
 
 diBox.show = show
-diBox.update = update
-diBox.draw = draw
 
 return diBox

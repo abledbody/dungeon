@@ -6,20 +6,18 @@ local DIRX,DIRY = const.DIRX,const.DIRY
 	--Class--
 local Mob = class("Mob")
 
-function Mob:initialize(x,y,aSet,ai)
+Mob.smooveRate = 0.06
+Mob.updates = {}
+
+function Mob:initialize(x,y,aSet)
 	self.x,self.y = x,y
 	self.sx,self.sy = x*8,y*8
-	self.ai = ai
-	self.smooveRate = 0.06
+
 	self.t_move = game.Timer:new(0.22)
-	self.t_attack = game.Timer:new(0.4)
-	
-	self.movable = mapEnts.Movable:new(self)
-	self.melee = mapEnts.Melee:new()
 
 	local function attackEndWrapper() Mob.attackAnimEnd(self) end
 	self.animator = game.Animator:new(aSet,"idle",{attack = attackEndWrapper})
-	
+
 	table.insert(mobs.all,self)
 end
 
@@ -28,19 +26,17 @@ function Mob:attackAnimEnd()
 end
 
 function Mob:update(dt)
-	local animator,x,y,sx,sy,t_move,t_attack,smooveRate,ai = self.animator,self.x,self.y,self.sx,self.sy,self.t_move,self.t_attack,self.smooveRate,self.ai
-	
-	--Animation--
-	animator:update(dt)
-	
-	--Other--
-	sx,sy = game.smoove(sx,sy,x*8,y*8,smooveRate/dt)
-	
-	t_move:update(dt)
-	t_attack:update(dt)
-	if ai then ai:update(dt) end
-	
-	self.sx,self.sy = sx,sy
+	self.sx,self.sy = game.smoove(
+		self.sx,self.sy,
+		self.x*8,self.y*8,
+		self.smooveRate/dt)
+
+	for k,v in pairs(self.updates) do
+		v(self,dt)
+	end
+
+	self.t_move:update(dt)
+	self.animator:update(dt)
 end
 
 function Mob:flipCheck(xM)
@@ -50,14 +46,25 @@ function Mob:flipCheck(xM)
 end
 
 function Mob:move(dir)
-	local movable,t_move = self.movable,self.t_move
+	local t_move = self.t_move
 	
 	local xM,yM = DIRX[dir],DIRY[dir]
 	
 	local couldMove = false
 
 	if t_move:check() then
-		couldMove = movable:move(xM,yM)
+
+		local x,y = self.x,self.y
+		local xNew,yNew = x+xM,y+yM
+		
+		if not gMap.getSquare(xNew,yNew,"blocked") then
+			gMap.setSquare(x,y,"blocked",nil)
+			gMap.setSquare(x,y,"mobs",nil)
+			self.x,self.y = xNew,yNew
+			gMap.setSquare(xNew,yNew,"blocked",true)
+			gMap.setSquare(xNew,yNew,"mobs",self)
+			couldMove = true
+		end
 
 		if couldMove then
 			SFX(7)
@@ -68,22 +75,6 @@ function Mob:move(dir)
 	end
 
 	return couldMove
-end
-
-function Mob:attack(dir)
-	local t_attack = self.t_attack
-
-	if t_attack:check() then
-		local melee = self.melee
-		local xM,yM = DIRX[dir],DIRY[dir]
-		local x,y = self.x+xM,self.y+yM
-
-		melee:trigger(x,y)
-		self.animator:setState("attack")
-		self:flipCheck(xM)
-
-		t_attack:trigger()
-	end
 end
 
 function Mob:hit(dir)

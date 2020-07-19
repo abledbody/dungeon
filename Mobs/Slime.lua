@@ -1,5 +1,5 @@
 --FIXME
-local SlimeAI = dofile(PATH.."Mobs/AI/SlimeAI.lua")
+local SlimeAI = dofile(MOBS_PATH.."/AI/SlimeAI.lua")
 
 local Slime = class("Slime")
 
