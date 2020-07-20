@@ -1,11 +1,9 @@
 	--Localization--
 local rand = math.random
-local abs = math.abs
-local sign = math.sign
 
-local Mob = dofile(MOBS_PATH.."Mob.lua")
-local melee = dofile(COMPONENT_PATH.."melee.lua")
-local health = dofile(COMPONENT_PATH.."health.lua")
+local Mob = mobs.Mob
+local melee = components.melee
+local health = components.health
 local ai = dofile(MOBS_PATH.."AI/SlimeAI.lua")
 
 local anim_set = {
@@ -39,7 +37,7 @@ end
 
 function Slime:kill()
 	for i = 1, 10 do
-		particleSys.newParticle(self.x*8+4,self.y*8+8,4,rand()*20-10,rand()*20-10,28,11,0,rand()+3)
+		particleSys.newParticle(self.sx+4,self.sy+8,4,rand()*20-10,rand()*20-10,28,11,0,rand()+3)
 	end
 
 	Mob.kill(self)

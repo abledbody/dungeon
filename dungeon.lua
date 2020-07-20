@@ -3,7 +3,6 @@
 
 --Define PATH (Used for loading)
 PATH = "D:/dungeon/"
-COMPONENT_PATH = PATH.."Components/"
 
 --Apply the custom Rayleigh palette
 dofile(PATH.."Rayleigh.lua")
@@ -36,6 +35,7 @@ main = nil --General systems
 game = nil --Gameplay-specific functionality
 diBox = nil --Dialogue box
 gMap = nil --Game map
+components = nil --Components for mobs and things
 mobs = nil --Enemies, player, ect.
 things = nil --Non-map objects within the game
 particleSys = nil --The particle system
@@ -44,6 +44,7 @@ main = dofile(PATH.."main.lua")
 game = dofile(PATH.."game.lua")
 diBox = dofile(PATH.."diBox.lua")
 gMap = dofile(PATH.."map.lua")
+components = dofile(PATH.."components.lua")
 mobs = dofile(PATH.."mobs.lua")
 things = dofile(PATH.."things.lua")
 particleSys = dofile(PATH.."particles.lua")

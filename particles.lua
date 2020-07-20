@@ -4,7 +4,7 @@ local abs = math.abs
 local particleSys = {}
 
 -- Constants--
-particleSys.gravity = 130
+particleSys.gravity = 250
 
 -- Data--
 local particles = {}

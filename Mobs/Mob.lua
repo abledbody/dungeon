@@ -83,8 +83,8 @@ function Mob:hit(dir,damage)
 
 	for i = 1, 3 do
 		particleSys.newParticle(
-			self.x*8+4, self.y*8+4, 4,
-			rand()*12-6+xM*20, rand()*12-6+yM*20, 17,
+			self.sx+4, self.sy+4, 4,
+			rand()*30-15+xM*rand()*40, rand()*30-15+yM*rand()*40, 17,
 			self.blood_color, 0, rand()+3)
 	end
 

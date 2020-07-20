@@ -1,6 +1,6 @@
-local Mob = dofile(MOBS_PATH.."Mob.lua")
-local melee = dofile(COMPONENT_PATH.."melee.lua")
-local health = dofile(COMPONENT_PATH.."health.lua")
+local Mob = mobs.Mob
+local melee = components.melee
+local health = components.health
 
 local anim_set = {
     --Default player state
