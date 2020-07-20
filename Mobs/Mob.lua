@@ -13,7 +13,7 @@ function Mob:initialize(x,y,aSet)
 	self.x,self.y = x,y
 	self.sx,self.sy = x*8,y*8
 
-	self.t_move = game.Timer:new(self.move_speed)
+	self.t_disable = game.Timer:new(self.move_speed)
 
 	self.updates = {}
 	self.draws = {}
@@ -36,7 +36,7 @@ function Mob:update(dt)
 		v(self,dt)
 	end
 
-	self.t_move:update(dt)
+	self.t_disable:update(dt)
 	self.animator:update(dt)
 end
 
@@ -47,13 +47,13 @@ function Mob:flipCheck(xM)
 end
 
 function Mob:move(dir)
-	local t_move = self.t_move
+	local t_disable = self.t_disable
 	
 	local xM,yM = DIRX[dir],DIRY[dir]
 	
 	local couldMove = false
 
-	if t_move:check() then
+	if t_disable:check() then
 
 		local x,y = self.x,self.y
 		local xNew,yNew = x+xM,y+yM
@@ -69,7 +69,7 @@ function Mob:move(dir)
 
 		if couldMove then
 			SFX(7)
-			t_move:trigger(self.move_speed)
+			t_disable:trigger(self.move_speed)
 		end
 		
 		self:flipCheck(xM)

@@ -4,9 +4,8 @@ local rand = math.random
 
 local function attack(self,dir)
 	local melee = self.melee
-	local timer = melee.timer
 
-	if timer:check() then
+	if self.t_disable:check() then
 		local xM,yM = DIRX[dir],DIRY[dir]
 		local x = self.x + xM
 		local y = self.y + yM
@@ -31,23 +30,18 @@ local function attack(self,dir)
 		self.animator:setState("attack")
 		self:flipCheck(xM)
 
-		timer:trigger()
+		self.t_disable:trigger(melee.delay)
 	end
 end
 
-local function update(object, dt)
-	object.melee.timer:update(dt)
-end
-
-local function attach(object,delay)
+local function attach(object, delay, damage)
 	object.melee = {
 		attack_sound = 0,
 		wall_sound = 6,
-		timer = game.Timer:new(delay or 0.4),
-		damage = 1,
+		delay = delay or 0.4,
+		damage = damage or 1,
 	}
 	object.melee_attack = attack
-	table.insert(object.updates, update)
 	object.animator.endCalls.attack = function() object.animator:setState("idle") end
 end
 
