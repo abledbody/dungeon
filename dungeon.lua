@@ -3,7 +3,7 @@
 
 --Define PATH (Used for loading)
 PATH = "D:/dungeon/"
-MIXIN_PATH = PATH.."Mixins/"
+COMPONENT_PATH = PATH.."Components/"
 
 --Apply the custom Rayleigh palette
 dofile(PATH.."Rayleigh.lua")

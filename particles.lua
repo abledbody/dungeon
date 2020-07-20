@@ -4,7 +4,7 @@ local abs = math.abs
 local particleSys = {}
 
 -- Constants--
-particleSys.gravity = 100
+particleSys.gravity = 130
 
 -- Data--
 local particles = {}
@@ -23,7 +23,7 @@ local particleBase = {
 particleBase.__index = particleBase
 
 -- Particle constructor--
-function particleSys.newParticle(x, y, z, vx, vy, vz, col, bounce)
+function particleSys.newParticle(x, y, z, vx, vy, vz, col, bounce, life)
     -- If we feed this function parameters they'll get set here in the table declaration.
     -- Otherwise, the metatable values will be used.
     local particle = {
@@ -34,10 +34,13 @@ function particleSys.newParticle(x, y, z, vx, vy, vz, col, bounce)
         vy = vy,
         vz = vz,
         col = col,
-        bounce = bounce
+		bounce = bounce,
+		timer = game.Timer:new(life or 4)
     }
     setmetatable(particle, particleBase)
 
+	particle.timer:trigger()
+	
     table.insert(particles, particle)
 
     return particle
@@ -77,10 +80,15 @@ function particleBase:update(dt)
     -- If this particle has basically
     -- stopped moving, we'll tell the
     -- update function by returning true.
-    if z < 1 and abs(vz) < 1 and abs(vx) < 21 and abs(vy) < 2 then
-        return true
-    end
+    --if z < 1 and abs(vz) < 1 and abs(vx) < 21 and abs(vy) < 2 then
+    --    return true
+	--end
 
+	if self.timer:check() then
+		return true
+	end
+
+	self.timer:update(dt)
 end
 
 function particleBase:draw()

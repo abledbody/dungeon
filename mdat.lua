@@ -19,7 +19,9 @@ rooms.entry = {
 	things = {
 		{"RobeStat",5,4,{}}
 	},
-	mobs = {},
+	mobs = {
+		{"Slime",3,5,{}}
+	},
 }
 
 rooms.entryHall = {
@@ -60,9 +62,9 @@ rooms.slime = {
 	mobs = {
 		{"Slime",7,2,{}},
 		{"Slime",8,2,{}},
-		{"Slime",7,3,{}},
-		{"Slime",8,3,{}},
-		{"Slime",9,3,{}}
+		--{"Slime",7,3,{}},
+		--{"Slime",8,3,{}},
+		--{"Slime",9,3,{}}
 	},
 }
 

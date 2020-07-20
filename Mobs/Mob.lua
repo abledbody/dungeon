@@ -1,5 +1,3 @@
-local rand = math.random
-
 	--Localization--
 local DIRX,DIRY = const.DIRX,const.DIRY
 
@@ -7,7 +5,6 @@ local DIRX,DIRY = const.DIRX,const.DIRY
 local Mob = class("Mob")
 
 Mob.smooveRate = 0.06
-Mob.updates = {}
 
 function Mob:initialize(x,y,aSet)
 	self.x,self.y = x,y
@@ -15,14 +12,15 @@ function Mob:initialize(x,y,aSet)
 
 	self.t_move = game.Timer:new(0.22)
 
-	local function attackEndWrapper() Mob.attackAnimEnd(self) end
-	self.animator = game.Animator:new(aSet,"idle",{attack = attackEndWrapper})
+	self.updates = {}
+
+	
+	self.animator = game.Animator:new(aSet,"idle",{})
+
+	gMap.setSquare(x,y,"blocked",self)
+	gMap.setSquare(x,y,"mobs",self)
 
 	table.insert(mobs.all,self)
-end
-
-function Mob:attackAnimEnd()
-	self.animator:setState("idle")
 end
 
 function Mob:update(dt)
@@ -77,10 +75,24 @@ function Mob:move(dir)
 	return couldMove
 end
 
-function Mob:hit(dir)
-	for i = 1, 4 do
-		particleSys.newParticle(self.x*8,self.y*8,4,rand()*4-2,rand()*4-2,10,8,0)
+function Mob:hit(dir,damage)
+	if self.hit_sound then
+		SFX(self.hit_sound,1)
 	end
+
+	if self.damage then
+		self:damage(damage)
+	end
+end
+
+function Mob:kill()
+	self:remove()
+end
+
+function Mob:remove()
+	gMap.setSquare(self.x, self.y, "mobs", nil)
+	gMap.setSquare(self.x, self.y, "blocked", nil)
+	self.remove_me = true
 end
 
 function Mob:interact(dir)

@@ -103,7 +103,7 @@ function main.updates.game(dt)
 		end
 	end
 	--Mobs--
-	mobs.doAll("update",dt)
+	mobs.update(dt)
 
 	particleSys.update(dt)
 end
