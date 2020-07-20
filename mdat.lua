@@ -20,7 +20,7 @@ rooms.entry = {
 		{"RobeStat",5,4,{}}
 	},
 	mobs = {
-		{"Slime",3,5,{}}
+
 	},
 }
 
@@ -32,8 +32,12 @@ rooms.entryHall = {
 	rw = 4, rh = 7,
 
 	cx = 2, cy = 3,
-	things = {},
-	mobs = {},
+	things = {
+
+	},
+	mobs = {
+
+	},
 }
 
 rooms.text = {
@@ -47,7 +51,9 @@ rooms.text = {
 	things = {
 		{"ExTile",1,0,{{"Note to Joffrey: Please do not let\nthe slimes roam the dungeon. They\nneed to be kept in the traps where\nthey will not attack the staff.","It's been physically\nchiseled into the wall.","Note to Joffrey: Please do not let\nthe slimes roam the dungeon. They\nneed to be kept in the traps where\nthey will not attack the staff."}}}
 	},
-	mobs = {},
+	mobs = {
+		{"Slime",6,4,{}},
+	},
 }
 
 rooms.slime = {
@@ -58,13 +64,12 @@ rooms.slime = {
 	rw = 15, rh = 7,
 
 	cx = 7, cy = 4,
-	things = {},
+	things = {
+
+	},
 	mobs = {
 		{"Slime",7,2,{}},
 		{"Slime",8,2,{}},
-		--{"Slime",7,3,{}},
-		--{"Slime",8,3,{}},
-		--{"Slime",9,3,{}}
 	},
 }
 
@@ -76,8 +81,12 @@ rooms.lavaBridge = {
 	rw = 10, rh = 13,
 
 	cx = 5, cy = 7,
-	things = {},
-	mobs = {},
+	things = {
+
+	},
+	mobs = {
+		{"Slime",1,8,{}},
+	},
 }
 
 rooms.lavaCave = {
@@ -88,8 +97,12 @@ rooms.lavaCave = {
 	rw = 9, rh = 8,
 
 	cx = 4, cy = 4,
-	things = {},
-	mobs = {},
+	things = {
+
+	},
+	mobs = {
+		
+	},
 }
 
 --Connections

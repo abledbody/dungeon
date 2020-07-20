@@ -1,9 +1,12 @@
+	--Localization--
 local rand = math.random
-local DIRX,DIRY = const.DIRX,const.DIRY
+local abs = math.abs
+local sign = math.sign
 
 local Mob = dofile(MOBS_PATH.."Mob.lua")
 local melee = dofile(COMPONENT_PATH.."melee.lua")
 local health = dofile(COMPONENT_PATH.."health.lua")
+local ai = dofile(MOBS_PATH.."AI/SlimeAI.lua")
 
 local anim_set = {
 	idle = {
@@ -21,30 +24,16 @@ local anim_set = {
 local Slime = class("Slime", Mob)
 
 function Slime:initialize(x, y)
+	self.move_speed = 1
+
 	Mob.initialize(self, x, y, anim_set)
+	
 	melee(self, 0.6)
 	health(self, 3)
+	ai(self)
 
 	self.hit_sound = 13
-end
-
-function Slime:update(dt)
-	local other = gMap.getSquare(self.x+1,self.y,"mobs")
-	if other == game.pl() then
-		self:melee_attack(2)
-	end
-
-	Mob.update(self, dt)
-end
-
-function Slime:hit(dir, damage)
-	local xM,yM = DIRX[dir],DIRY[dir]
-
-	for i = 1, 3 do
-		particleSys.newParticle(self.x*8+4,self.y*8+8,4,rand()*12-6+xM*20,rand()*12-6+yM*20,17,11,0,rand()+3)
-	end
-
-	Mob.hit(self, dir, damage)
+	self.blood_color = 11
 end
 
 function Slime:kill()

@@ -1,16 +1,19 @@
 	--Localization--
 local DIRX,DIRY = const.DIRX,const.DIRY
+local rand = math.random
 
 	--Class--
 local Mob = class("Mob")
 
 Mob.smooveRate = 0.06
+Mob.blood_color = 8
+Mob.move_speed = 0.22
 
 function Mob:initialize(x,y,aSet)
 	self.x,self.y = x,y
 	self.sx,self.sy = x*8,y*8
 
-	self.t_move = game.Timer:new(0.22)
+	self.t_move = game.Timer:new(self.move_speed)
 
 	self.updates = {}
 
@@ -66,7 +69,7 @@ function Mob:move(dir)
 
 		if couldMove then
 			SFX(7)
-			t_move:trigger()
+			t_move:trigger(self.move_speed)
 		end
 		
 		self:flipCheck(xM)
@@ -76,6 +79,15 @@ function Mob:move(dir)
 end
 
 function Mob:hit(dir,damage)
+	local xM,yM = DIRX[dir],DIRY[dir]
+
+	for i = 1, 3 do
+		particleSys.newParticle(
+			self.x*8+4, self.y*8+8, 4,
+			rand()*12-6+xM*20, rand()*12-6+yM*20, 17,
+			self.blood_color, 0, rand()+3)
+	end
+
 	if self.hit_sound then
 		SFX(self.hit_sound,1)
 	end

@@ -2,18 +2,10 @@
 local abs = math.abs
 local sign = math.sign
 
-	--Class
-local SlimeAI = class("SlimeAI")
-
-SlimeAI.maxDist = 10
-
-function SlimeAI:initialize()
-
-end
-
-function SlimeAI:update()
-	local mob,maxDist,target = self.mob,self.maxDist,self.target
-	local x,y = mob.x,mob.y
+local function update(self)
+	local ai = self.ai
+	local maxDist,target = ai.maxDist,ai.target
+	local x,y = self.x,self.y
 	local targetDist
 	
 
@@ -23,7 +15,7 @@ function SlimeAI:update()
 		targetDist = gMap.dist(x,y,pl.x,pl.y)
 		
 		if targetDist <= maxDist then
-			self.target = pl
+			ai.target = pl
 		end
 	end
 	
@@ -47,18 +39,27 @@ function SlimeAI:update()
 			
 			
 			if yGreater then
-				local _ = mob:move(yDir) or (xSign == 0 or mob:move(xDir))
+				local _ = self:move(yDir) or (xSign == 0 or self:move(xDir))
 			else
-				local _ = mob:move(xDir) or (ySign == 0 or mob:move(yDir))
+				local _ = self:move(xDir) or (ySign == 0 or self:move(yDir))
 			end
 		else --Attacking--
 			if yGreater then
-				mob:attack(yDir)
+				self:melee_attack(yDir)
 			else
-				mob:attack(xDir)
+				self:melee_attack(xDir)
 			end
 		end
 	end
 end
 
-return SlimeAI
+local function attach(object)
+	object.ai = {
+		maxDist = 10,
+		target = nil,
+	}
+
+	table.insert(object.updates, update)
+end
+
+return attach
