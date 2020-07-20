@@ -5,7 +5,7 @@ local rand = math.random
 	--Class--
 local Mob = class("Mob")
 
-Mob.smooveRate = 0.06
+Mob.smoove_rate = 0.06
 Mob.blood_color = 8
 Mob.move_speed = 0.22
 
@@ -16,7 +16,7 @@ function Mob:initialize(x,y,aSet)
 	self.t_move = game.Timer:new(self.move_speed)
 
 	self.updates = {}
-
+	self.draws = {}
 	
 	self.animator = game.Animator:new(aSet,"idle",{})
 
@@ -30,9 +30,9 @@ function Mob:update(dt)
 	self.sx,self.sy = game.smoove(
 		self.sx,self.sy,
 		self.x*8,self.y*8,
-		self.smooveRate/dt)
+		self.smoove_rate/dt)
 
-	for k,v in pairs(self.updates) do
+	for _,v in pairs(self.updates) do
 		v(self,dt)
 	end
 
@@ -83,7 +83,7 @@ function Mob:hit(dir,damage)
 
 	for i = 1, 3 do
 		particleSys.newParticle(
-			self.x*8+4, self.y*8+8, 4,
+			self.x*8+4, self.y*8+4, 4,
 			rand()*12-6+xM*20, rand()*12-6+yM*20, 17,
 			self.blood_color, 0, rand()+3)
 	end
@@ -138,6 +138,10 @@ function Mob:draw()
 	x = flip and x+8 or x
 	
 	Sprite(spr,x,y,0,xScale)
+
+	for _,v in pairs(self.draws) do
+		v(self)
+	end
 end
 
 return Mob

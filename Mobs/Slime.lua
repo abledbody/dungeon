@@ -25,9 +25,10 @@ local Slime = class("Slime", Mob)
 
 function Slime:initialize(x, y)
 	self.move_speed = 1
+	self.smoove_rate = 0.2
 
 	Mob.initialize(self, x, y, anim_set)
-	
+
 	melee(self, 0.6)
 	health(self, 3)
 	ai(self)

@@ -92,9 +92,6 @@ function particleBase:update(dt)
 end
 
 function particleBase:draw()
-    -- Particle
-	color(0)
-    point(self.x, self.y)
     color(self.col)
 	point(self.x, self.y - self.z)
 end

@@ -34,6 +34,7 @@ local Player = class("Player", Mob)
 function Player:initialize(x, y)
 	Mob.initialize(self, x, y, anim_set)
 	melee(self, 0.4)
+	health(self,10)
 
 	self.move = function(self,dir)
 		if Mob.move(self,dir) then gMap.plMoved(self.x,self.y) end
