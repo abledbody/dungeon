@@ -105,6 +105,8 @@ function main.updates.game(dt)
 	--Mobs--
 	mobs.update(dt)
 
+	gMap.update(dt)
+
 	particleSys.update(dt)
 end
 

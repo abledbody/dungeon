@@ -1,30 +1,8 @@
 local mdat = dofile(PATH.."mdat.lua")
 
-	--Map data verification--
-for i = 1, #mdat.rooms do
-	local con = mdat.rooms[i].con
-	--In each of the connected rooms of this room
-	for j = 1, #con do
-		local otherIndex = con[j]
-		local otherRoom = mdat.rooms[otherIndex]
-		local otherCon = otherRoom.con
-		
-		local isConnected = false
-		--We look for this room in the connections of the connected room
-		for k = 1, #otherCon do
-			local checkIndex = otherCon[k]
+local LAVA_SPRITE = 25
 
-			if checkIndex == i then
-				isConnected = true
-				break
-			end
-		end
-
-		if not isConnected then
-			error("Room ["..otherIndex.."] is not connected to room ["..i.."]")
-		end
-	end
-end
+local gMap = {}
 
 	--Localization--
 local band = bit.band
@@ -33,6 +11,18 @@ local abs = math.abs
 	--Variables--
 local sheetImage = SpriteMap:image()
 local bg = sheetImage:batch()
+
+local special_tiles = {
+	[25] = {
+		animator = game.Animator:new(aData.lava, "anim"),
+		update = function(self, dt)
+			self.animator:update(dt)
+			for i = 1, #self do
+				bg:set(self[i].id, SpriteMap:quad(self.animator:fetch("spr")), self[i].x, self[i].y)
+			end
+		end
+	}
+}
 
 local room = nil
 
@@ -46,7 +36,7 @@ local gridData = {
 
 
 	--Functions--
-local function dist(x1,y1,x2,y2)
+function gMap.dist(x1,y1,x2,y2)
 	local dx = abs(x2-x1)
 	local dy = abs(y2-y1)
 
@@ -56,34 +46,6 @@ end
 local function checkBit(flag,n)
 	n = (n==0) and 1 or (2^n)
 	return band(flag,n) == n
-end
-
-local function setSquare(x,y,key,state)
-	local dataset = gridData[key]
-
-	if not dataset then
-		error("No such grid key \""..key.."\"")
-	end
-
-	dataset[x.." "..y] = state
-end
-
-local function getSquare(x,y,key)
-	local dataset = gridData[key]
-
-	if not dataset then
-		error("No such grid key \""..key.."\"")
-	end
-
-	return dataset[x.." "..y]
-end
-
-local function bulk(obj,x,y,w,h,action)
-	for i = x, x+w do
-		for j = y, y+h do
-			action(i,j,obj)
-		end
-	end
 end
 
 local function spawnInRoom(datTab,classTab,x,y)
@@ -103,13 +65,19 @@ local function tileIter(x,y,spr)
 	if spr ~= 0 then
 		--Rendering--
 		local q = SpriteMap:quad(spr)
-		bg:add(q,x*8,y*8)
+		
+		local newTile = bg:add(q,x*8,y*8)
+
+		if special_tiles[spr] then
+			table.insert(special_tiles[spr], {id = newTile, x = x*8, y = y*8})
+		end
+		
 		
 		--Collision--
 		local flags = fget(spr)
 		
 		if checkBit(flags,0) then
-			setSquare(x,y,"blocked",true)
+			gMap.setSquare(x,y,"blocked",true)
 		end
 	end
 end
@@ -124,7 +92,41 @@ local function reveal()
 	spawnInRoom(room.mobs,mobs.types,x,y)
 end
 
-local function switchRoom(r)
+local function inBounds(xT,yT,room)
+	local x,y,w,h = room.x,room.y,room.w,room.h
+	
+	return yT>=y and xT>=x and yT<y+h and xT<x+w
+end
+
+function gMap.setSquare(x,y,key,state)
+	local dataset = gridData[key]
+
+	if not dataset then
+		error("No such grid key \""..key.."\"")
+	end
+
+	dataset[x.." "..y] = state
+end
+
+function gMap.getSquare(x,y,key)
+	local dataset = gridData[key]
+
+	if not dataset then
+		error("No such grid key \""..key.."\"")
+	end
+
+	return dataset[x.." "..y]
+end
+
+function gMap.bulk(obj,x,y,w,h,action)
+	for i = x, x+w do
+		for j = y, y+h do
+			action(i,j,obj)
+		end
+	end
+end
+
+function gMap.switchRoom(r)
 	room = mdat.rooms[r]
 	
 	if not room then
@@ -140,13 +142,7 @@ local function switchRoom(r)
 	game.setCamTarget(x + room.cx, y + room.cy)
 end
 
-local function inBounds(xT,yT,room)
-	local x,y,w,h = room.x,room.y,room.w,room.h
-	
-	return yT>=y and xT>=x and yT<y+h and xT<x+w
-end
-
-local function plMoved(x,y)
+function gMap.plMoved(x,y)
 	if not inBounds(x,y,room) then
 		local connected = room.con
 		
@@ -160,7 +156,7 @@ local function plMoved(x,y)
 			end
 			
 			if inBounds(x,y,cRoom) then
-				switchRoom(cri)
+				gMap.switchRoom(cri)
 				break
 			end
 		end
@@ -168,20 +164,16 @@ local function plMoved(x,y)
 	end
 end
 
-local function draw()
+function gMap.draw()
 	bg:draw()
 end
 
-	--Module--
-local gMap = {}
-
-gMap.plMoved = plMoved
-gMap.switchRoom = switchRoom
-gMap.setSquare = setSquare
-gMap.getSquare = getSquare
-gMap.dist = dist
-
-gMap.draw = draw
-
+function gMap.update(dt)
+	for _,v in pairs(special_tiles) do
+		if v.update then
+			v:update(dt)
+		end
+	end
+end
 
 return gMap
