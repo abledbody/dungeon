@@ -21,7 +21,8 @@
         "screenWidth",
         "screenHeight",
         "exit",
-        "pal"
+        "pal",
+        "ellipse"
     ],
     "Lua.diagnostics.disable": [
         "lowercase-global"
