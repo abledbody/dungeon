@@ -52,7 +52,7 @@ function Player:hit(damage, dir)
 end
 
 function Player:kill()
-
+	game_over.trigger()
 end
 
 return Player

@@ -96,6 +96,10 @@ function particleBase:draw()
 	point(self.x, self.y - self.z)
 end
 
+function particleSys.clear()
+	particles = {}
+end
+
 function particleSys.update(dt)
     for k, v in pairs(particles) do
         -- If the update returns true then

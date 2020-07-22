@@ -21,7 +21,7 @@ local function draw(self)
 	local max_hp = health.max_hp
 	local hp = health.hp
 
-	if hp < max_hp then
+	if hp < max_hp and hp > 0 then
 		color(8)
 		rect(self.sx - max_hp/2 + 4,self.sy-2,max_hp,1)
 		color(11)

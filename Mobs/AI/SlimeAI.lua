@@ -11,7 +11,7 @@ local function update(self)
 
 	--Targeting--
 	if not target then
-		local pl = game.pl()
+		local pl = game.player
 		targetDist = gMap.dist(x,y,pl.x,pl.y)
 		
 		if targetDist <= maxDist then

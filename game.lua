@@ -9,14 +9,14 @@ local CLASSPATH = PATH.."Game/"
 local game = {
 	camSmooth = 0.16,
 	darkness = 3.99,
-	fade_speed = 10
+	fade_speed = 10,
+	player = nil, --Player mob
 }
 
 	--Parameters--
 
 	--Variables--
 local time = 0
-local pl = nil --Player mob
 
 --The center of the camera in pixelspace
 local xCam,yCam = 480,48
@@ -65,17 +65,24 @@ local function getTime()
 	return time
 end
 
-local function pl_prop(value)
-	if value then pl = value end
-	return pl
-end
-
 local function setCamTarget(x,y)
 	xCamTarget,yCamTarget = x,y
 end
 
 local function spawnPlayer(x,y)
-	pl = dofile(MOBS_PATH.."Player.lua"):new(x,y)
+	game.player = dofile(MOBS_PATH.."Player.lua"):new(x,y)
+end
+
+function game.camera_smoove(dt)
+	local _roomX, _roomY =
+		xCamTarget*8, yCamTarget*8
+	xCam, yCam = smoove(xCam, yCam, _roomX, _roomY, game.camSmooth/dt)
+end
+
+function game.camera_transform()
+	cam("translate",
+		round(-xCam + HSW),
+		round(-yCam + HSH))
 end
 
 	--States--
@@ -84,10 +91,7 @@ function main.updates.game(dt)
 	things.indicatorY(sin(time*7)+0.5)
 	
 	--Camera--
-	local _roomX,_roomY =
-		xCamTarget*8,yCamTarget*8
-	xCam,yCam =
-		smoove(xCam,yCam,_roomX,_roomY,camSmooth/dt)
+	game.camera_smoove(dt)
 		
 	--Player control--
 	local attack = btn(5)
@@ -99,11 +103,11 @@ function main.updates.game(dt)
 	for i = 1, 4 do
 		if btn(i) then
 			if attack then
-				pl:melee_attack(i)
+				game.player:melee_attack(i)
 			elseif interact then
-				pl:interact(i)
+				game.player:interact(i)
 			else
-				pl:move(i)
+				game.player:move(i)
 			end
 			break
 		end
@@ -124,9 +128,7 @@ function main.draws.game()
 	brightness(game.darkness)
 	
 	pushMatrix()
-	cam("translate",
-		round(-xCam+HSW),
-		round(-yCam+HSH))
+	game.camera_transform()
 	
 	gMap.draw()
 	particleSys.draw()
@@ -136,8 +138,8 @@ function main.draws.game()
 	local xCheck,yCheck
 	
 	for i = 1, 4 do
-		xCheck = pl.x + DIRX[i]
-		yCheck = pl.y + DIRY[i]
+		xCheck = game.player.x + DIRX[i]
+		yCheck = game.player.y + DIRY[i]
 		local iact = gMap.getSquare(xCheck,yCheck,"interactable")
 		if iact then
 			iact:drawIndicator()
@@ -154,7 +156,6 @@ game.examine = examine
 game.time = getTime
 game.setCamTarget = setCamTarget
 game.spawnPlayer = spawnPlayer
-game.pl = pl_prop
 
 game.Timer = dofile(CLASSPATH.."Timer.lua")
 game.Animator = dofile(CLASSPATH.."Animator.lua")
