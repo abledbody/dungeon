@@ -17,7 +17,11 @@
         "pushMatrix",
         "cam",
         "popMatrix",
-        "SpriteGroup"
+        "SpriteGroup",
+        "screenWidth",
+        "screenHeight",
+        "exit",
+        "pal"
     ],
     "Lua.diagnostics.disable": [
         "lowercase-global"

@@ -5,8 +5,14 @@ local HSW,HSH,DIRX,DIRY = const.HSW,const.HSH,const.DIRX,const.DIRY
 	--Constants--
 local CLASSPATH = PATH.."Game/"
 
+
+local game = {
+	camSmooth = 0.16,
+	darkness = 3.99,
+	fade_speed = 10
+}
+
 	--Parameters--
-local camSmooth = 0.16
 
 	--Variables--
 local time = 0
@@ -108,10 +114,14 @@ function main.updates.game(dt)
 	gMap.update(dt)
 
 	particleSys.update(dt)
+
+	game.darkness = math.max(game.darkness - game.fade_speed * dt, 0)
 end
 
 function main.draws.game()
 	clear()
+
+	brightness(game.darkness)
 	
 	pushMatrix()
 	cam("translate",
@@ -138,7 +148,6 @@ function main.draws.game()
 end
 
 	--Module--
-local game = {}
 
 game.smoove = smoove
 game.examine = examine

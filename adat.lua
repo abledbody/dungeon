@@ -10,4 +10,11 @@ aData.lava = {
 	}
 }
 
+aData.cursor = {
+	anim = {
+		spr =		{383,	381,	380,	382},
+		timing =	{0.9,		0.2,	0.1,	0.2},
+	}
+}
+
 return aData

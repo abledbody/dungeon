@@ -27,12 +27,15 @@ aData = dofile(PATH.."adat.lua")
 --Game constants
 const = dofile(PATH.."gameConsts.lua")
 
+brightness = dofile(PATH.."brightness.lua")
+
 --== Load game modules ==--
 
 --These are all forward declarations of modules defined later,
 --so Lua can refer to these tables without needing to know what's in them.
 main = nil --General systems
 game = nil --Gameplay-specific functionality
+main_menu = nil
 diBox = nil --Dialogue box
 gMap = nil --Game map
 components = nil --Components for mobs and things
@@ -42,6 +45,7 @@ particleSys = nil --The particle system
 
 main = dofile(PATH.."main.lua")
 game = dofile(PATH.."game.lua")
+main_menu = dofile(PATH.."mainmenu.lua")
 diBox = dofile(PATH.."diBox.lua")
 gMap = dofile(PATH.."map.lua")
 components = dofile(PATH.."components.lua")
@@ -53,7 +57,7 @@ particleSys = dofile(PATH.."particles.lua")
 --== Start the program ==--
 
 function _init()
-	main.setState("game")
+	main.setState("main_menu")
 	gMap.switchRoom("entry")
 	game.spawnPlayer(59,1)
 end
