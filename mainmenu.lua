@@ -3,7 +3,7 @@ local OPTIONS = {
 		name = "Start",
 		select = function()
 			main.setState("game")
-			SFX(10)
+			SFX(10,3)
 		end
 	},
 	{
