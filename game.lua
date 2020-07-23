@@ -69,10 +69,6 @@ local function setCamTarget(x,y)
 	xCamTarget,yCamTarget = x,y
 end
 
-local function spawnPlayer(x,y)
-	game.player = dofile(MOBS_PATH.."Player.lua"):new(x,y)
-end
-
 function game.camera_smoove(dt)
 	local _roomX, _roomY =
 		xCamTarget*8, yCamTarget*8
@@ -88,7 +84,7 @@ end
 	--States--
 function main.updates.game(dt)
 	time = time+dt
-	things.indicatorY(sin(time*7)+0.5)
+	things.indicatorY = sin(time*7)+0.5
 	
 	--Camera--
 	game.camera_smoove(dt)
@@ -155,7 +151,6 @@ game.smoove = smoove
 game.examine = examine
 game.time = getTime
 game.setCamTarget = setCamTarget
-game.spawnPlayer = spawnPlayer
 
 game.Timer = dofile(CLASSPATH.."Timer.lua")
 game.Animator = dofile(CLASSPATH.."Animator.lua")

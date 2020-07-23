@@ -55,9 +55,7 @@ local function spawnInRoom(datTab,classTab,x,y)
 		local name,xT,yT,meta = unpack(item)
 		if not (name and xT and yT and meta) then error("Room data requires the name of the class, the x and y positions, and a table with spawning metadata.") end
 		
-		local itemCl = classTab[name]
-		if not itemCl then error("Could not find item \""..name.."\"") end
-		itemCl:new(x+xT,y+yT,unpack(meta))
+		classTab.spawn(name, x+xT, y+yT, meta)
 	end
 end
 
@@ -88,8 +86,8 @@ local function reveal()
 	room.rev = true
 	TileMap:map(tileIter,rx,ry,rw,rh)
 	
-	spawnInRoom(room.things,things.types,x,y)
-	spawnInRoom(room.mobs,mobs.types,x,y)
+	spawnInRoom(room.things,things,x,y)
+	spawnInRoom(room.mobs,mobs,x,y)
 end
 
 local function inBounds(xT,yT,room)

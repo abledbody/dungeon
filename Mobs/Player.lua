@@ -43,6 +43,8 @@ function Player:initialize(x, y)
 	self.animator.endCalls.damage = function() self.animator:setState("idle") end
 
 	self.hit_sound = 8
+
+	game.player = self
 end
 
 function Player:hit(damage, dir)

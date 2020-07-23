@@ -36,7 +36,7 @@ function RobeStat:drawIndicator()
 	local x,y = self.x,self.y
 	
 	x = x*8+4
-	y = y*8-5+things.indicatorY()
+	y = y*8-5+things.indicatorY
 	
 	Sprite(361,x,y)
 end

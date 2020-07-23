@@ -3,13 +3,18 @@ MOBS_PATH = PATH.."Mobs/"
 
 	--Module--
 mobs = {
-	types = {},
-	all = {},
 	Mob = dofile(MOBS_PATH.."Mob.lua")
 }
 
+--Mobs need access to mobs.Mob to initialize
+mobs.types = {
+	Player = dofile(MOBS_PATH.."Player.lua"),
+	Slime = dofile(MOBS_PATH.."Slime.lua"),
+}
+
 	--Variables--
-local all = mobs.all
+local all = {}
+local types = mobs.types
 
 	--Functions--
 function mobs.update(dt)
@@ -28,10 +33,18 @@ function mobs.doAll(method,...)
 	end
 end
 
-	--Types--
-mobs.types = {
-	Player = dofile(MOBS_PATH.."Player.lua"),
-	Slime = dofile(MOBS_PATH.."Slime.lua"),
-}
+function mobs.spawn(mob_type, x, y, meta)
+	local itemCl = types[mob_type]
+	if not itemCl then error("Could not find mob \""..mob_type.."\"") end
+
+	local mob
+	if meta then
+		mob = itemCl:new(x, y, unpack(meta))
+	else
+		mob = itemCl:new(x, y)
+	end
+
+	table.insert(all, mob)
+end
 
 return mobs

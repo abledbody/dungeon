@@ -22,8 +22,6 @@ function Mob:initialize(x,y,aSet)
 
 	gMap.setSquare(x,y,"blocked",self)
 	gMap.setSquare(x,y,"mobs",self)
-
-	table.insert(mobs.all,self)
 end
 
 function Mob:update(dt)
