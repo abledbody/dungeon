@@ -17,6 +17,10 @@ function main.updates.game_over(dt)
 	game.darkness = math.min(game.darkness + game.fade_speed * dt, 3.99)
 	game.camera_smoove(dt)
 
+	if exploded and text_timer:check() and btn_down(7) then
+		main.setState("main_menu")
+	end
+
 	if explode_timer:check() and not exploded then
 		local player = game.player
 		
@@ -34,6 +38,7 @@ function main.updates.game_over(dt)
 
 	explode_timer:update(dt)
 	text_timer:update(dt)
+
 	particleSys.update(dt)
 end
 
