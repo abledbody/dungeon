@@ -12,8 +12,6 @@ local boxSpeed = 1
 local boxWidth = 200
 local message = {}
 
-local scrImage
-
 	--Functions--
 --Returns an array of strings split up by newlines.
 local function lineSplit(text)
@@ -45,8 +43,7 @@ end
 --Dialogue box trigger
 local function show(m)
 	--We keep a screenshot of the game to display behind the text box.
-	local imgDat = screenshot()
-	scrImage = imgDat:image()
+	game.screenshot()
 	main.setState("diBox")
 	
 	SFX(9)
@@ -65,7 +62,7 @@ end
 function main.updates.diBox(dt)
 	size = min(size+dt*boxSpeed,targetSize)
 	
-	if btn(5) then
+	if btn_down(5) then
 		main.setState("game")
 	end
 end
@@ -73,7 +70,7 @@ end
 function main.draws.diBox()
 	clear()
 	
-	scrImage:draw()
+	game.scrImage:draw()
 
 	local x = HSW+0.5-boxWidth/2
 	local y = HSH+0.5-size/2

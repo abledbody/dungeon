@@ -11,6 +11,7 @@ local game = {
 	darkness = 3.99,
 	fade_speed = 10,
 	player = nil, --Player mob
+	scrImage = nil,
 }
 
 	--Parameters--
@@ -81,6 +82,11 @@ function game.camera_transform()
 		round(-yCam + HSH))
 end
 
+function game.screenshot()
+	local imgDat = screenshot()
+	game.scrImage = imgDat:image()
+end
+
 	--States--
 function main.updates.game(dt)
 	time = time+dt
@@ -90,6 +96,12 @@ function main.updates.game(dt)
 	game.camera_smoove(dt)
 		
 	--Player control--
+	local open_menu = btn_down(7)
+
+	if open_menu then
+		game_menu.open()
+	end
+
 	local attack = btn(5)
 	local interact = btn(6)
 	
@@ -98,10 +110,10 @@ function main.updates.game(dt)
 	
 	for i = 1, 4 do
 		if btn(i) then
-			if attack then
-				game.player:melee_attack(i)
-			elseif interact then
+			if interact then
 				game.player:interact(i)
+			elseif attack then
+					game.player:melee_attack(i)
 			else
 				game.player:move(i)
 			end

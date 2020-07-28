@@ -39,7 +39,6 @@ local main_menu = {}
 
 local selected = 0
 
-local pressed = {}
 local drips = {}
 
 function new_drip(x,y)
@@ -109,33 +108,18 @@ function draw_drips()
 end
 
 function main.updates.main_menu(dt)
-	if btn(5) then
-		if not pressed.start then
-			OPTIONS[selected].select()
-			pressed.start = true
-		end
-	else
-		pressed.start = false
+	if btn_down(5) then
+		OPTIONS[selected].select()
 	end
 
-	if btn(3) then
-		if not pressed.up then
-			selected = (selected - 1) % (#OPTIONS + 1)
-			pressed.up = true
-			SFX(15)
-		end
-	else
-		pressed.up = false
+	if btn_down(3) then
+		selected = (selected - 1) % (#OPTIONS + 1)
+		SFX(15)
 	end
 
-	if btn(4) then
-		if not pressed.down then
-			selected = (selected + 1) % (#OPTIONS + 1)
-			pressed.down = true
-			SFX(15)
-		end
-	else
-		pressed.down = false
+	if btn_down(4) then
+		selected = (selected + 1) % (#OPTIONS + 1)
+		SFX(15)
 	end
 
 	menu.update_cursor(dt)

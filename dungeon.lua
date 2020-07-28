@@ -37,6 +37,7 @@ main = nil --General systems
 game = nil --Gameplay-specific functionality
 main_menu = nil
 game_over = nil
+game_menu = nil
 
 menu = nil --All things menu UI related
 diBox = nil --Dialogue box
@@ -50,6 +51,8 @@ main = dofile(PATH.."main.lua")
 game = dofile(PATH.."game.lua")
 main_menu = dofile(PATH.."mainmenu.lua")
 game_over = dofile(PATH.."gameover.lua")
+game_menu = dofile(PATH.."gamemenu.lua")
+
 menu = dofile(PATH.."menu.lua")
 diBox = dofile(PATH.."diBox.lua")
 gMap = dofile(PATH.."map.lua")
