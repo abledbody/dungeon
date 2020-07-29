@@ -90,7 +90,7 @@ end
 function draw_drips()
 	for _,drip in pairs(drips) do
 		if drip.forming then
-			Sprite(295,drip.x-1, drip.y)
+			Sprite(295, drip.x-1, drip.y)
 		elseif drip.splashed then
 			color(5)
 			local splash_radius = drip.splash_radius
@@ -113,12 +113,12 @@ function main.updates.main_menu(dt)
 	end
 
 	if btn_down(3) then
-		selected = (selected - 1) % (#OPTIONS + 1)
+		selected = menu.cycle_previous(OPTIONS, selected)
 		SFX(15)
 	end
 
 	if btn_down(4) then
-		selected = (selected + 1) % (#OPTIONS + 1)
+		selected = menu.cycle_next(OPTIONS, selected)
 		SFX(15)
 	end
 

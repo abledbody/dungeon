@@ -12,4 +12,12 @@ function menu.draw_cursor(x, y)
 	Sprite(cursor_sprite, x - 10, y)
 end
 
+function menu.cycle_next(list, selected)
+	return (selected + 1) % (#list + 1)
+end
+
+function menu.cycle_previous(list, selected)
+	return (selected - 1) % (#list + 1)
+end
+
 return menu

@@ -23,7 +23,9 @@
 		"exit",
 		"pal",
 		"ellipse",
-		"imagedata"
+		"imagedata",
+		"quad",
+		"palt"
 	],
     "Lua.diagnostics.disable": [
         "lowercase-global"
