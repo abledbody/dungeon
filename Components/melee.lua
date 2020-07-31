@@ -10,19 +10,21 @@ local function attack(self,dir)
 		local x = self.x + xM
 		local y = self.y + yM
 
-		local other = gMap.getSquare(x,y,"mobs")
+		local other = gMap.getSquare(x,y)
 
 		if other then
-			other:hit(dir,melee.damage)
-			SFX(melee.attack_sound)
-		elseif gMap.getSquare(x,y,"blocked") then
-			for i = 1, 3 do
-				particleSys.newParticle(
-					x*8+4, y*8+4, 0,
-					rand()*30-15-xM*70, rand()*30-15-yM*70, rand()*16-8,
-					7, 0.8, rand()*0.1+0.2)
+			if other.hit then
+				other:hit(dir,melee.damage)
+				SFX(melee.attack_sound)
+			else
+				for i = 1, 3 do
+					particleSys.newParticle(
+						x*8+4, y*8+4, 0,
+						rand()*30-15-xM*70, rand()*30-15-yM*70, rand()*16-8,
+						7, 0.8, rand()*0.1+0.2)
+				end
+				SFX(melee.wall_sound)
 			end
-			SFX(melee.wall_sound)
 		else
 			SFX(melee.attack_sound)
 		end

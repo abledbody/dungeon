@@ -12,7 +12,7 @@ local INSCREEN_QUAD = quad(0, 0, WIDTH, HEIGHT, const.SW, const.SH)
 local SLOT_SIZE = 16
 local SLOT_PADDING = 6
 
-local categories = {
+game_menu.categories = {
 	system = {
 		selected = 0,
 		slots = {
@@ -39,22 +39,7 @@ local categories = {
 
 	flasks = {
 		selected = 0,
-		slots = {
-			[0] = {
-				draw = function(self, x, y)
-					pal(6, 8)
-					pal(5, 8)
-					pal(1, 2)
-					pal(15, 9)
-					SpriteGroup(313, x, y, 2, 2)
-					pal()
-				end,
-
-				select = function()
-					game_menu.close()
-				end,
-			}
-		}
+		slots = {}
 	}
 }
 
@@ -64,7 +49,7 @@ local category_indeces = {
 }
 
 local selected_category = 0
-local active_category = categories[category_indeces[selected_category]]
+local active_category = game_menu.categories[category_indeces[selected_category]]
 
 function game_menu.open()
 	game.screenshot()
@@ -90,13 +75,13 @@ function main.updates.game_menu(dt)
 
 	if btn_down(3) then
 		selected_category = menu.cycle_previous(category_indeces, selected_category)
-		active_category = categories[category_indeces[selected_category]]
+		active_category = game_menu.categories[category_indeces[selected_category]]
 		SFX(15)
 	end
 
 	if btn_down(4) then
 		selected_category = menu.cycle_next(category_indeces, selected_category)
-		active_category = categories[category_indeces[selected_category]]
+		active_category = game_menu.categories[category_indeces[selected_category]]
 		SFX(15)
 	end
 
@@ -115,7 +100,7 @@ function main.draws.game_menu()
 	clear()
 
 	for i = 0, #category_indeces do
-		local category = categories[category_indeces[i]]
+		local category = game_menu.categories[category_indeces[i]]
 		for j = 0, #category.slots do
 			local slot = category.slots[j]
 

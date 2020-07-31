@@ -45,6 +45,7 @@ gMap = nil --Game map
 components = nil --Components for mobs and things
 mobs = nil --Enemies, player, ect.
 things = nil --Non-map objects within the game
+items = nil
 particleSys = nil --The particle system
 
 main = dofile(PATH.."main.lua")
@@ -59,6 +60,7 @@ gMap = dofile(PATH.."map.lua")
 components = dofile(PATH.."components.lua")
 mobs = dofile(PATH.."mobs.lua")
 things = dofile(PATH.."things.lua")
+items = dofile(PATH.."items.lua")
 particleSys = dofile(PATH.."particles.lua")
 
 
@@ -68,4 +70,5 @@ function _init()
 	main.setState("main_menu")
 	gMap.switchRoom("entry")
 	mobs.spawn("Player", 59, 1)
+	local flask = items.types.Flask:new():add(1)
 end

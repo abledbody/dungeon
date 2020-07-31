@@ -111,7 +111,7 @@ function main.updates.game(dt)
 	for i = 1, 4 do
 		if btn(i) then
 			if interact then
-				game.player:interact(i)
+				game.player:trigger_interact(i)
 			elseif attack then
 					game.player:melee_attack(i)
 			else
@@ -148,9 +148,9 @@ function main.draws.game()
 	for i = 1, 4 do
 		xCheck = game.player.x + DIRX[i]
 		yCheck = game.player.y + DIRY[i]
-		local iact = gMap.getSquare(xCheck,yCheck,"interactable")
-		if iact then
-			iact:drawIndicator()
+		local occupant = gMap.getSquare(xCheck,yCheck)
+		if occupant and occupant.interact then
+			occupant:drawIndicator()
 		end
 	end
 	

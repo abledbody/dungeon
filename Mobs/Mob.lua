@@ -20,8 +20,7 @@ function Mob:initialize(x,y,aSet)
 	
 	self.animator = game.Animator:new(aSet,"idle",{})
 
-	gMap.setSquare(x,y,"blocked",self)
-	gMap.setSquare(x,y,"mobs",self)
+	gMap.setSquare(x,y,self)
 end
 
 function Mob:update(dt)
@@ -56,12 +55,10 @@ function Mob:move(dir)
 		local x,y = self.x,self.y
 		local xNew,yNew = x+xM,y+yM
 		
-		if not gMap.getSquare(xNew,yNew,"blocked") then
-			gMap.setSquare(x,y,"blocked",nil)
-			gMap.setSquare(x,y,"mobs",nil)
+		if not gMap.getSquare(xNew,yNew) then
+			gMap.setSquare(x,y,nil)
 			self.x,self.y = xNew,yNew
-			gMap.setSquare(xNew,yNew,"blocked",true)
-			gMap.setSquare(xNew,yNew,"mobs",self)
+			gMap.setSquare(xNew,yNew,self)
 			couldMove = true
 		end
 
@@ -100,12 +97,11 @@ function Mob:kill()
 end
 
 function Mob:remove()
-	gMap.setSquare(self.x, self.y, "mobs", nil)
-	gMap.setSquare(self.x, self.y, "blocked", nil)
+	gMap.setSquare(self.x, self.y, nil)
 	self.remove_me = true
 end
 
-function Mob:interact(dir)
+function Mob:trigger_interact(dir)
 	local x,y = self.x,self.y
 	
 	local xM,yM = DIRX[dir],DIRY[dir]
@@ -113,10 +109,10 @@ function Mob:interact(dir)
 	
 	self:flipCheck(xM)
 	
-	local iact = gMap.getSquare(x,y,"interactable")
+	local occupant = gMap.getSquare(x,y)
 	
-	if iact then
-		iact:interact(self)
+	if occupant and occupant.interact then
+		occupant:interact(self)
 	end
 end
 

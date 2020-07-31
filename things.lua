@@ -2,14 +2,19 @@
 local CLASSPATH = PATH.."Things/"
 
 	--Module--
-local things = {
+things = {
 	--Interaction indicator vertical position
-	indicatorY = 0
+	indicatorY = 0,
+	Thing = dofile(CLASSPATH.."Thing.lua"),
 }
 
 	--Variables--
 local all = {}
-local types = {}
+local types = {
+	RobeStat = dofile(CLASSPATH.."RobeStat.lua"),
+	ExTile = dofile(CLASSPATH.."ExTile.lua"),
+	Chest = dofile(CLASSPATH.."Chest.lua"),
+}
 
 	--Functions--
 function things.update(dt)
@@ -34,15 +39,8 @@ function things.spawn(thing_type, x, y, meta)
 	table.insert(all, itemCl:new(x, y, unpack(meta)))
 end
 
-	--Classes--
-local Examable = dofile(CLASSPATH.."Examable.lua")
-
-types.RobeStat = dofile(CLASSPATH.."RobeStat.lua")
-types.ExTile = dofile(CLASSPATH.."ExTile.lua")
-
 
 things.types = types
 things.all = all
-things.Examable = Examable
 
 return things

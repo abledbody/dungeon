@@ -30,7 +30,7 @@ local function draw(self)
 end
 
 	--Class--
-local function attach(object,max_hp,damage_calls)
+local function attach(object, max_hp, damage_calls)
 	object.health = {
 		max_hp = max_hp or 5,
 		hp = max_hp,

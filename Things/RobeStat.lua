@@ -1,6 +1,6 @@
-local RobeStat = class("RobeStat")
+local RobeStat = class("RobeStat", things.Thing)
 
-RobeStat.dat = {
+local exam_dat = {
 	"It's a statue of a robed figure.",
 	"I don't recognize the face.",
 	"It could be a saint.",
@@ -10,20 +10,14 @@ RobeStat.dat = {
 	"It's a statue of a robed figure."
 }
 
-function RobeStat:initialize(x,y)
-	for i = x, x+1 do
-		for j = y+1, y+2 do
-			gMap.setSquare(i,j,"blocked",true)
-			gMap.setSquare(i,j,"interactable",self)
-		end
-	end
+function RobeStat:initialize(x, y)
+	gMap.bulk(self, x, y + 1, 2, 2, gMap.setSquare)
 	
-	local examable = things.Examable:new()
+	components.examable(self, exam_dat)
 	
-	examable.dat = self.dat
+	dat = self.dat
 	
-	self.x,self.y,self.examable = x,y,examable
-	table.insert(things.all,self)
+	things.Thing.initialize(self, x, y)
 end
 
 function RobeStat:draw()
@@ -39,10 +33,6 @@ function RobeStat:drawIndicator()
 	y = y*8-5+things.indicatorY
 	
 	Sprite(361,x,y)
-end
-
-function RobeStat:interact()
-	self.examable:trigger()
 end
 
 return RobeStat

@@ -13,7 +13,7 @@ local sheetImage = SpriteMap:image()
 local bg = sheetImage:batch()
 
 local special_tiles = {
-	[25] = {
+	[LAVA_SPRITE] = {
 		animator = game.Animator:new(aData.lava, "anim"),
 		update = function(self, dt)
 			self.animator:update(dt)
@@ -29,9 +29,6 @@ local room = nil
 --This table is for checking grid positions for certain kinds of occupants.
 --Their position indeces are written as [x.." "..y]
 local gridData = {
-	blocked = {},
-	interactable = {},
-	mobs = {},
 }
 
 
@@ -75,7 +72,7 @@ local function tileIter(x,y,spr)
 		local flags = fget(spr)
 		
 		if checkBit(flags,0) then
-			gMap.setSquare(x,y,"blocked",true)
+			gMap.setSquare(x,y,gridData)
 		end
 	end
 end
@@ -96,29 +93,17 @@ local function inBounds(xT,yT,room)
 	return yT>=y and xT>=x and yT<y+h and xT<x+w
 end
 
-function gMap.setSquare(x,y,key,state)
-	local dataset = gridData[key]
-
-	if not dataset then
-		error("No such grid key \""..key.."\"")
-	end
-
-	dataset[x.." "..y] = state
+function gMap.setSquare(x,y,value)
+	gridData[x.." "..y] = value
 end
 
-function gMap.getSquare(x,y,key)
-	local dataset = gridData[key]
-
-	if not dataset then
-		error("No such grid key \""..key.."\"")
-	end
-
-	return dataset[x.." "..y]
+function gMap.getSquare(x, y)
+	return gridData[x.." "..y]
 end
 
 function gMap.bulk(obj,x,y,w,h,action)
-	for i = x, x+w do
-		for j = y, y+h do
+	for i = x, x+w-1 do
+		for j = y, y+h-1 do
 			action(i,j,obj)
 		end
 	end
