@@ -1,15 +1,15 @@
-local Flask = class("Flask", items.Item)
+local flask = setmetatable(items.item_base, {})
 
-Flask.category = "flasks"
-Flask.item_name = "Flask"
+flask.category = "flasks"
+flask.item_name = "Flask"
 
-function Flask:draw(x, y)
+function flask:draw(x, y)
 	SpriteGroup(313, x, y, 2, 2)
 end
 
-function Flask:select()
+function flask:select()
 	self:remove(1)
 	game_menu.close()
 end
 
-return Flask
+return flask

@@ -1,29 +1,36 @@
-local Item = class("Item")
+local item = {}
+item.__index = item
 
-Item.category = "other"
-Item.item_name = "INVALID_ITEM_TYPE"
-Item.count = 0
+item.category = "other"
+item.item_name = "INVALID_ITEM_TYPE"
+item.count = 0
 
-function Item:add(count)
+function item:add(count)
 	local category = game_menu.categories[self.category]
 	local slot = category[self.item_name]
 
 	if not slot then
-		category[self.item_name] = self
+		game_menu.add_item(self)
 	end
 	
 	self.count = self.count + count
 end
 
-function Item:remove(count)
+function item:remove(count)
+	if count > self.count then
+		return false
+	else
+		self.count = self.count - count
+	end
+
 	local category = game_menu.categories[self.category]
 	local slot = category[self.item_name]
 
 	if slot then
-		if slot.count - count <= 0 then
-			category[self.item_name] = nil
+		if self.count == 0 then
+			game_menu.remove_item(self)
 		end
 	end
 end
 
-return Item
+return item

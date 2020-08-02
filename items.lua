@@ -1,13 +1,13 @@
 	--Constants--
-local CLASSPATH = PATH.."Items/"
+local ITEMPATH = PATH.."Items/"
 
 	--Module--
 items = {
-	Item = dofile(CLASSPATH.."Item.lua"),
+	item_base = dofile(ITEMPATH.."item.lua"),
 }
 
 items.types = {
-	Flask = dofile(CLASSPATH.."Flask.lua"),
+	flask = dofile(ITEMPATH.."flask.lua"),
 }
 
 return items

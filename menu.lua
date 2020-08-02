@@ -13,11 +13,11 @@ function menu.draw_cursor(x, y)
 end
 
 function menu.cycle_next(list, selected)
-	return (selected + 1) % (#list + 1)
+	return selected % #list + 1
 end
 
 function menu.cycle_previous(list, selected)
-	return (selected - 1) % (#list + 1)
+	return (selected - 2) % #list + 1
 end
 
 return menu

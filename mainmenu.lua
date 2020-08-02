@@ -1,7 +1,7 @@
 local rand = math.random
 
 local OPTIONS = {
-	[0] = {
+	{
 		name = "Start",
 		select = function()
 			main.setState("game")
@@ -37,7 +37,7 @@ local FLOOR_ASPECT = 0.4
 local main_menu = {}
 
 
-local selected = 0
+local selected = 1
 
 local drips = {}
 
@@ -141,15 +141,15 @@ function main.draws.main_menu()
 	draw_drips()
 
 	color(1)
-	rect(OPTIONS_X - 2, OPTIONS_Y - 2, OPTIONS_WIDTH, (#OPTIONS + 1) * 8 + 2)
+	rect(OPTIONS_X - 2, OPTIONS_Y - 2, OPTIONS_WIDTH, #OPTIONS * 8 + 2)
 
-	for i = 0, #OPTIONS do
+	for i = 1, #OPTIONS do
 		local option = OPTIONS[i]
 		color(7)
-		print(option.name, OPTIONS_X, OPTIONS_Y + i*8)
+		print(option.name, OPTIONS_X, OPTIONS_Y + (i - 1)*8)
 	end
 
-	menu.draw_cursor(OPTIONS_X, OPTIONS_Y + selected*8 - 1)
+	menu.draw_cursor(OPTIONS_X, OPTIONS_Y + (selected - 1)*8 - 1)
 end
 
 return main_menu

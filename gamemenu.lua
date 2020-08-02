@@ -14,9 +14,9 @@ local SLOT_PADDING = 6
 
 game_menu.categories = {
 	system = {
-		selected = 0,
+		selected = 1,
 		slots = {
-			[0] = {
+			{
 				draw = function(self, x, y)
 					Sprite(315, x + 4, y + 4)
 				end,
@@ -38,17 +38,17 @@ game_menu.categories = {
 	},
 
 	flasks = {
-		selected = 0,
+		selected = 1,
 		slots = {}
 	}
 }
 
 local category_indeces = {
-	[0] = "system",
+	"system",
 	"flasks",
 }
 
-local selected_category = 0
+local selected_category = 1
 local active_category = game_menu.categories[category_indeces[selected_category]]
 
 function game_menu.open()
@@ -99,9 +99,9 @@ end
 function main.draws.game_menu()
 	clear()
 
-	for i = 0, #category_indeces do
+	for i = 1, #category_indeces do
 		local category = game_menu.categories[category_indeces[i]]
-		for j = 0, #category.slots do
+		for j = 1, #category.slots do
 			local slot = category.slots[j]
 
 			local x = (j - category.selected) * (SLOT_SIZE + SLOT_PADDING) + HW - SLOT_SIZE / 2
