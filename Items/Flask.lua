@@ -8,7 +8,6 @@ function flask:draw(x, y)
 end
 
 function flask:select()
-	self:remove(1)
 	game_menu.close()
 end
 

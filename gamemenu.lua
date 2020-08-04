@@ -44,12 +44,37 @@ game_menu.categories = {
 }
 
 local category_indeces = {
-	"system",
-	"flasks",
+	{name = "system", populated = true},
+	{name = "flasks", populated = false},
 }
 
 local selected_category = 1
-local active_category = game_menu.categories[category_indeces[selected_category]]
+local active_category = game_menu.categories[category_indeces[selected_category].name]
+
+
+
+local function select_category(index)
+	selected_category = index
+	active_category = game_menu.categories[category_indeces[index].name]
+end
+
+local function reselect()
+	local category_length = #active_category.slots
+
+	if category_length <= 0 then
+		local category_count = #game_menu.categories
+
+		if selected_category > category_count then
+			select_category(category_count)
+		end
+
+	else
+
+		if active_category.selected > category_length then
+			active_category.selected = category_length
+		end
+	end
+end
 
 function game_menu.open()
 	game.screenshot()
@@ -74,14 +99,12 @@ function main.updates.game_menu(dt)
 	end
 
 	if btn_down(3) then
-		selected_category = menu.cycle_previous(category_indeces, selected_category)
-		active_category = game_menu.categories[category_indeces[selected_category]]
+		select_category(menu.cycle_previous(category_indeces, selected_category))
 		SFX(15)
 	end
 
 	if btn_down(4) then
-		selected_category = menu.cycle_next(category_indeces, selected_category)
-		active_category = game_menu.categories[category_indeces[selected_category]]
+		select_category(menu.cycle_next(category_indeces, selected_category))
 		SFX(15)
 	end
 
@@ -100,7 +123,7 @@ function main.draws.game_menu()
 	clear()
 
 	for i = 1, #category_indeces do
-		local category = game_menu.categories[category_indeces[i]]
+		local category = game_menu.categories[category_indeces[i].name]
 		for j = 1, #category.slots do
 			local slot = category.slots[j]
 

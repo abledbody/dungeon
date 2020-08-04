@@ -3,11 +3,16 @@ local Chest = class("Chest", things.Thing)
 function Chest:initialize(x, y, contains)
 	gMap.setSquare(x, y, self)
 
-	local item = items.types[contains]:new()
+	local item = items.types[contains]
 
 	components.searchable(self, item)
 
 	things.Thing.initialize(self, x, y)
+end
+
+function Chest:on_searched()
+	self.opened = true
+	self.interact = nil
 end
 
 function Chest:draw()

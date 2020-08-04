@@ -109,10 +109,13 @@ function main.updates.game(dt)
 	local hMove = (btn(1) and -1 or 0) + (btn(2) and 1 or 0)
 	
 	for i = 1, 4 do
-		if btn(i) then
+		
+		if btn_down(i) then
 			if interact then
 				game.player:trigger_interact(i)
-			elseif attack then
+			end
+		elseif btn(i) then
+			if attack then
 					game.player:melee_attack(i)
 			else
 				game.player:move(i)
