@@ -114,7 +114,7 @@ function main.updates.game(dt)
 			if interact then
 				game.player:trigger_interact(i)
 			end
-		elseif btn(i) then
+		elseif btn(i) and not interact then
 			if attack then
 					game.player:melee_attack(i)
 			else

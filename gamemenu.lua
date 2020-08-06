@@ -13,45 +13,77 @@ local SLOT_SIZE = 16
 local SLOT_PADDING = 6
 
 game_menu.categories = {
-	system = {
+	{
 		selected = 1,
+		name = "system",
 		slots = {
 			{
-				draw = function(self, x, y)
-					Sprite(315, x + 4, y + 4)
-				end,
+				count = 1,
+				object = {
+					draw = function(self, x, y)
+						Sprite(315, x + 4, y + 4)
+					end,
 
-				select = function(self)
-					main.setState("main_menu")
-				end,
+					select = function(self)
+						main.setState("main_menu")
+					end,
+				},
 			},
 			{
-				draw = function(self, x, y)
-					Sprite(316, x + 4, y + 4)
-				end,
+				count = 1,
+				object = {
+					draw = function(self, x, y)
+						Sprite(316, x + 4, y + 4)
+					end,
 
-				select = function(self)
-					main.setState("main_menu")
-				end
-			}
-		}
+					select = function(self)
+						main.setState("main_menu")
+					end
+				},
+			},
+		},
 	},
-
-	flasks = {
-		selected = 1,
-		slots = {}
-	}
 }
 
 local category_indeces = {
-	{name = "system", populated = true},
-	{name = "flasks", populated = false},
+	system = 1,
+}
+
+local category_sort_values = {
+	system = 1,
+	flasks = 2,
 }
 
 local selected_category = 1
-local active_category = game_menu.categories[category_indeces[selected_category].name]
+local active_category = game_menu.categories[category_indeces[selected_category]]
 
 
+local function new_category(category_name)
+	local category = {
+		selected = 1,
+		index = category_sort_values[category_name],
+		slots = {}
+	}
+
+	game_menu.categories[category_name] = category
+end
+
+local function remove_category(category_name)
+	game_menu.categories[category_name] = nil
+end
+
+local function category_iterator(a, b)
+	return a.index < b.index
+end
+
+local function sort_categories()
+	table.sort(categories, category_iterator)
+
+	category_indeces = {}
+	for i = 1, #categories do
+		category_indeces[categories[i].name] = i
+	end
+end
 
 local function select_category(index)
 	selected_category = index
@@ -122,10 +154,10 @@ end
 function main.draws.game_menu()
 	clear()
 
-	for i = 1, #category_indeces do
-		local category = game_menu.categories[category_indeces[i].name]
+	for i = 1, #game_menu.categories do
+		local category = game_menu.categories[i]
 		for j = 1, #category.slots do
-			local slot = category.slots[j]
+			local slot = category.slots[j].object
 
 			local x = (j - category.selected) * (SLOT_SIZE + SLOT_PADDING) + HW - SLOT_SIZE / 2
 			local y = (i - selected_category) * (SLOT_SIZE + SLOT_PADDING) + HH - SLOT_SIZE / 2
