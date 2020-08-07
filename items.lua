@@ -7,7 +7,8 @@ items = {
 }
 
 items.types = {
-	flask = dofile(ITEMPATH.."flask.lua"),
+	health_flask = dofile(ITEMPATH.."health_flask.lua"),
+	speed_flask = dofile(ITEMPATH.."speed_flask.lua"),
 }
 
 return items

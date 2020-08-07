@@ -18,10 +18,10 @@ rooms.entry = {
 	--which works like   thatClass:new(unpack(thatTable))
 	things = {
 		{"RobeStat",5,4,{}},
-		{"Chest", 1, 1, {"flask"}},
-		{"Chest", 2, 1, {"flask"}},
-		{"Chest", 10, 1, {"flask"}},
-		{"Chest", 9, 1, {"flask"}},
+		{"Chest", 1, 1, {"health_flask"}},
+		{"Chest", 2, 1, {"health_flask"}},
+		{"Chest", 10, 1, {"speed_flask"}},
+		{"Chest", 9, 1, {"speed_flask"}},
 	},
 	mobs = {
 

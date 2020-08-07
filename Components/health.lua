@@ -3,7 +3,7 @@ local clamp = math.clamp
 
 local function damage(self, dmg)
 	local health = self.health
-	local hp = clamp(health.hp-dmg,0,health.max_hp)
+	local hp = clamp(health.hp - dmg, 0, health.max_hp)
 	
 	for _,call in pairs(health.damage_calls) do
 		call(self, dmg)
@@ -14,6 +14,12 @@ local function damage(self, dmg)
 	end
 
 	health.hp = hp
+end
+
+local function heal(self, dmg)
+	local health = self.health
+	health.hp = clamp(health.hp + dmg, 0, health.max_hp)
+	SFX(22)
 end
 
 local function draw(self)
@@ -37,6 +43,7 @@ local function attach(object, max_hp, damage_calls)
 		damage_calls = damage_calls or {},
 	}
 	object.damage = damage
+	object.heal = heal
 	table.insert(object.draws, draw)
 end
 

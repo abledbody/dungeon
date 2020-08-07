@@ -72,6 +72,11 @@ local selected_category = 1
 local active_category = game_menu.categories[selected_category]
 
 
+local function select_category(index)
+	selected_category = index
+	active_category = game_menu.categories[index]
+end
+
 local function category_iterator(a, b)
 	return a.index < b.index
 end
@@ -84,11 +89,8 @@ local function sort_categories()
 	for i = 1, #categories do
 		category_indeces[categories[i].name] = i
 	end
-end
-
-local function select_category(index)
-	selected_category = index
-	active_category = game_menu.categories[index]
+	
+	select_category(selected_category)
 end
 
 local function reselect()
@@ -132,7 +134,7 @@ function game_menu.add_item(item, count)
 	if existing_item then
 		existing_item.count = existing_item.count + count
 	else
-		local relevant_category = game_menu.categories[item.category] or new_category(item.category)
+		local relevant_category = game_menu.categories[category_indeces[item.category]] or new_category(item.category)
 
 		local new_slot = {
 			count = count,
@@ -158,13 +160,15 @@ function game_menu.remove_item(item, count)
 
 			for i = 1, #relevant_category.slots do
 				if relevant_category.slots[i].object == item then
-					relevant_category.slots[i] = nil
+					table.remove(relevant_category.slots, i)
 					break
 				end
 			end
 			if #relevant_category.slots == 0 then
 				remove_category(item.category)
 			end
+
+			reselect()
 		elseif count < existing_item.count then
 			existing_item.count = existing_item.count - count
 		else
@@ -229,13 +233,17 @@ function main.draws.game_menu()
 
 	for i = 1, #game_menu.categories do
 		local category = game_menu.categories[i]
+
 		local y = (i - selected_category) * (SLOT_SIZE + SLOT_V_PADDING) + HH - SLOT_SIZE / 2
-		print(category.index, 3, y)
+
+		--print(category.index, 3, y)
+
 		for j = 1, #category.slots do
 			local slot = category.slots[j]
 
 			local x = (j - category.selected) * (SLOT_SIZE + SLOT_H_PADDING) + HW - SLOT_SIZE / 2
 
+			--Outline
 			if selected_category == i and category.selected == j then
 				color(7)
 			else
@@ -243,8 +251,10 @@ function main.draws.game_menu()
 			end
 			rect(x - 1, y - 1, SLOT_SIZE + 2, SLOT_SIZE + 2, true)
 
+			--Sprite
 			slot.object:draw(x, y)
 			
+			--Count
 			if slot.count > 1 then
 				color(0)
 				rect(x + SLOT_COUNT_X - 1, y + SLOT_COUNT_Y - 1, SLOT_SIZE - SLOT_COUNT_X + 2, SLOT_SIZE - SLOT_COUNT_Y + 2)
@@ -253,14 +263,12 @@ function main.draws.game_menu()
 				color(7)
 				print(slot.count, x + SLOT_COUNT_X, y + SLOT_COUNT_Y)
 			end
-
-			brightness(0)
 		end
 	end
 
 	--Debug
-	print(selected_category, 0, 0)
-	print(active_category.selected, 0, 8)
+	--print(selected_category, 0, 0)
+	--print(active_category.selected, 0, 8)
 
 
 	--After drawing to the menu
