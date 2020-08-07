@@ -50,16 +50,20 @@ function particleBase:update(dt)
     -- Localizing variables from self
     local x, y, z, vx, vy, vz, bounce = self.x, self.y, self.z, self.vx, self.vy, self.vz, self.bounce
 
-    -- Motion--
-    x = x + vx * dt
-    y = y + vy * dt
-    z = z + vz * dt
+	-- Motion--
+	if abs(vz) > 5 or z > 0.5 then
+		x = x + vx * dt
+		y = y + vy * dt
+		z = z + vz * dt
+	end
 
-    -- Gravity--
-    vz = vz - particleSys.gravity * dt
+	-- Gravity--
+	if z > 0.5 then
+		vz = vz - particleSys.gravity * dt
+	end
 
     -- Bouncing--
-    if z <= 0 then
+    if z < 0 then
         -- We'll compensate for going through
         -- the floor by reflecting Z through
         -- zero
@@ -69,8 +73,8 @@ function particleBase:update(dt)
         -- should scale down all motion on
         -- every bounce.
         vx = vx * bounce
-        vy = vy * bounce
-        vz = -vz * bounce
+		vy = vy * bounce
+		vz = -vz * bounce
     end
 
     -- Giving the updated values back to

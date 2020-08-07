@@ -28,8 +28,7 @@ local room = nil
 
 --This table is for checking grid positions for certain kinds of occupants.
 --Their position indeces are written as [x.." "..y]
-local gridData = {
-}
+local gridData = {}
 
 
 	--Functions--

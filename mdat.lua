@@ -17,11 +17,13 @@ rooms.entry = {
 	--Things and mobs have a class name, an x and y coordinate, and a table of data for spawning,
 	--which works like   thatClass:new(unpack(thatTable))
 	things = {
-		{"RobeStat",5,4,{}},
+		{"RobeStat", 5, 4, {}},
 		{"Chest", 1, 1, {"health_flask"}},
 		{"Chest", 2, 1, {"health_flask"}},
 		{"Chest", 10, 1, {"speed_flask"}},
 		{"Chest", 9, 1, {"speed_flask"}},
+		{"Barrel", 10, 10, {"health_flask"}},
+		{"Barrel", 10, 9, {"health_flask"}},
 	},
 	mobs = {
 
@@ -69,7 +71,7 @@ rooms.slime = {
 
 	cx = 7, cy = 4,
 	things = {
-		{"Chest", 6, 1, {"flask"}}
+		{"Chest", 6, 1, {"health_flask"}}
 	},
 	mobs = {
 		{"Slime",7,2,{}},

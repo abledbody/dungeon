@@ -123,8 +123,9 @@ function main.updates.game(dt)
 			break
 		end
 	end
-	--Mobs--
+	
 	mobs.update(dt)
+	things.update(dt)
 
 	gMap.update(dt)
 

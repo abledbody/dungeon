@@ -19,8 +19,8 @@ local function attack(self,dir)
 			else
 				for i = 1, 3 do
 					particleSys.newParticle(
-						x*8+4, y*8+4, 0,
-						rand()*30-15-xM*70, rand()*30-15-yM*70, rand()*16-8,
+						x*8+4, y*8+6, 2,
+						rand()*30-15-xM*70, rand()*30-15-yM*70, rand()*16+8,
 						7, 0.8, rand()*0.1+0.2)
 				end
 				SFX(melee.wall_sound)

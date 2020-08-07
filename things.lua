@@ -14,12 +14,15 @@ local types = {
 	RobeStat = dofile(CLASSPATH.."RobeStat.lua"),
 	ExTile = dofile(CLASSPATH.."ExTile.lua"),
 	Chest = dofile(CLASSPATH.."Chest.lua"),
+	Barrel = dofile(CLASSPATH.."Barrel.lua"),
 }
 
 	--Functions--
 function things.update(dt)
 	for k, v in pairs(all) do
-		v:update(dt)
+		if v.update then
+			v:update(dt)
+		end
 		if v.remove_me then
 			table.remove(all, k)
 		end

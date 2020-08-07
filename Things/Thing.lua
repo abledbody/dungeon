@@ -20,4 +20,9 @@ function Thing:drawIndicator()
 	Sprite(361,x,y)
 end
 
+function Thing:remove()
+	gMap.setSquare(self.x, self.y, nil)
+	self.remove_me = true
+end
+
 return Thing
