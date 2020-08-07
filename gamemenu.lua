@@ -10,7 +10,11 @@ local HH = HEIGHT / 2
 local INSCREEN_QUAD = quad(0, 0, WIDTH, HEIGHT, const.SW, const.SH)
 
 local SLOT_SIZE = 16
-local SLOT_PADDING = 6
+local SLOT_H_PADDING = 6
+local SLOT_V_PADDING = 6
+
+local SLOT_COUNT_X = 14
+local SLOT_COUNT_Y = 13
 
 game_menu.categories = {
 	{
@@ -42,7 +46,7 @@ game_menu.categories = {
 					end,
 
 					select = function(self)
-						main.setState("main_menu")
+						game_menu.close()
 					end
 				},
 			},
@@ -95,12 +99,11 @@ local function reselect()
 
 	length = #active_category.slots
 	if active_category.selected > length then
-		active_category.selected = #length
+		active_category.selected = length
 	end
 end
 
 local function new_category(category_name)
-	print("Created category for "..category_name)
 	local category = {
 		selected = 1,
 		name = category_name,
@@ -129,7 +132,6 @@ function game_menu.add_item(item, count)
 	if existing_item then
 		existing_item.count = existing_item.count + count
 	else
-		print("Item did not exist, adding new slot")
 		local relevant_category = game_menu.categories[item.category] or new_category(item.category)
 
 		local new_slot = {
@@ -140,7 +142,6 @@ function game_menu.add_item(item, count)
 		item_lookup[item.item_name] = new_slot
 
 		table.insert(relevant_category.slots, new_slot)
-		sleep(3)
 	end
 end
 
@@ -228,19 +229,31 @@ function main.draws.game_menu()
 
 	for i = 1, #game_menu.categories do
 		local category = game_menu.categories[i]
+		local y = (i - selected_category) * (SLOT_SIZE + SLOT_V_PADDING) + HH - SLOT_SIZE / 2
+		print(category.index, 3, y)
 		for j = 1, #category.slots do
-			local item = category.slots[j].object
+			local slot = category.slots[j]
 
-			local x = (j - category.selected) * (SLOT_SIZE + SLOT_PADDING) + HW - SLOT_SIZE / 2
-			local y = (i - selected_category) * (SLOT_SIZE + SLOT_PADDING) + HH - SLOT_SIZE / 2
+			local x = (j - category.selected) * (SLOT_SIZE + SLOT_H_PADDING) + HW - SLOT_SIZE / 2
+
 			if selected_category == i and category.selected == j then
 				color(7)
 			else
 				color(5)
 			end
-			
 			rect(x - 1, y - 1, SLOT_SIZE + 2, SLOT_SIZE + 2, true)
-			item:draw(x, y)
+
+			slot.object:draw(x, y)
+			
+			if slot.count > 1 then
+				color(0)
+				rect(x + SLOT_COUNT_X - 1, y + SLOT_COUNT_Y - 1, SLOT_SIZE - SLOT_COUNT_X + 2, SLOT_SIZE - SLOT_COUNT_Y + 2)
+				color(1)
+				print(slot.count, x + SLOT_COUNT_X + 1, y + SLOT_COUNT_Y + 1)
+				color(7)
+				print(slot.count, x + SLOT_COUNT_X, y + SLOT_COUNT_Y)
+			end
+
 			brightness(0)
 		end
 	end
