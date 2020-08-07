@@ -16,10 +16,13 @@ game_menu.categories = {
 	{
 		selected = 1,
 		name = "system",
+		index = 1,
 		slots = {
 			{
 				count = 1,
 				object = {
+					item_name = "Exit",
+					category = "system",
 					draw = function(self, x, y)
 						Sprite(315, x + 4, y + 4)
 					end,
@@ -32,6 +35,8 @@ game_menu.categories = {
 			{
 				count = 1,
 				object = {
+					item_name = "Options",
+					category = "system",
 					draw = function(self, x, y)
 						Sprite(316, x + 4, y + 4)
 					end,
@@ -54,29 +59,21 @@ local category_sort_values = {
 	flasks = 2,
 }
 
+local item_lookup = {
+	Exit = game_menu.categories[1].slots[1],
+	Options = game_menu.categories[1].slots[2],
+}
+
 local selected_category = 1
-local active_category = game_menu.categories[category_indeces[selected_category]]
+local active_category = game_menu.categories[selected_category]
 
-
-local function new_category(category_name)
-	local category = {
-		selected = 1,
-		index = category_sort_values[category_name],
-		slots = {}
-	}
-
-	game_menu.categories[category_name] = category
-end
-
-local function remove_category(category_name)
-	game_menu.categories[category_name] = nil
-end
 
 local function category_iterator(a, b)
 	return a.index < b.index
 end
 
 local function sort_categories()
+	local categories = game_menu.categories
 	table.sort(categories, category_iterator)
 
 	category_indeces = {}
@@ -87,25 +84,100 @@ end
 
 local function select_category(index)
 	selected_category = index
-	active_category = game_menu.categories[category_indeces[index].name]
+	active_category = game_menu.categories[index]
 end
 
 local function reselect()
-	local category_length = #active_category.slots
-
-	if category_length <= 0 then
-		local category_count = #game_menu.categories
-
-		if selected_category > category_count then
-			select_category(category_count)
-		end
-
-	else
-
-		if active_category.selected > category_length then
-			active_category.selected = category_length
-		end
+	local length = #game_menu.categories
+	if selected_category > length then
+		select_category(length)
 	end
+
+	length = #active_category.slots
+	if active_category.selected > length then
+		active_category.selected = #length
+	end
+end
+
+local function new_category(category_name)
+	print("Created category for "..category_name)
+	local category = {
+		selected = 1,
+		name = category_name,
+		index = category_sort_values[category_name],
+		slots = {}
+	}
+
+	table.insert(game_menu.categories, category)
+
+	sort_categories()
+
+	return category
+end
+
+local function remove_category(category_name)
+	table.remove(game_menu.categories, category_indeces[category_name])
+	sort_categories()
+	reselect()
+end
+
+function game_menu.add_item(item, count)
+	count = count or 1
+
+	local existing_item = item_lookup[item.item_name]
+
+	if existing_item then
+		existing_item.count = existing_item.count + count
+	else
+		print("Item did not exist, adding new slot")
+		local relevant_category = game_menu.categories[item.category] or new_category(item.category)
+
+		local new_slot = {
+			count = count,
+			object = item,
+		}
+
+		item_lookup[item.item_name] = new_slot
+
+		table.insert(relevant_category.slots, new_slot)
+		sleep(3)
+	end
+end
+
+function game_menu.remove_item(item, count)
+	count = count or 1
+
+	local existing_item = item_lookup[item.item_name]
+
+	if existing_item then
+		if count == existing_item.count then
+			local relevant_category = game_menu.categories[category_indeces[item.category]]
+
+			item_lookup[item.item_name] = nil
+
+			for i = 1, #relevant_category.slots do
+				if relevant_category.slots[i].object == item then
+					relevant_category.slots[i] = nil
+					break
+				end
+			end
+			if #relevant_category.slots == 0 then
+				remove_category(item.category)
+			end
+		elseif count < existing_item.count then
+			existing_item.count = existing_item.count - count
+		else
+			error("Attempted to remove more items than were in the inventory. ("..item.item_name..")")
+		end
+	else
+		error("Attempted to remove an item that isn't in the inventory. ("..item.item_name..")")
+	end
+end
+
+function game_menu.peek_item_count(item)
+	local existing_item = item_lookup[item.item_name]
+
+	return (existing_item and existing_item.count) or 0
 end
 
 function game_menu.open()
@@ -131,18 +203,18 @@ function main.updates.game_menu(dt)
 	end
 
 	if btn_down(3) then
-		select_category(menu.cycle_previous(category_indeces, selected_category))
+		select_category(menu.cycle_previous(game_menu.categories, selected_category))
 		SFX(15)
 	end
 
 	if btn_down(4) then
-		select_category(menu.cycle_next(category_indeces, selected_category))
+		select_category(menu.cycle_next(game_menu.categories, selected_category))
 		SFX(15)
 	end
 
 	if btn_down(5) then
-		active_category.slots[active_category.selected]:select()
-		SFX(16)
+		active_category.slots[active_category.selected].object:select()
+		SFX(16, 3)
 	end
 
 	if btn_down(6) or btn_down(7) then
@@ -157,7 +229,7 @@ function main.draws.game_menu()
 	for i = 1, #game_menu.categories do
 		local category = game_menu.categories[i]
 		for j = 1, #category.slots do
-			local slot = category.slots[j].object
+			local item = category.slots[j].object
 
 			local x = (j - category.selected) * (SLOT_SIZE + SLOT_PADDING) + HW - SLOT_SIZE / 2
 			local y = (i - selected_category) * (SLOT_SIZE + SLOT_PADDING) + HH - SLOT_SIZE / 2
@@ -168,7 +240,7 @@ function main.draws.game_menu()
 			end
 			
 			rect(x - 1, y - 1, SLOT_SIZE + 2, SLOT_SIZE + 2, true)
-			slot:draw(x, y)
+			item:draw(x, y)
 			brightness(0)
 		end
 	end

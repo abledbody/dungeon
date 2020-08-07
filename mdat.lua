@@ -65,7 +65,7 @@ rooms.slime = {
 
 	cx = 7, cy = 4,
 	things = {
-		{"Chest", 6, 1, {"Flask"}}
+		{"Chest", 6, 1, {"flask"}}
 	},
 	mobs = {
 		{"Slime",7,2,{}},

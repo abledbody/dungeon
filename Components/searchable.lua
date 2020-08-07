@@ -1,5 +1,6 @@
 local function interact(self, other)
 	if self.on_searched then self:on_searched(other) end
+	self.searchable.contains:add()
 	SFX(3, 2)
 end
 
