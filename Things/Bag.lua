@@ -1,6 +1,6 @@
 local Bag = class("Bag", things.Thing)
 
-local BAG_GRAVITY = 100
+local BAG_GRAVITY = 70
 local BAG_JUMP = -30
 
 function Bag:initialize(x, y, contains)

@@ -3,6 +3,7 @@ local rand = math.random
 local game_over = {}
 
 local exploded = false
+local made_sound = false
 
 local explode_timer = game.Timer:new()
 local text_timer = game.Timer:new()
@@ -34,6 +35,12 @@ function main.updates.game_over(dt)
 		text_timer:trigger(0.5)
 
 		exploded = true
+	end
+
+	if exploded and text_timer:check() and not made_sound then
+		SFX(4)
+		SFX(5,1)
+		made_sound = true
 	end
 
 	explode_timer:update(dt)
