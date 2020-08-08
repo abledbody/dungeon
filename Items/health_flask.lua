@@ -8,7 +8,7 @@ function health_flask:draw(x, y)
 	pal(1, 2)
 	pal(5, 8)
 	pal(6, 14)
-	SpriteGroup(313, x, y, 2, 2)
+	SpriteGroup(317, x, y)
 	pal()
 end
 

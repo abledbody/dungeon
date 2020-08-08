@@ -5,9 +5,7 @@ local Barrel = class("Barrel", things.Thing)
 function Barrel:initialize(x, y, contains)
 	gMap.setSquare(x, y, self)
 
-	local item = items.types[contains]
-
-	--components.drops_bag(self, contains)
+	components.bag_dropper(self, contains)
 
 	things.Thing.initialize(self, x, y)
 end
@@ -22,6 +20,7 @@ function Barrel:hit()
 		particleSys.newParticle(self.x*8 + 4, self.y*8 + 4, 4, rand()*40 - 20, rand()*40 - 20, rand()*40, particle_color, 0.6, rand() + 3)
 	end
 	self:remove()
+	self:drop_bag()
 end
 
 function Barrel:draw()

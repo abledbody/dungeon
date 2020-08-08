@@ -9,12 +9,12 @@ local HW = WIDTH / 2
 local HH = HEIGHT / 2
 local INSCREEN_QUAD = quad(0, 0, WIDTH, HEIGHT, const.SW, const.SH)
 
-local SLOT_SIZE = 16
+local SLOT_SIZE = 12
 local SLOT_H_PADDING = 6
 local SLOT_V_PADDING = 6
 
-local SLOT_COUNT_X = 14
-local SLOT_COUNT_Y = 13
+local SLOT_COUNT_X = 10
+local SLOT_COUNT_Y = 9
 
 game_menu.categories = {
 	{
@@ -28,7 +28,7 @@ game_menu.categories = {
 					item_name = "Exit",
 					category = "system",
 					draw = function(self, x, y)
-						Sprite(315, x + 4, y + 4)
+						Sprite(315, x, y)
 					end,
 
 					select = function(self)
@@ -42,7 +42,7 @@ game_menu.categories = {
 					item_name = "Options",
 					category = "system",
 					draw = function(self, x, y)
-						Sprite(316, x + 4, y + 4)
+						Sprite(316, x, y)
 					end,
 
 					select = function(self)
@@ -252,7 +252,7 @@ function main.draws.game_menu()
 			rect(x - 1, y - 1, SLOT_SIZE + 2, SLOT_SIZE + 2, true)
 
 			--Sprite
-			slot.object:draw(x, y)
+			slot.object:draw(x + 2, y + 2)
 			
 			--Count
 			if slot.count > 1 then
@@ -265,6 +265,9 @@ function main.draws.game_menu()
 			end
 		end
 	end
+
+	color(7)
+	print(active_category.slots[active_category.selected].object.item_name, 1, 1)
 
 	--Debug
 	--print(selected_category, 0, 0)

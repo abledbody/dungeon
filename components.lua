@@ -5,6 +5,7 @@ local components = {
 	health =		dofile(COMPONENT_PATH.."health.lua"),
 	examable =		dofile(COMPONENT_PATH.."examable.lua"),
 	searchable =	dofile(COMPONENT_PATH.."searchable.lua"),
+	bag_dropper =	dofile(COMPONENT_PATH.."bag_dropper.lua")
 }
 
 return components

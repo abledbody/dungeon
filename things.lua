@@ -15,6 +15,8 @@ local types = {
 	ExTile = dofile(CLASSPATH.."ExTile.lua"),
 	Chest = dofile(CLASSPATH.."Chest.lua"),
 	Barrel = dofile(CLASSPATH.."Barrel.lua"),
+	Bag = dofile(CLASSPATH.."Bag.lua"),
+	ItemPreview = dofile(CLASSPATH.."ItemPreview.lua"),
 }
 
 	--Functions--
