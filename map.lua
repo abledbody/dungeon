@@ -1,11 +1,12 @@
-local mdat = dofile(PATH.."mdat.lua")
-
 local LAVA_SPRITE = 25
 
 local gMap = {}
 
+local mdat = dofile(PATH.."mdat.lua")
+
 	--Localization--
 local band = bit.band
+local DIRX, DIRY = const.DIRX, const.DIRY
 local abs = math.abs
 
 	--Variables--
@@ -37,6 +38,20 @@ function gMap.dist(x1,y1,x2,y2)
 	local dy = abs(y2-y1)
 
 	return dx+dy
+end
+
+function gMap.ray_cast(x, y, dir, max_dist)
+	local delta_x = DIRX[dir]
+	local delta_y = DIRY[dir]
+
+	for dist = 1, max_dist do
+		local target_x =  x + delta_x * dist
+		local target_y =  y + delta_y * dist
+
+		if dist == max_dist or gMap.getSquare(target_x, target_y) then
+			return target_x, target_y, dist
+		end
+	end
 end
 
 local function checkBit(flag,n)

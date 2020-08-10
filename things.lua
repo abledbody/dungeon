@@ -17,6 +17,7 @@ local types = {
 	Barrel = dofile(CLASSPATH.."Barrel.lua"),
 	Bag = dofile(CLASSPATH.."Bag.lua"),
 	ItemPreview = dofile(CLASSPATH.."ItemPreview.lua"),
+	FlyingFlask = dofile(CLASSPATH.."FlyingFlask.lua"),
 }
 
 	--Functions--
@@ -26,6 +27,8 @@ function things.update(dt)
 			v:update(dt)
 		end
 		if v.remove_me then
+			print("removed "..k)
+			sleep(1)
 			table.remove(all, k)
 		end
 	end
