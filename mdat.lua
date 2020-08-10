@@ -22,8 +22,8 @@ rooms.entry = {
 		{"Chest", 2, 1, {"health_flask"}},
 		{"Chest", 10, 1, {"speed_flask"}},
 		{"Chest", 9, 1, {"speed_flask"}},
-		{"Barrel", 10, 10, {"health_flask"}},
-		{"Barrel", 10, 9, {"health_flask"}},
+		{"Barrel", 10, 10, {"water_flask"}},
+		{"Barrel", 10, 9, {"water_flask"}},
 	},
 	mobs = {
 
@@ -59,6 +59,8 @@ rooms.text = {
 	},
 	mobs = {
 		{"Slime",6,4,{}},
+		{"Barrel", 6, 1, {"water_flask"}},
+		{"Barrel", 5, 1, {"water_flask"}},
 	},
 }
 

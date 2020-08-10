@@ -35,6 +35,7 @@ brightness = dofile(PATH.."brightness.lua")
 --so Lua can refer to these tables without needing to know what's in them.
 main = nil --General systems
 game = nil --Gameplay-specific functionality
+throw_select = nil
 main_menu = nil
 game_over = nil
 game_menu = nil
@@ -50,6 +51,7 @@ particleSys = nil --The particle system
 
 main = dofile(PATH.."main.lua")
 game = dofile(PATH.."game.lua")
+throw_select = dofile(PATH.."throwselect.lua")
 main_menu = dofile(PATH.."mainmenu.lua")
 game_over = dofile(PATH.."gameover.lua")
 game_menu = dofile(PATH.."gamemenu.lua")

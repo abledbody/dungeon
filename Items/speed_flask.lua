@@ -8,7 +8,7 @@ function speed_flask:draw(x, y)
 	pal(1, 2)
 	pal(5, 9)
 	pal(6, 10)
-	SpriteGroup(317, x, y)
+	Sprite(317, x, y)
 	pal()
 end
 

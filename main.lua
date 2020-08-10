@@ -1,6 +1,12 @@
-	--Variables--
-local updates = {}
-local draws = {}
+local main = {
+	updates = {},
+	draws = {},
+	inits = {},
+}
+local updates = main.updates
+local draws = main.draws
+local inits = main.inits
+
 local state = "main_menu"
 
 local button_locks = {
@@ -33,8 +39,11 @@ local buttons_up = {
 
 	--Functions--
 --Just to change _update and _draw in the same line
-local function setState(new_state)
+function main.setState(new_state)
 	state = new_state
+	if inits[state] then
+		inits[state]()
+	end
 end
 
 function _update(dt)
@@ -70,13 +79,5 @@ end
 function btn_down(index)
 	return buttons_down[index]
 end
-
-	--Module--
-local main = {}
-
-main.updates = updates
-main.draws = draws
-
-main.setState = setState
 
 return main

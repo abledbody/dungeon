@@ -1,6 +1,7 @@
 local Mob = mobs.Mob
 local melee = components.melee
 local health = components.health
+local thrower = components.thrower
 
 local anim_set = {
     --Default player state
@@ -25,7 +26,7 @@ local anim_set = {
 	throw = {
 		spr =		{217,	218},
 		offX =		{-3,	1},
-		timing =	{0.1,	0.2}
+		timing =	{0.05,	0.1}
 	}
 }
 
@@ -34,7 +35,8 @@ local Player = class("Player", Mob)
 function Player:initialize(x, y)
 	Mob.initialize(self, x, y, anim_set)
 	melee(self, 0.4)
-	health(self,10)
+	health(self, 10)
+	thrower(self)
 
 	self.move = function(self,dir)
 		if Mob.move(self,dir) then gMap.plMoved(self.x,self.y) end
