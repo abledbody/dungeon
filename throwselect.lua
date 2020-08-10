@@ -6,7 +6,7 @@ local throw_select = {}
 local direction = 3
 
 function main.inits.throw_select()
-    direction = 3
+    game.player:flipCheck(DIRX[direction])
     game.player.animator:setState("throw")
 end
 
@@ -27,7 +27,13 @@ function main.updates.throw_select(dt)
         main.setState("game")
         SFX(20, 1)
         game.player:throw(direction, throw_select.item)
-    end
+	end
+	
+	if btn_down(6) then
+		main.setState("game")
+		SFX(23, 1)
+		game.player.animator:setState("idle")
+	end
 end
 
 local pointer_offset_lookup = {

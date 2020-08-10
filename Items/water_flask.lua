@@ -12,10 +12,13 @@ function water_flask:draw(x, y)
 end
 
 function water_flask:select()
-	self:remove()
 	game_menu.close()
 	main.setState("throw_select")
 	throw_select.item = self
+end
+
+function water_flask:throw(object, dir)
+	self:remove()
 end
 
 return water_flask

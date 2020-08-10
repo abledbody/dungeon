@@ -1,5 +1,5 @@
 local function throw(self, dir, item)
-
+	item:throw(self, dir)
 end
 
 local function attach(object)
