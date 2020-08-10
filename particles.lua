@@ -3,9 +3,6 @@ local abs = math.abs
 
 local particleSys = {}
 
--- Constants--
-particleSys.gravity = 250
-
 -- Data--
 local particles = {}
 
@@ -18,12 +15,13 @@ local particleBase = {
     vy = 0,
     vz = 0,
     col = 7,
-    bounce = 0.6
+    bounce = 0.6,
+    gravity = 250,
 }
 particleBase.__index = particleBase
 
 -- Particle constructor--
-function particleSys.newParticle(x, y, z, vx, vy, vz, col, bounce, life)
+function particleSys.newParticle(x, y, z, vx, vy, vz, col, bounce, life, gravity)
     -- If we feed this function parameters they'll get set here in the table declaration.
     -- Otherwise, the metatable values will be used.
     local particle = {
@@ -34,8 +32,9 @@ function particleSys.newParticle(x, y, z, vx, vy, vz, col, bounce, life)
         vy = vy,
         vz = vz,
         col = col,
-		bounce = bounce,
-		timer = game.Timer:new(life or 4)
+        bounce = bounce,
+        gravity = gravity,
+		timer = game.Timer:new(life or 4),
     }
     setmetatable(particle, particleBase)
 
@@ -59,7 +58,7 @@ function particleBase:update(dt)
 
 	-- Gravity--
 	if z > 0.5 then
-		vz = vz - particleSys.gravity * dt
+		vz = vz - self.gravity * dt
 	end
 
     -- Bouncing--

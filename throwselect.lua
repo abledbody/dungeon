@@ -6,6 +6,7 @@ local throw_select = {}
 local direction = 3
 
 function main.inits.throw_select()
+    direction = 3
     game.player.animator:setState("throw")
 end
 
