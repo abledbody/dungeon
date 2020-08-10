@@ -2,7 +2,7 @@ local water_flask = setmetatable({}, items.item_base)
 water_flask.__index = water_flask
 
 water_flask.category = "flasks"
-water_flask.item_name = "Speed Flask"
+water_flask.item_name = "Water Flask"
 
 function water_flask:draw(x, y)
 	pal(5, 13)

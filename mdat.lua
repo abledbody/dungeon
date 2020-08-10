@@ -55,12 +55,12 @@ rooms.text = {
 
 	cx = 4, cy = 3,
 	things = {
-		{"ExTile",1,0,{{"Note to Joffrey: Please do not let\nthe slimes roam the dungeon. They\nneed to be kept in the traps where\nthey will not attack the staff.","It's been physically\nchiseled into the wall.","Note to Joffrey: Please do not let\nthe slimes roam the dungeon. They\nneed to be kept in the traps where\nthey will not attack the staff."}}}
+		{"ExTile",1,0,{{"Note to Joffrey: Please do not let\nthe slimes roam the dungeon. They\nneed to be kept in the traps where\nthey will not attack the staff.","It's been physically\nchiseled into the wall.","Note to Joffrey: Please do not let\nthe slimes roam the dungeon. They\nneed to be kept in the traps where\nthey will not attack the staff."}}},
+		{"Barrel", 6, 1, {"water_flask"}},
+		{"Barrel", 5, 1, {"water_flask"}},
 	},
 	mobs = {
 		{"Slime",6,4,{}},
-		{"Barrel", 6, 1, {"water_flask"}},
-		{"Barrel", 5, 1, {"water_flask"}},
 	},
 }
 
