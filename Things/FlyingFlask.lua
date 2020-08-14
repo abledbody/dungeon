@@ -2,10 +2,10 @@ local DIRX, DIRY = const.DIRX, const.DIRY
 
 local FlyingFlask = class("FlyingFlask", things.Thing)
 
-local THROW_SPEED = 80
-local GRAVITY = 100
+local THROW_SPEED = 160
+local GRAVITY = 200
 local MAX_DIST = 12
-local ROT_SPEED = 10
+local ROT_SPEED = 20
 
 local function get_zvel(distance)
 	return distance/THROW_SPEED*GRAVITY/2

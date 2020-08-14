@@ -22,14 +22,15 @@ local types = {
 
 	--Functions--
 function things.update(dt)
-	for k, v in pairs(all) do
-		if v.update then
-			v:update(dt)
+	for i, thing in pairs(all) do
+		if thing.update then
+			thing:update(dt)
 		end
-		if v.remove_me then
-			print("removed "..k)
-			sleep(1)
-			table.remove(all, k)
+
+		if thing.remove_me then
+			--print("Removed "..i)
+			--sleep(1)
+			table.remove(all, i)
 		end
 	end
 end

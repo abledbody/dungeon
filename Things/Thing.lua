@@ -6,8 +6,6 @@ Thing.indicator_point_y = -5
 
 function Thing:initialize(x, y)
 	self.x, self.y = x, y
-	
-	table.insert(things.all,self)
 end
 
 

@@ -1,7 +1,7 @@
 local Bag = class("Bag", things.Thing)
 
-local BAG_GRAVITY = 70
-local BAG_JUMP = -30
+local BAG_GRAVITY = 300
+local BAG_JUMP = -60
 
 function Bag:initialize(x, y, contains)
 	gMap.setSquare(x, y, self)

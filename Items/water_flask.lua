@@ -26,10 +26,10 @@ end
 
 function water_flask:smash(x, y)
 	SFX(11, 1)
-	for i = 1, 18 do
+	for i = 1, 20 do
 		particleSys.newParticle(x*8 + 4, y*8 + 4, 4, rand()*60 - 30, rand()*60 - 30, rand()*10, 7, 0.7, rand() + 3)
 	end
-	for i = 1, 18 do
+	for i = 1, 20 do
 		particleSys.newParticle(x*8 + 4, y*8 + 4, 0, rand()*40 - 20, rand()*40 - 20, rand()*40, 13, 0.1, rand() + 3)
 	end
 end

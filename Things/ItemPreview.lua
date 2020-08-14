@@ -1,10 +1,10 @@
 local ItemPreview = class("ItemPreview", things.Thing)
 
 local RISE_HEIGHT = 10
-local RISE_SMOOVE = 0.5
+local RISE_SMOOVE = 0.25
 local FLASH_COUNT = 3
-local FLASH_RATE = 0.2
-local FLASH_TIME = 0.9
+local FLASH_RATE = 0.1
+local FLASH_TIME = 0.45
 
 function ItemPreview:initialize(x, y, item)
 	self.item = item
