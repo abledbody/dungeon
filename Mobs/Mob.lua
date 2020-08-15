@@ -73,6 +73,10 @@ function Mob:move(dir)
 	return couldMove
 end
 
+function Mob:out_of_bounds()
+	self:remove()
+end
+
 function Mob:hit(dir,damage)
 	local xM,yM = DIRX[dir],DIRY[dir]
 

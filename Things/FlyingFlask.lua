@@ -40,7 +40,7 @@ function FlyingFlask:update(dt)
 	
 	if self.sz <= 0 then
 		self.item:smash(self.x, self.y)
-		self.remove_me = true
+		self:remove()
 	end
 end
 

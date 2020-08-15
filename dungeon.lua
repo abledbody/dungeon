@@ -72,5 +72,4 @@ function _init()
 	main.setState("main_menu")
 	gMap.switchRoom("entry")
 	mobs.spawn("Player", 59, 1)
-	--items.types.flask:add(1)
 end
