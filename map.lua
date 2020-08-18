@@ -18,10 +18,12 @@ local special_tiles = {
 		animator = game.Animator:new(aData.lava, "anim"),
 		update = function(self, dt)
 			self.animator:update(dt)
-			for i = 1, #self do
-				bg:set(self[i].id, SpriteMap:quad(self.animator:fetch("spr")), self[i].x, self[i].y)
+			for i = 1, #self.tiles do
+				local tile = self.tiles[i]
+				bg:set(tile.id, SpriteMap:quad(self.animator:fetch("spr")), tile.x, tile.y)
 			end
-		end
+		end,
+		tiles = {}
 	}
 }
 
@@ -95,9 +97,9 @@ local function tileIter(x,y,spr)
 		local newTile = bg:add(q,x*8,y*8)
 		table.insert(loaded_rooms[loading_room].tiles, newTile)
 
-		--if special_tiles[spr] then
-		--	table.insert(special_tiles[spr], {id = newTile, x = x*8, y = y*8})
-		--end
+		if special_tiles[spr] then
+			table.insert(special_tiles[spr].tiles, {id = newTile, x = x*8, y = y*8})
+		end
 		
 		
 		--Collision--
@@ -111,6 +113,9 @@ end
 
 local function reload_batch()
 	bg = sheetImage:batch()
+	for _, v in pairs(special_tiles) do
+		v.tiles = {}
+	end
 
 	for k in pairs(loaded_rooms) do
 		loading_room = k
