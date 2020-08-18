@@ -71,5 +71,5 @@ particleSys = dofile(PATH.."particles.lua")
 function _init()
 	main.setState("main_menu")
 	gMap.switchRoom("entry")
-	mobs.spawn("Player", 59, 1)
+	mobs.spawn("Player", 59, 1, nil, "entry")
 end

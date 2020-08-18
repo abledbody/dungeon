@@ -29,7 +29,7 @@ local current_room = nil
 local loaded_rooms = {}
 local loading_room = nil
 
---This table is for checking grid positions for certain kinds of occupants.
+--This table is for checking grid positions for their occupants.
 --Their position indeces are written as [x.." "..y]
 local gridData = {}
 
@@ -61,10 +61,11 @@ local function checkBit(flag,n)
 	return band(flag,n) == n
 end
 
-local function load_room_contents(room)
+local function load_room_contents(room_index)
+	local room = mdat.rooms[room_index]
 	local x, y = room.x, room.y
 
-	local room_contents = loaded_rooms[loading_room]
+	local room_contents = loaded_rooms[room_index]
 
 	for i = 1, #room.mobs do
 		local item = room.mobs[i]
@@ -72,8 +73,7 @@ local function load_room_contents(room)
 		local name, xT, yT, meta = unpack(item)
 		if not (name and xT and yT and meta) then error("Room data requires the name of the class, the x and y positions, and a table with spawning metadata.") end
 		
-		local new_mob = mobs.spawn(name, x+xT, y+yT, meta)
-		table.insert(room_contents.mobs, new_mob)
+		local new_mob = mobs.spawn(name, x+xT, y+yT, meta, room_index)
 	end
 
 	for i = 1, #room.things do
@@ -82,7 +82,7 @@ local function load_room_contents(room)
 		local name,xT,yT,meta = unpack(item)
 		if not (name and xT and yT and meta) then error("Room data requires the name of the class, the x and y positions, and a table with spawning metadata.") end
 		
-		local new_thing = things.spawn(name, x+xT, y+yT, meta)
+		local new_thing = things.spawn(name, x+xT, y+yT, meta, room_index)
 		table.insert(room_contents.things, new_thing)
 	end
 end
@@ -95,9 +95,9 @@ local function tileIter(x,y,spr)
 		local newTile = bg:add(q,x*8,y*8)
 		table.insert(loaded_rooms[loading_room].tiles, newTile)
 
-		if special_tiles[spr] then
-			table.insert(special_tiles[spr], {id = newTile, x = x*8, y = y*8})
-		end
+		--if special_tiles[spr] then
+		--	table.insert(special_tiles[spr], {id = newTile, x = x*8, y = y*8})
+		--end
 		
 		
 		--Collision--
@@ -109,38 +109,33 @@ local function tileIter(x,y,spr)
 	end
 end
 
+local function reload_batch()
+	bg = sheetImage:batch()
+
+	for k in pairs(loaded_rooms) do
+		loading_room = k
+		local room = mdat.rooms[k]
+
+		local rx, ry = room.rx, room.ry
+		local rw, rh = room.rw, room.rh
+
+		TileMap:map(tileIter,rx,ry,rw,rh)
+	end
+end
+
 local function load_room(room_index)
-	local room = mdat.rooms[room_index]
-
-	local rx, ry = room.rx, room.ry
-	local rw, rh = room.rw, room.rh
-	
-	room.loaded = true
-
-	loading_room = room_index
-	loaded_rooms[loading_room] = {
+	loaded_rooms[room_index] = {
 		tiles = {},
-		mobs = {},
 		things = {},
 	}
-
-	TileMap:map(tileIter,rx,ry,rw,rh)
 	
-	load_room_contents(room)
+	load_room_contents(room_index)
 end
 
 local function unload_room(room_index)
 	local room = loaded_rooms[room_index]
 
-	for _, v in pairs(room.tiles) do
-		bg:remove(v)
-	end
-
 	for _, v in pairs(room.things) do
-		v:remove()
-	end
-
-	for _, v in pairs(room.mobs) do
 		v:remove()
 	end
 
@@ -183,33 +178,34 @@ function gMap.switchRoom(new_room)
 	
 	local x, y = room.x, room.y
 	
-	if not room.loaded then
+	if not loaded_rooms[current_room] then
 		load_room(current_room)
 	end
 
 	for _, v in pairs(room.con) do
-		local connected_room = mdat.rooms[v]
-		if not connected_room.loaded then
+		if not loaded_rooms[v] then
 			load_room(v)
 		end
 	end
 
 	for k in pairs(loaded_rooms) do
-		local is_connected = false
+		if k ~= current_room then
+			local is_connected = false
 
-		for _, v in pairs(mdat.rooms[k]) do
-			local connected_room = mdat.rooms[v]
-			
-			if connected_room == current_room then
-				is_connected = true
-				break
+			for _, v in pairs(mdat.rooms[k].con) do
+				if v == current_room then
+					is_connected = true
+					break
+				end
+			end
+
+			if not is_connected then
+				unload_room(k)
 			end
 		end
-
-		if not is_connected then
-			unload_room(k)
-		end
 	end
+
+	reload_batch()
 	
 	game.setCamTarget(x + room.cx, y + room.cy)
 end
@@ -244,6 +240,10 @@ function gMap.plMoved(x,y)
 	if new_room then
 		gMap.switchRoom(new_room)
 	end
+end
+
+function gMap.is_loaded(room_index)
+	return loaded_rooms[room_index]
 end
 
 function gMap.draw()

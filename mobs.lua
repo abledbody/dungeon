@@ -33,7 +33,7 @@ function mobs.doAll(method,...)
 	end
 end
 
-function mobs.spawn(mob_type, x, y, meta)
+function mobs.spawn(mob_type, x, y, meta, room)
 	local itemCl = types[mob_type]
 	if not itemCl then error("Could not find mob \""..mob_type.."\"") end
 
@@ -43,8 +43,11 @@ function mobs.spawn(mob_type, x, y, meta)
 	else
 		mob = itemCl:new(x, y)
 	end
+	mob.room = room
 
 	table.insert(all, mob)
+
+	return mob
 end
 
 return mobs

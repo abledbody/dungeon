@@ -35,6 +35,10 @@ function Mob:update(dt)
 
 	self.t_disable:update(dt)
 	self.animator:update(dt)
+
+	if not gMap.is_loaded(self.room) then
+		self:remove()
+	end
 end
 
 function Mob:flipCheck(xM)
@@ -56,9 +60,9 @@ function Mob:move(dir)
 		local xNew,yNew = x+xM,y+yM
 		
 		if not gMap.getSquare(xNew,yNew) then
-			gMap.setSquare(x,y,nil)
-			self.x,self.y = xNew,yNew
-			gMap.setSquare(xNew,yNew,self)
+			gMap.setSquare(x, y, nil)
+			self.x, self.y = xNew, yNew
+			gMap.setSquare(xNew, yNew, self)
 			couldMove = true
 		end
 
@@ -69,6 +73,12 @@ function Mob:move(dir)
 		
 		self:flipCheck(xM)
 	end
+
+	local new_room = gMap.find_room(self.room, self.x, self.y)
+	if new_room then
+		self.room = new_room
+	end
+	
 
 	return couldMove
 end

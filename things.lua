@@ -41,11 +41,15 @@ function things.doAll(method,...)
 	end
 end
 
-function things.spawn(thing_type, x, y, meta)
+function things.spawn(thing_type, x, y, meta, room)
 	local itemCl = types[thing_type]
 	if not itemCl then error("Could not find thing \""..thing_type.."\"") end
 
-	table.insert(all, itemCl:new(x, y, unpack(meta)))
+	local new_thing = itemCl:new(x, y, unpack(meta))
+	new_thing.room = room
+	table.insert(all, new_thing)
+
+	return new_thing
 end
 
 
