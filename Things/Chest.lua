@@ -29,6 +29,11 @@ function Chest:draw()
 	palt()
 end
 
+function Chest:remove()
+	gMap.setSquare(self.x, self.y, nil)
+	things.Thing.remove(self)
+end
+
 
 
 return Chest

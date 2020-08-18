@@ -72,4 +72,5 @@ function _init()
 	main.setState("main_menu")
 	gMap.switchRoom("entry")
 	mobs.spawn("Player", 59, 1, nil, "entry")
+	items.types.water_flask:add(20)
 end

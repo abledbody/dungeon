@@ -19,7 +19,6 @@ function Thing:drawIndicator()
 end
 
 function Thing:remove()
-	gMap.setSquare(self.x, self.y, nil)
 	self.remove_me = true
 end
 

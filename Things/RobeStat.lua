@@ -35,4 +35,9 @@ function RobeStat:drawIndicator()
 	Sprite(361,x,y)
 end
 
+function RobeStat:remove()
+	gMap.bulk(nil, self.x, self.y + 1, 2, 2, gMap.setSquare)
+	things.Thing.remove(self)
+end
+
 return RobeStat

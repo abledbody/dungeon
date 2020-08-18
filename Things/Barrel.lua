@@ -27,4 +27,9 @@ function Barrel:draw()
 	Sprite(123, self.x * 8, self.y * 8)
 end
 
+function Barrel:remove()
+	gMap.setSquare(self.x, self.y, nil)
+	things.Thing.remove(self)
+end
+
 return Barrel

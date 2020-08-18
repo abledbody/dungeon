@@ -33,4 +33,9 @@ function Bag:draw()
 	Sprite(147, self.x * 8, self.y * 8 + self.z)
 end
 
+function Bag:remove()
+	gMap.setSquare(self.x, self.y, nil)
+	things.Thing.remove(self)
+end
+
 return Bag
