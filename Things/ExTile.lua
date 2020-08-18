@@ -11,4 +11,9 @@ end
 function ExTile:draw()
 end
 
+function ExTile:remove()
+	gMap.setSquare(self.x, self.y, nil)
+	things.Thing.remove(self)
+end
+
 return ExTile

@@ -106,7 +106,9 @@ local function tileIter(x,y,spr)
 		local flags = fget(spr)
 		
 		if checkBit(flags,0) then
-			gMap.setSquare(x,y,gridData)
+			if not gMap.getSquare(x, y) then
+				gMap.setSquare(x, y, gridData)
+			end
 		end
 	end
 end
