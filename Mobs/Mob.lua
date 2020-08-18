@@ -8,6 +8,7 @@ local Mob = class("Mob")
 Mob.smoove_rate = 0.06
 Mob.blood_color = 8
 Mob.move_speed = 0.22
+Mob.walk_sound = 7
 
 function Mob:initialize(x,y,aSet)
 	self.x,self.y = x,y
@@ -67,7 +68,7 @@ function Mob:move(dir)
 		end
 
 		if couldMove then
-			SFX(7)
+			SFX(self.walk_sound)
 			t_disable:trigger(self.move_speed)
 		end
 		

@@ -20,19 +20,18 @@ local anim_set = {
 }
 
 local Slime = class("Slime", Mob)
+Slime.move_speed = 1
+Slime.smoove_rate = 0.2
+Slime.hit_sound = 13
+Slime.blood_color = 11
+Slime.walk_sound = 24
 
 function Slime:initialize(x, y)
-	self.move_speed = 1
-	self.smoove_rate = 0.2
-
 	Mob.initialize(self, x, y, anim_set)
 
 	melee(self, 0.6)
 	health(self, 3)
 	ai(self)
-
-	self.hit_sound = 13
-	self.blood_color = 11
 end
 
 function Slime:kill()
