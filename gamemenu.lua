@@ -32,7 +32,7 @@ game_menu.categories = {
 					end,
 
 					select = function(self)
-						main.setState("main_menu")
+						main.setState("quit_prompt")
 					end,
 				},
 			},

@@ -1,6 +1,8 @@
 local max,min = math.max,math.min
 local HSW,HSH = const.HSW,const.HSH
 
+local diBox = {}
+
 	--Parameters--
 local boxTime = 1/20 --Should open in a 20th of a second.
 
@@ -40,16 +42,9 @@ local function textWidth(lns)
 	return max(unpack(lineLens))
 end
 
---Dialogue box trigger
-local function show(m)
-	--We keep a screenshot of the game to display behind the text box.
-	game.screenshot()
-	main.setState("diBox")
-	
-	SFX(9)
-	
+function diBox.set_text(text)
 	size = 0
-	message = lineSplit(m)
+	message = lineSplit(text)
 	boxWidth = textWidth(message)
 	
 	--Text characters are 4*6, with spaces of 1 pixel
@@ -58,20 +53,22 @@ local function show(m)
 	boxSpeed = targetSize/boxTime
 end
 
-	--States--
-function main.updates.diBox(dt)
-	size = min(size+dt*boxSpeed,targetSize)
+--Dialogue box trigger
+function diBox.show(text)
+	--We keep a screenshot of the game to display behind the text box.
+	game.screenshot()
+	main.setState("diBox")
 	
-	if btn_down(5) then
-		main.setState("game")
-	end
+	SFX(9)
+	
+	diBox.set_text(text)
 end
 
-function main.draws.diBox()
-	clear()
-	
-	game.scrImage:draw()
+function diBox.widen(dt)
+	size = min(size+dt*boxSpeed,targetSize)
+end
 
+function diBox.draw_box()
 	local x = HSW+0.5-boxWidth/2
 	local y = HSH+0.5-size/2
 	
@@ -79,7 +76,7 @@ function main.draws.diBox()
 	rect(x-2,y-2,boxWidth+4,size+4)
 	color(0)
 	rect(x-1,y-1,boxWidth+2,size+2)
-	
+
 	if size >= targetSize then
 		color(7)
 		for i = 1, #message do
@@ -90,9 +87,21 @@ function main.draws.diBox()
 	end
 end
 
-	--Module--
-local diBox = {}
+	--States--
+function main.updates.diBox(dt)
+	diBox.widen(dt)
 
-diBox.show = show
+	if btn_down(5) then
+		main.setState("game")
+	end
+end
+
+function main.draws.diBox()
+	clear()
+	
+	game.scrImage:draw()
+	
+	diBox.draw_box()
+end
 
 return diBox
