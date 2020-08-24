@@ -7,10 +7,12 @@ function Timer:initialize(l)
 end
 
 function Timer:trigger(l)
-	local timer,len = self.timer,self.length
 	if l then
 		self.length = l
 	end
+
+	
+	local timer,len = self.timer,self.length
 	
 	--Just in case this timer gets triggered multiple times in a single frame.
 	if timer <= 0 then

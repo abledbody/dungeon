@@ -1,56 +1,61 @@
+local LAVA_SPRITE = 25
+
+game_map = {}
+
 local mdat = dofile(PATH.."mdat.lua")
-
-	--Map data verification--
-for i = 1, #mdat.rooms do
-	local con = mdat.rooms[i].con
-	--In each of the connected rooms of this room
-	for j = 1, #con do
-		local otherIndex = con[j]
-		local otherRoom = mdat.rooms[otherIndex]
-		local otherCon = otherRoom.con
-		
-		local isConnected = false
-		--We look for this room in the connections of the connected room
-		for k = 1, #otherCon do
-			local checkIndex = otherCon[k]
-
-			if checkIndex == i then
-				isConnected = true
-				break
-			end
-		end
-
-		if not isConnected then
-			error("Room ["..otherIndex.."] is not connected to room ["..i.."]")
-		end
-	end
-end
 
 	--Localization--
 local band = bit.band
+local DIR_X, DIR_Y = const.DIR_X, const.DIR_Y
 local abs = math.abs
 
 	--Variables--
 local sheetImage = SpriteMap:image()
 local bg = sheetImage:batch()
 
-local room = nil
-
---This table is for checking grid positions for certain kinds of occupants.
---Their position indeces are written as [x.." "..y]
-local gridData = {
-	blocked = {},
-	interactable = {},
-	mobs = {},
+local special_tiles = {
+	[LAVA_SPRITE] = {
+		animator = game.Animator:new(a_data.lava, "anim"),
+		update = function(self, dt)
+			self.animator:update(dt)
+			for i = 1, #self.tiles do
+				local tile = self.tiles[i]
+				bg:set(tile.id, SpriteMap:quad(self.animator:fetch("spr")), tile.x, tile.y)
+			end
+		end,
+		tiles = {}
+	}
 }
+
+local current_room = nil
+local loaded_rooms = {}
+local loading_room = nil
+
+--This table is for checking grid positions for their occupants.
+--Their position indeces are written as [x.." "..y]
+local gridData = {}
 
 
 	--Functions--
-local function dist(x1,y1,x2,y2)
+function game_map.dist(x1,y1,x2,y2)
 	local dx = abs(x2-x1)
 	local dy = abs(y2-y1)
 
 	return dx+dy
+end
+
+function game_map.ray_cast(x, y, dir, max_dist)
+	local delta_x = DIR_X[dir]
+	local delta_y = DIR_Y[dir]
+
+	for dist = 1, max_dist do
+		local target_x =  x + delta_x * dist
+		local target_y =  y + delta_y * dist
+
+		if dist == max_dist or game_map.getSquare(target_x, target_y) then
+			return target_x, target_y, dist
+		end
+	end
 end
 
 local function checkBit(flag,n)
@@ -58,44 +63,29 @@ local function checkBit(flag,n)
 	return band(flag,n) == n
 end
 
-local function setSquare(x,y,key,state)
-	local dataset = gridData[key]
+local function load_room_contents(room_index)
+	local room = mdat.rooms[room_index]
+	local x, y = room.x, room.y
 
-	if not dataset then
-		error("No such grid key \""..key.."\"")
+	local room_contents = loaded_rooms[room_index]
+
+	for i = 1, #room.mobs do
+		local item = room.mobs[i]
+		
+		local name, xT, yT, meta = unpack(item)
+		if not (name and xT and yT and meta) then error("Room data requires the name of the class, the x and y positions, and a table with spawning metadata.") end
+		
+		local new_mob = mobs.spawn(name, x+xT, y+yT, meta, room_index)
 	end
 
-	dataset[x.." "..y] = state
-end
-
-local function getSquare(x,y,key)
-	local dataset = gridData[key]
-
-	if not dataset then
-		error("No such grid key \""..key.."\"")
-	end
-
-	return dataset[x.." "..y]
-end
-
-local function bulk(obj,x,y,w,h,action)
-	for i = x, x+w do
-		for j = y, y+h do
-			action(i,j,obj)
-		end
-	end
-end
-
-local function spawnInRoom(datTab,classTab,x,y)
-	for i = 1, #datTab do
-		local item = datTab[i]
+	for i = 1, #room.things do
+		local item = room.things[i]
 		
 		local name,xT,yT,meta = unpack(item)
 		if not (name and xT and yT and meta) then error("Room data requires the name of the class, the x and y positions, and a table with spawning metadata.") end
 		
-		local itemCl = classTab[name]
-		if not itemCl then error("Could not find item \""..name.."\"") end
-		itemCl:new(x+xT,y+yT,unpack(meta))
+		local new_thing = things.spawn(name, x+xT, y+yT, meta, room_index)
+		table.insert(room_contents.things, new_thing)
 	end
 end
 
@@ -103,85 +93,174 @@ local function tileIter(x,y,spr)
 	if spr ~= 0 then
 		--Rendering--
 		local q = SpriteMap:quad(spr)
-		bg:add(q,x*8,y*8)
+		
+		local newTile = bg:add(q,x*8,y*8)
+		table.insert(loaded_rooms[loading_room].tiles, newTile)
+
+		if special_tiles[spr] then
+			table.insert(special_tiles[spr].tiles, {id = newTile, x = x*8, y = y*8})
+		end
+		
 		
 		--Collision--
 		local flags = fget(spr)
 		
 		if checkBit(flags,0) then
-			setSquare(x,y,"blocked",true)
+			if not game_map.getSquare(x, y) then
+				game_map.setSquare(x, y, gridData)
+			end
 		end
 	end
 end
 
-local function reveal()
-	local x,y,rx,ry,rw,rh = room.x,room.y,room.rx,room.ry,room.rw,room.rh
-	
-	room.rev = true
-	TileMap:map(tileIter,rx,ry,rw,rh)
-	
-	spawnInRoom(room.things,things.types,x,y)
-	spawnInRoom(room.mobs,mobs.types,x,y)
+local function reload_batch()
+	bg = sheetImage:batch()
+	for _, v in pairs(special_tiles) do
+		v.tiles = {}
+	end
+
+	for k in pairs(loaded_rooms) do
+		loading_room = k
+		local room = mdat.rooms[k]
+
+		local rx, ry = room.rx, room.ry
+		local rw, rh = room.rw, room.rh
+
+		TileMap:map(tileIter,rx,ry,rw,rh)
+	end
 end
 
-local function switchRoom(r)
-	room = mdat.rooms[r]
+local function load_room(room_index)
+	loaded_rooms[room_index] = {
+		tiles = {},
+		things = {},
+	}
 	
-	if not room then
-		error("switchRoom: No such room "..r)
-	end
-	
-	local x,y = room.x,room.y
-	
-	if not room.rev then
-		reveal()
-	end
-	
-	game.setCamTarget(x + room.cx, y + room.cy)
+	load_room_contents(room_index)
 end
 
-local function inBounds(xT,yT,room)
-	local x,y,w,h = room.x,room.y,room.w,room.h
+local function unload_room(room_index)
+	local room = loaded_rooms[room_index]
+
+	for _, v in pairs(room.things) do
+		v:remove()
+	end
+
+	loaded_rooms[room_index] = nil
+end
+
+local function inBounds(xT, yT, room_index)
+	local room = mdat.rooms[room_index]
+
+	local x, y = room.x, room.y
+	local w, h = room.w, room.h
 	
 	return yT>=y and xT>=x and yT<y+h and xT<x+w
 end
 
-local function plMoved(x,y)
-	if not inBounds(x,y,room) then
-		local connected = room.con
-		
-		--Searching through connected rooms to figure out which one the player is in.
-		for i = 1, #connected do
-			local cri = connected[i]
-			local cRoom = mdat.rooms[cri]
-			
-			if not cRoom then
-				error("Could not find room index "..cri)
-			end
-			
-			if inBounds(x,y,cRoom) then
-				switchRoom(cri)
-				break
-			end
+function game_map.setSquare(x,y,value)
+	gridData[x.." "..y] = value
+end
+
+function game_map.getSquare(x, y)
+	return gridData[x.." "..y]
+end
+
+function game_map.bulk(obj,x,y,w,h,action)
+	for i = x, x+w-1 do
+		for j = y, y+h-1 do
+			action(i,j,obj)
 		end
-		
 	end
 end
 
-local function draw()
+function game_map.switchRoom(new_room)
+	current_room = new_room
+	
+	local room = mdat.rooms[current_room]
+
+	if not room then
+		error("switchRoom: No such room "..new_room)
+	end
+	
+	local x, y = room.x, room.y
+	
+	if not loaded_rooms[current_room] then
+		load_room(current_room)
+	end
+
+	for _, v in pairs(room.con) do
+		if not loaded_rooms[v] then
+			load_room(v)
+		end
+	end
+
+	for k in pairs(loaded_rooms) do
+		if k ~= current_room then
+			local is_connected = false
+
+			for _, v in pairs(mdat.rooms[k].con) do
+				if v == current_room then
+					is_connected = true
+					break
+				end
+			end
+
+			if not is_connected then
+				unload_room(k)
+			end
+		end
+	end
+
+	reload_batch()
+	
+	game.setCamTarget(x + room.cx, y + room.cy)
+end
+
+function game_map.find_room(current, x, y)
+	if inBounds(x, y, current) then
+		return false
+	else
+		local room = mdat.rooms[current]
+		local connected = room.con
+		
+		--Searching through connected rooms to figure out which one the coordinate is in.
+		for i = 1, #connected do
+			local other_room_index = connected[i]
+			local other_room = mdat.rooms[other_room_index]
+			
+			if not other_room then
+				error("Could not find room index "..other_room_index)
+			end
+			
+			if inBounds(x,y,other_room_index) then
+				return other_room_index
+			end
+		end
+
+		error("Could not find any rooms connected to "..current.." in coordinates "..x..", "..y)
+	end
+end
+
+function game_map.plMoved(x,y)
+	local new_room = game_map.find_room(current_room, x, y)
+	if new_room then
+		game_map.switchRoom(new_room)
+	end
+end
+
+function game_map.is_loaded(room_index)
+	return loaded_rooms[room_index]
+end
+
+function game_map.draw()
 	bg:draw()
 end
 
-	--Module--
-local gMap = {}
-
-gMap.plMoved = plMoved
-gMap.switchRoom = switchRoom
-gMap.setSquare = setSquare
-gMap.getSquare = getSquare
-gMap.dist = dist
-
-gMap.draw = draw
-
-
-return gMap
+function game_map.update(dt)
+	for _,v in pairs(special_tiles) do
+		if v.update then
+			v:update(dt)
+		end
+	end
+end

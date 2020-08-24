@@ -17,9 +17,17 @@ rooms.entry = {
 	--Things and mobs have a class name, an x and y coordinate, and a table of data for spawning,
 	--which works like   thatClass:new(unpack(thatTable))
 	things = {
-		{"RobeStat",5,4,{}}
+		{"RobeStat", 5, 4, {}},
+		{"Chest", 1, 1, {"health_flask"}},
+		{"Chest", 2, 1, {"health_flask"}},
+		{"Chest", 10, 1, {"speed_flask"}},
+		{"Chest", 9, 1, {"speed_flask"}},
+		{"Barrel", 10, 10, {"water_flask"}},
+		{"Barrel", 10, 9, {"water_flask"}},
 	},
-	mobs = {},
+	mobs = {
+
+	},
 }
 
 rooms.entryHall = {
@@ -30,8 +38,12 @@ rooms.entryHall = {
 	rw = 4, rh = 7,
 
 	cx = 2, cy = 3,
-	things = {},
-	mobs = {},
+	things = {
+
+	},
+	mobs = {
+
+	},
 }
 
 rooms.text = {
@@ -43,9 +55,13 @@ rooms.text = {
 
 	cx = 4, cy = 3,
 	things = {
-		{"ExTile",1,0,{{"Note to Joffrey: Please do not let\nthe slimes roam the dungeon. They\nneed to be kept in the traps where\nthey will not attack the staff.","It's been physically\nchiseled into the wall.","Note to Joffrey: Please do not let\nthe slimes roam the dungeon. They\nneed to be kept in the traps where\nthey will not attack the staff."}}}
+		{"ExTile",1,0,{{"Note to Joffrey: Please do not let\nthe slimes roam the dungeon. They\nneed to be kept in the traps where\nthey will not attack the staff.","It's been physically\nchiseled into the wall.","Note to Joffrey: Please do not let\nthe slimes roam the dungeon. They\nneed to be kept in the traps where\nthey will not attack the staff."}}},
+		{"Barrel", 6, 1, {"water_flask"}},
+		{"Barrel", 5, 1, {"water_flask"}},
 	},
-	mobs = {},
+	mobs = {
+		{"Slime",6,4,{}},
+	},
 }
 
 rooms.slime = {
@@ -56,13 +72,12 @@ rooms.slime = {
 	rw = 15, rh = 7,
 
 	cx = 7, cy = 4,
-	things = {},
+	things = {
+		{"Chest", 6, 1, {"health_flask"}}
+	},
 	mobs = {
 		{"Slime",7,2,{}},
 		{"Slime",8,2,{}},
-		{"Slime",7,3,{}},
-		{"Slime",8,3,{}},
-		{"Slime",9,3,{}}
 	},
 }
 
@@ -74,8 +89,12 @@ rooms.lavaBridge = {
 	rw = 10, rh = 13,
 
 	cx = 5, cy = 7,
-	things = {},
-	mobs = {},
+	things = {
+
+	},
+	mobs = {
+		{"Slime",1,8,{}},
+	},
 }
 
 rooms.lavaCave = {
@@ -86,8 +105,12 @@ rooms.lavaCave = {
 	rw = 9, rh = 8,
 
 	cx = 4, cy = 4,
-	things = {},
-	mobs = {},
+	things = {
+
+	},
+	mobs = {
+		
+	},
 }
 
 --Connections

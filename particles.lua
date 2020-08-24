@@ -1,10 +1,7 @@
 -- math imports--
 local abs = math.abs
 
-local particleSys = {}
-
--- Constants--
-particleSys.gravity = 100
+particle_sys = {}
 
 -- Data--
 local particles = {}
@@ -18,12 +15,13 @@ local particleBase = {
     vy = 0,
     vz = 0,
     col = 7,
-    bounce = 0.6
+    bounce = 0.6,
+    gravity = 250,
 }
 particleBase.__index = particleBase
 
 -- Particle constructor--
-function particleSys.newParticle(x, y, z, vx, vy, vz, col, bounce)
+function particle_sys.newParticle(x, y, z, vx, vy, vz, col, bounce, life, gravity)
     -- If we feed this function parameters they'll get set here in the table declaration.
     -- Otherwise, the metatable values will be used.
     local particle = {
@@ -34,10 +32,14 @@ function particleSys.newParticle(x, y, z, vx, vy, vz, col, bounce)
         vy = vy,
         vz = vz,
         col = col,
-        bounce = bounce
+        bounce = bounce,
+        gravity = gravity,
+		timer = game.Timer:new(life or 4),
     }
     setmetatable(particle, particleBase)
 
+	particle.timer:trigger()
+	
     table.insert(particles, particle)
 
     return particle
@@ -47,16 +49,20 @@ function particleBase:update(dt)
     -- Localizing variables from self
     local x, y, z, vx, vy, vz, bounce = self.x, self.y, self.z, self.vx, self.vy, self.vz, self.bounce
 
-    -- Motion--
-    x = x + vx * dt
-    y = y + vy * dt
-    z = z + vz * dt
+	-- Motion--
+	if abs(vz) > 5 or z > 0.5 then
+		x = x + vx * dt
+		y = y + vy * dt
+		z = z + vz * dt
+	end
 
-    -- Gravity--
-    vz = vz - particleSys.gravity * dt
+	-- Gravity--
+	if z > 0.5 then
+		vz = vz - self.gravity * dt
+	end
 
     -- Bouncing--
-    if z <= 0 then
+    if z < 0 then
         -- We'll compensate for going through
         -- the floor by reflecting Z through
         -- zero
@@ -66,8 +72,8 @@ function particleBase:update(dt)
         -- should scale down all motion on
         -- every bounce.
         vx = vx * bounce
-        vy = vy * bounce
-        vz = -vz * bounce
+		vy = vy * bounce
+		vz = -vz * bounce
     end
 
     -- Giving the updated values back to
@@ -77,19 +83,27 @@ function particleBase:update(dt)
     -- If this particle has basically
     -- stopped moving, we'll tell the
     -- update function by returning true.
-    if z < 1 and abs(vz) < 1 and abs(vx) < 21 and abs(vy) < 2 then
-        return true
-    end
+    --if z < 1 and abs(vz) < 1 and abs(vx) < 21 and abs(vy) < 2 then
+    --    return true
+	--end
 
+	if self.timer:check() then
+		return true
+	end
+
+	self.timer:update(dt)
 end
 
 function particleBase:draw()
-    -- Particle
     color(self.col)
-    point(self.x, self.y - self.z)
+	point(self.x, self.y - self.z)
 end
 
-function particleSys.update(dt)
+function particle_sys.clear()
+	particles = {}
+end
+
+function particle_sys.update(dt)
     for k, v in pairs(particles) do
         -- If the update returns true then
         -- we can get rid of the particle.
@@ -99,11 +113,9 @@ function particleSys.update(dt)
     end
 end
 
-function particleSys.draw()
+function particle_sys.draw()
     -- Drawing all the active particles
     for k, v in pairs(particles) do
         v:draw()
     end
 end
-
-return particleSys

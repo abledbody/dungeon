@@ -1,46 +1,46 @@
-local rand = math.random
-
 	--Localization--
-local DIRX,DIRY = const.DIRX,const.DIRY
+local DIR_X,DIR_Y = const.DIR_X,const.DIR_Y
+local rand = math.random
 
 	--Class--
 local Mob = class("Mob")
 
-function Mob:initialize(x,y,aSet,ai)
+Mob.smoove_rate = 0.06
+Mob.blood_color = 8
+Mob.move_speed = 0.22
+Mob.walk_sound = 7
+
+function Mob:initialize(x,y,aSet)
 	self.x,self.y = x,y
 	self.sx,self.sy = x*8,y*8
-	self.ai = ai
-	self.smooveRate = 0.06
-	self.t_move = game.Timer:new(0.22)
-	self.t_attack = game.Timer:new(0.4)
-	
-	self.movable = mapEnts.Movable:new(self)
-	self.melee = mapEnts.Melee:new()
 
-	local function attackEndWrapper() Mob.attackAnimEnd(self) end
-	self.animator = game.Animator:new(aSet,"idle",{attack = attackEndWrapper})
-	
-	table.insert(mobs.all,self)
-end
+	self.t_disable = game.Timer:new(self.move_speed)
 
-function Mob:attackAnimEnd()
-	self.animator:setState("idle")
+	self.updates = {}
+	self.draws = {}
+	self.status_effects = {}
+	
+	self.animator = game.Animator:new(aSet,"idle",{})
+
+	game_map.setSquare(x,y,self)
 end
 
 function Mob:update(dt)
-	local animator,x,y,sx,sy,t_move,t_attack,smooveRate,ai = self.animator,self.x,self.y,self.sx,self.sy,self.t_move,self.t_attack,self.smooveRate,self.ai
-	
-	--Animation--
-	animator:update(dt)
-	
-	--Other--
-	sx,sy = game.smoove(sx,sy,x*8,y*8,smooveRate/dt)
-	
-	t_move:update(dt)
-	t_attack:update(dt)
-	if ai then ai:update(dt) end
-	
-	self.sx,self.sy = sx,sy
+	self.sx,self.sy = game.smoove(
+		self.sx,self.sy,
+		self.x*8,self.y*8,
+		self.smoove_rate/dt)
+
+	for _,v in pairs(self.updates) do
+		v(self,dt)
+	end
+
+	self.t_disable:update(dt)
+	self.animator:update(dt)
+
+	if not game_map.is_loaded(self.room) then
+		self:remove()
+	end
 end
 
 function Mob:flipCheck(xM)
@@ -50,60 +50,85 @@ function Mob:flipCheck(xM)
 end
 
 function Mob:move(dir)
-	local movable,t_move = self.movable,self.t_move
+	local t_disable = self.t_disable
 	
-	local xM,yM = DIRX[dir],DIRY[dir]
+	local xM,yM = DIR_X[dir],DIR_Y[dir]
 	
 	local couldMove = false
 
-	if t_move:check() then
-		couldMove = movable:move(xM,yM)
+	if t_disable:check() then
+
+		local x,y = self.x,self.y
+		local xNew,yNew = x+xM,y+yM
+		
+		if not game_map.getSquare(xNew,yNew) then
+			game_map.setSquare(x, y, nil)
+			self.x, self.y = xNew, yNew
+			game_map.setSquare(xNew, yNew, self)
+			couldMove = true
+		end
 
 		if couldMove then
-			SFX(7)
-			t_move:trigger()
+			SFX(self.walk_sound)
+			t_disable:trigger(self.move_speed)
 		end
 		
 		self:flipCheck(xM)
 	end
 
+	local new_room = game_map.find_room(self.room, self.x, self.y)
+	if new_room then
+		self.room = new_room
+	end
+	
+
 	return couldMove
 end
 
-function Mob:attack(dir)
-	local t_attack = self.t_attack
+function Mob:out_of_bounds()
+	self:remove()
+end
 
-	if t_attack:check() then
-		local melee = self.melee
-		local xM,yM = DIRX[dir],DIRY[dir]
-		local x,y = self.x+xM,self.y+yM
+function Mob:hit(dir,damage)
+	local xM,yM = DIR_X[dir],DIR_Y[dir]
 
-		melee:trigger(x,y)
-		self.animator:setState("attack")
-		self:flipCheck(xM)
+	for i = 1, 3 do
+		particle_sys.newParticle(
+			self.sx+4, self.sy+4, 4,
+			rand()*30-15+xM*rand()*40, rand()*30-15+yM*rand()*40, 17,
+			self.blood_color, 0, rand()+3)
+	end
 
-		t_attack:trigger()
+	if self.hit_sound then
+		SFX(self.hit_sound,1)
+	end
+
+	if self.damage then
+		self:damage(damage)
 	end
 end
 
-function Mob:hit(dir)
-	for i = 1, 4 do
-		particleSys.newParticle(self.x*8,self.y*8,4,rand()*4-2,rand()*4-2,10,8,0)
-	end
+function Mob:kill()
+	self:remove()
 end
 
-function Mob:interact(dir)
+function Mob:remove()
+	game_map.setSquare(self.x, self.y, nil)
+	self.remove_me = true
+end
+
+function Mob:trigger_interact(dir)
 	local x,y = self.x,self.y
 	
-	local xM,yM = DIRX[dir],DIRY[dir]
+	local xM,yM = DIR_X[dir],DIR_Y[dir]
 	x,y = x+xM,y+yM
 	
 	self:flipCheck(xM)
 	
-	local iact = gMap.getSquare(x,y,"interactable")
+	local occupant = game_map.getSquare(x,y)
 	
-	if iact then
-		iact:interact(self)
+	if occupant and occupant.interact then
+		occupant:interact(self)
 	end
 end
 
@@ -123,6 +148,10 @@ function Mob:draw()
 	x = flip and x+8 or x
 	
 	Sprite(spr,x,y,0,xScale)
+
+	for _,v in pairs(self.draws) do
+		v(self)
+	end
 end
 
 return Mob

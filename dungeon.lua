@@ -2,7 +2,8 @@
 
 
 --Define PATH (Used for loading)
-PATH = ("D:/dungeon/")
+PATH = "D:/dungeon/"
+
 --Apply the custom Rayleigh palette
 dofile(PATH.."Rayleigh.lua")
 
@@ -14,7 +15,7 @@ class = Library("class")
 --== Load external libraries ==--
 
 --Animation system
-anim = dofile(PATH.."anim.lua")
+dofile(PATH.."anim.lua")
 --Extended math library
 dofile(PATH.."amath.lua")
 
@@ -22,37 +23,39 @@ dofile(PATH.."amath.lua")
 --== Load external files ==--
 
 --Animation data
-aData = dofile(PATH.."adat.lua")
+dofile(PATH.."a_data.lua")
 --Game constants
-const = dofile(PATH.."gameConsts.lua")
+dofile(PATH.."const.lua")
+
+brightness = dofile(PATH.."brightness.lua")
 
 --== Load game modules ==--
 
---These are all forward declarations of modules defined later,
---so Lua can refer to these tables without needing to know what's in them.
-main = nil --General systems
-game = nil --Gameplay-specific functionality
-diBox = nil --Dialogue box
-gMap = nil --Game map
-mapEnts = nil --Entities in the game
-mobs = nil --Enemies, player, ect.
-things = nil --Non-map objects within the game
-particleSys = nil --The particle system
+--States--
+dofile(PATH.."main.lua")
+dofile(PATH.."game.lua")
+dofile(PATH.."throw_select.lua")
+dofile(PATH.."main_menu.lua")
+dofile(PATH.."game_over.lua")
+dofile(PATH.."game_menu.lua")
+dofile(PATH.."quit_prompt.lua")
 
-main = dofile(PATH.."main.lua")
-game = dofile(PATH.."game.lua")
-diBox = dofile(PATH.."diBox.lua")
-gMap = dofile(PATH.."map.lua")
-mapEnts = dofile(PATH.."mapEntities.lua")
-mobs = dofile(PATH.."mobs.lua")
-things = dofile(PATH.."things.lua")
-particleSys = dofile(PATH.."particles.lua")
+--Others--
+dofile(PATH.."menu.lua")
+dofile(PATH.."di_box.lua")
+dofile(PATH.."map.lua")
+dofile(PATH.."components.lua")
+dofile(PATH.."mobs.lua")
+dofile(PATH.."things.lua")
+dofile(PATH.."items.lua")
+dofile(PATH.."particles.lua")
 
 
 --== Start the program ==--
 
 function _init()
-	main.setState("game")
-	gMap.switchRoom("entry")
-	game.spawnPlayer(59,1)
+	main.set_state(main_menu)
+	game_map.switchRoom("entry")
+	mobs.spawn("Player", 59, 1, nil, "entry")
+	items.types.water_flask:add(20)
 end

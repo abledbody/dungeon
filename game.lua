@@ -1,16 +1,23 @@
 	--Localization--
 local sin,abs,round,min = math.sin,math.abs,math.round,math.min
-local HSW,HSH,DIRX,DIRY = const.HSW,const.HSH,const.DIRX,const.DIRY
+local HSW,HSH,DIR_X,DIR_Y = const.HSW,const.HSH,const.DIR_X,const.DIR_Y
 
 	--Constants--
 local CLASSPATH = PATH.."Game/"
 
+
+game = {
+	camSmooth = 0.16,
+	darkness = 3.99,
+	fade_speed = 10,
+	player = nil, --Player mob
+	scrImage = nil,
+}
+
 	--Parameters--
-local camSmooth = 0.16
 
 	--Variables--
 local time = 0
-local pl = nil --Player mob
 
 --The center of the camera in pixelspace
 local xCam,yCam = 480,48
@@ -59,35 +66,42 @@ local function getTime()
 	return time
 end
 
-local function pl_prop(value)
-	if value then pl = value end
-	return pl
-end
-
 local function setCamTarget(x,y)
 	xCamTarget,yCamTarget = x,y
 end
 
-local function spawnPlayer(x,y)
-	pl = mobs.Mob:new(x,y,aData.player)
+function game.camera_smoove(dt)
+	local _roomX, _roomY =
+		xCamTarget*8, yCamTarget*8
+	xCam, yCam = smoove(xCam, yCam, _roomX, _roomY, game.camSmooth/dt)
+end
 
-	function pl:move(dir)
-		if mobs.Mob.move(self,dir) then gMap.plMoved(self.x,self.y) end
-	end
+function game.camera_transform()
+	cam("translate",
+		round(-xCam + HSW),
+		round(-yCam + HSH))
+end
+
+function game.screenshot()
+	local imgDat = screenshot()
+	game.scrImage = imgDat:image()
 end
 
 	--States--
-function main.updates.game(dt)
+function game.update(dt)
 	time = time+dt
-	things.indicatorY(sin(time*7)+0.5)
+	things.indicatorY = sin(time*7)+0.5
 	
 	--Camera--
-	local _roomX,_roomY =
-		xCamTarget*8,yCamTarget*8
-	xCam,yCam =
-		smoove(xCam,yCam,_roomX,_roomY,camSmooth/dt)
+	game.camera_smoove(dt)
 		
 	--Player control--
+	local open_menu = btn_down(7)
+
+	if open_menu then
+		game_menu.open()
+	end
+
 	local attack = btn(5)
 	local interact = btn(6)
 	
@@ -95,44 +109,52 @@ function main.updates.game(dt)
 	local hMove = (btn(1) and -1 or 0) + (btn(2) and 1 or 0)
 	
 	for i = 1, 4 do
-		if btn(i) then
+		
+		if btn_down(i) then
+			if interact then
+				game.player:trigger_interact(i)
+			end
+		elseif btn(i) and not interact then
 			if attack then
-				pl:attack(i)
-			elseif interact then
-				pl:interact(i)
+					game.player:melee_attack(i)
 			else
-				pl:move(i)
+				game.player:move(i)
 			end
 			break
 		end
 	end
-	--Mobs--
-	mobs.doAll("update",dt)
+	
+	mobs.update(dt)
+	things.update(dt)
 
-	particleSys.update(dt)
+	game_map.update(dt)
+
+	particle_sys.update(dt)
+
+	game.darkness = math.max(game.darkness - game.fade_speed * dt, 0)
 end
 
-function main.draws.game()
+function game.draw()
 	clear()
+
+	brightness(game.darkness)
 	
 	pushMatrix()
-	cam("translate",
-		round(-xCam+HSW),
-		round(-yCam+HSH))
+	game.camera_transform()
 	
-	gMap.draw()
-	particleSys.draw()
+	game_map.draw()
+	particle_sys.draw()
 	mobs.doAll("draw")
 	things.doAll("draw")
 	
 	local xCheck,yCheck
 	
 	for i = 1, 4 do
-		xCheck = pl.x + DIRX[i]
-		yCheck = pl.y + DIRY[i]
-		local iact = gMap.getSquare(xCheck,yCheck,"interactable")
-		if iact then
-			iact:drawIndicator()
+		xCheck = game.player.x + DIR_X[i]
+		yCheck = game.player.y + DIR_Y[i]
+		local occupant = game_map.getSquare(xCheck,yCheck)
+		if occupant and occupant.interact then
+			occupant:drawIndicator()
 		end
 	end
 	
@@ -140,16 +162,11 @@ function main.draws.game()
 end
 
 	--Module--
-local game = {}
 
 game.smoove = smoove
 game.examine = examine
 game.time = getTime
 game.setCamTarget = setCamTarget
-game.spawnPlayer = spawnPlayer
-game.pl = pl_prop
 
 game.Timer = dofile(CLASSPATH.."Timer.lua")
 game.Animator = dofile(CLASSPATH.."Animator.lua")
-
-return game

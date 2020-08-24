@@ -1,28 +1,53 @@
 	--Constants--
-local CLASSPATH = PATH.."Mobs/"
+MOBS_PATH = PATH.."Mobs/"
+
+	--Module--
+mobs = {
+	Mob = dofile(MOBS_PATH.."Mob.lua")
+}
+
+--Mobs need access to mobs.Mob to initialize
+mobs.types = {
+	Player = dofile(MOBS_PATH.."Player.lua"),
+	Slime = dofile(MOBS_PATH.."Slime.lua"),
+}
 
 	--Variables--
 local all = {}
-local types = {}
+local types = mobs.types
 
 	--Functions--
-local function doAll(method,...)
+function mobs.update(dt)
+	for k, v in pairs(all) do
+		v:update(dt)
+		if v.remove_me then
+			table.remove(all, k)
+		end
+	end
+end
+
+function mobs.doAll(method,...)
 	for i = 1, #all do
 		local mob = all[i]
 		mob[method](mob,...)
 	end
 end
 
-	--Types--
-types.Slime = dofile(CLASSPATH.."Slime.lua")
+function mobs.spawn(mob_type, x, y, meta, room)
+	local itemCl = types[mob_type]
+	if not itemCl then error("Could not find mob \""..mob_type.."\"") end
 
-	--Module--
-local mobs = {}
+	local mob
+	if meta then
+		mob = itemCl:new(x, y, unpack(meta))
+	else
+		mob = itemCl:new(x, y)
+	end
+	mob.room = room
 
-mobs.Mob = dofile(CLASSPATH.."Mob.lua")
+	table.insert(all, mob)
 
-mobs.all = all
-mobs.doAll = doAll
-mobs.types = types
+	return mob
+end
 
 return mobs
