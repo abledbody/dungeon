@@ -18,6 +18,7 @@ function Mob:initialize(x,y,aSet)
 
 	self.updates = {}
 	self.draws = {}
+	self.status_effects = {}
 	
 	self.animator = game.Animator:new(aSet,"idle",{})
 
