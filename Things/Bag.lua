@@ -4,7 +4,7 @@ local BAG_GRAVITY = 300
 local BAG_JUMP = -60
 
 function Bag:initialize(x, y, contains)
-	gMap.setSquare(x, y, self)
+	game_map.setSquare(x, y, self)
 
 	self.z = 0
 	self.z_vel = BAG_JUMP
@@ -34,7 +34,7 @@ function Bag:draw()
 end
 
 function Bag:remove()
-	gMap.setSquare(self.x, self.y, nil)
+	game_map.setSquare(self.x, self.y, nil)
 	things.Thing.remove(self)
 end
 

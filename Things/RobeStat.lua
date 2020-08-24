@@ -11,7 +11,7 @@ local exam_dat = {
 }
 
 function RobeStat:initialize(x, y)
-	gMap.bulk(self, x, y + 1, 2, 2, gMap.setSquare)
+	game_map.bulk(self, x, y + 1, 2, 2, game_map.setSquare)
 	
 	components.examable(self, exam_dat)
 	
@@ -36,7 +36,7 @@ function RobeStat:drawIndicator()
 end
 
 function RobeStat:remove()
-	gMap.bulk(nil, self.x, self.y + 1, 2, 2, gMap.setSquare)
+	game_map.bulk(nil, self.x, self.y + 1, 2, 2, game_map.setSquare)
 	things.Thing.remove(self)
 end
 

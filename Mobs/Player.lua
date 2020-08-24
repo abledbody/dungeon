@@ -39,7 +39,7 @@ function Player:initialize(x, y)
 	thrower(self)
 
 	self.move = function(self,dir)
-		if Mob.move(self,dir) then gMap.plMoved(self.x,self.y) end
+		if Mob.move(self,dir) then game_map.plMoved(self.x,self.y) end
 	end
 
 	self.animator.endCalls.damage = function() self.animator:setState("idle") end

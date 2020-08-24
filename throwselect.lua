@@ -1,36 +1,36 @@
 local tau = math.pi * 2
-local DIRX = const.DIRX
+local DIR_X = const.DIR_X
 
-local throw_select = {}
+throw_select = {}
 
 local direction = 3
 
-function main.inits.throw_select()
-    game.player:flipCheck(DIRX[direction])
+function throw_select.init()
+    game.player:flipCheck(DIR_X[direction])
     game.player.animator:setState("throw")
 end
 
-function main.updates.throw_select(dt)
+function throw_select.update(dt)
     for i = 1, 4 do
         if btn(i) then
             if direction ~= i then
                 SFX(15, 3)
             end
             direction = i
-            game.player:flipCheck(DIRX[i])
+            game.player:flipCheck(DIR_X[i])
             break
         end
     end
 
 
     if btn_down(5) then
-        main.setState("game")
+        main.set_state(game)
         SFX(20, 1)
         game.player:throw(direction, throw_select.item)
 	end
 	
 	if btn_down(6) then
-		main.setState("game")
+		main.set_state(game)
 		SFX(23, 1)
 		game.player.animator:setState("idle")
 	end
@@ -42,8 +42,8 @@ local pointer_offset_lookup = {
     rot = {-tau/4, tau/4, 0,  tau/2}
 }
 
-function main.draws.throw_select()
-     main.draws.game()
+function throw_select.draw()
+     game.draw()
 
      pushMatrix()
      game.camera_transform()
@@ -55,5 +55,3 @@ function main.draws.throw_select()
      Sprite(362, game.player.sx + offset_x, game.player.sy + offset_y, rot)
      popMatrix()
 end
-
-return throw_select

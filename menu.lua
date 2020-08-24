@@ -1,6 +1,6 @@
-local menu = {}
+menu = {}
 
-local cursor_animator = game.Animator:new(aData.cursor, "anim")
+local cursor_animator = game.Animator:new(a_data.cursor, "anim")
 
 function menu.update_cursor(dt)
 	cursor_animator:update(dt)
@@ -19,5 +19,3 @@ end
 function menu.cycle_previous(list, selected)
 	return (selected - 2) % #list + 1
 end
-
-return menu

@@ -1,7 +1,7 @@
 local Chest = class("Chest", things.Thing)
 
 function Chest:initialize(x, y, contains)
-	gMap.setSquare(x, y, self)
+	game_map.setSquare(x, y, self)
 
 	local item = items.types[contains]
 
@@ -30,7 +30,7 @@ function Chest:draw()
 end
 
 function Chest:remove()
-	gMap.setSquare(self.x, self.y, nil)
+	game_map.setSquare(self.x, self.y, nil)
 	things.Thing.remove(self)
 end
 

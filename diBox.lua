@@ -1,7 +1,7 @@
 local max,min = math.max,math.min
 local HSW,HSH = const.HSW,const.HSH
 
-local diBox = {}
+di_box = {}
 
 	--Parameters--
 local boxTime = 1/20 --Should open in a 20th of a second.
@@ -42,7 +42,7 @@ local function textWidth(lns)
 	return max(unpack(lineLens))
 end
 
-function diBox.set_text(text)
+function di_box.set_text(text)
 	size = 0
 	message = lineSplit(text)
 	boxWidth = textWidth(message)
@@ -54,21 +54,21 @@ function diBox.set_text(text)
 end
 
 --Dialogue box trigger
-function diBox.show(text)
+function di_box.show(text)
 	--We keep a screenshot of the game to display behind the text box.
 	game.screenshot()
-	main.setState("diBox")
+	main.set_state(di_box)
 	
 	SFX(9)
 	
-	diBox.set_text(text)
+	di_box.set_text(text)
 end
 
-function diBox.widen(dt)
+function di_box.widen(dt)
 	size = min(size+dt*boxSpeed,targetSize)
 end
 
-function diBox.draw_box()
+function di_box.draw_box()
 	local x = HSW+0.5-boxWidth/2
 	local y = HSH+0.5-size/2
 	
@@ -88,20 +88,18 @@ function diBox.draw_box()
 end
 
 	--States--
-function main.updates.diBox(dt)
-	diBox.widen(dt)
+function di_box.update(dt)
+	di_box.widen(dt)
 
 	if btn_down(5) then
-		main.setState("game")
+		main.set_state(game)
 	end
 end
 
-function main.draws.diBox()
+function di_box.draw()
 	clear()
 	
 	game.scrImage:draw()
 	
-	diBox.draw_box()
+	di_box.draw_box()
 end
-
-return diBox

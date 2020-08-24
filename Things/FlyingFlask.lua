@@ -1,4 +1,4 @@
-local DIRX, DIRY = const.DIRX, const.DIRY
+local DIR_X, DIR_Y = const.DIR_X, const.DIR_Y
 
 local FlyingFlask = class("FlyingFlask", things.Thing)
 
@@ -20,10 +20,10 @@ function FlyingFlask:initialize(x, y, dir, item)
 	self.sz = 0
 	self.rot = 0
 
-	local target_x, target_y, distance = gMap.ray_cast(x, y, dir, MAX_DIST)
+	local target_x, target_y, distance = game_map.ray_cast(x, y, dir, MAX_DIST)
 
-	self.x_vel = DIRX[dir] * THROW_SPEED
-	self.y_vel = DIRY[dir] * THROW_SPEED
+	self.x_vel = DIR_X[dir] * THROW_SPEED
+	self.y_vel = DIR_Y[dir] * THROW_SPEED
 	self.z_vel = get_zvel(distance * 8)
 
 	things.Thing.initialize(self, target_x, target_y)

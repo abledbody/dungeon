@@ -1,9 +1,9 @@
 local function trigger(self)
 	local dat = self.examable.dat
-	local datLen = #dat
+	local dat_len = #dat
 	
-	local count = game.examine(self,datLen)
-	diBox.show(dat[count])
+	local count = game.examine(self,dat_len)
+	di_box.show(dat[count])
 end
 
 local function attach(object, dat)

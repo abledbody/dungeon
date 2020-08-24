@@ -12,7 +12,7 @@ local function update(self)
 	--Targeting--
 	if not target then
 		local pl = game.player
-		targetDist = gMap.dist(x,y,pl.x,pl.y)
+		targetDist = game_map.dist(x,y,pl.x,pl.y)
 		
 		if targetDist <= maxDist then
 			ai.target = pl
@@ -32,7 +32,7 @@ local function update(self)
 		
 		local yGreater = abs(yDelta) >= abs(xDelta)
 
-		targetDist = targetDist or gMap.dist(x,y,xTarget,yTarget)
+		targetDist = targetDist or game_map.dist(x,y,xTarget,yTarget)
 
 		--Chasing--
 		if targetDist > 1 then

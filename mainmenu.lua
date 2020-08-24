@@ -4,14 +4,14 @@ local OPTIONS = {
 	{
 		name = "Start",
 		select = function()
-			main.setState("game")
+			main.set_state(game)
 			SFX(10,3)
 		end
 	},
 	{
 		name = "Options",
 		select = function()
-			main.setState("game")
+			main.set_state(game)
 		end
 	},
 	{
@@ -34,7 +34,7 @@ local FLOOR_HEIGHT = screenHeight() - 32
 local FLOOR_ASPECT = 0.4
 
 
-local main_menu = {}
+main_menu = {}
 
 
 local selected = 1
@@ -107,19 +107,20 @@ function draw_drips()
 	end
 end
 
-function main.updates.main_menu(dt)
+function main_menu.update(dt)
 	if btn_down(5) then
+		SFX(16, 2)
 		OPTIONS[selected].select()
 	end
 
 	if btn_down(3) then
-		selected = menu.cycle_previous(OPTIONS, selected)
 		SFX(15)
+		selected = menu.cycle_previous(OPTIONS, selected)
 	end
 
 	if btn_down(4) then
-		selected = menu.cycle_next(OPTIONS, selected)
 		SFX(15)
+		selected = menu.cycle_next(OPTIONS, selected)
 	end
 
 	menu.update_cursor(dt)
@@ -133,7 +134,7 @@ function main.updates.main_menu(dt)
 	update_drips(dt)
 end
 
-function main.draws.main_menu()
+function main_menu.draw()
 	clear()
 
 	SpriteGroup(289, TITLE_X, TITLE_Y, 6, 1)
@@ -151,5 +152,3 @@ function main.draws.main_menu()
 
 	menu.draw_cursor(OPTIONS_X, OPTIONS_Y + (selected - 1)*8 - 1)
 end
-
-return main_menu

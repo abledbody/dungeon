@@ -1,4 +1,4 @@
-local game_menu = {}
+game_menu = {}
 
 local PADDING = 16
 local WIDTH = const.SW - PADDING * 2
@@ -32,7 +32,7 @@ game_menu.categories = {
 					end,
 
 					select = function(self)
-						main.setState("quit_prompt")
+						main.set_state(quit_prompt)
 					end,
 				},
 			},
@@ -188,14 +188,14 @@ end
 function game_menu.open()
 	game.screenshot()
 	SFX(18, 3)
-	main.setState("game_menu")
+	main.set_state(game_menu)
 end
 
 function game_menu.close()
-	main.setState("game")
+	main.set_state(game)
 end
 
-function main.updates.game_menu(dt)
+function game_menu.update(dt)
 	
 	if btn_down(1) then
 		active_category.selected = menu.cycle_previous(active_category.slots, active_category.selected)
@@ -228,7 +228,7 @@ function main.updates.game_menu(dt)
 	end
 end
 
-function main.draws.game_menu()
+function game_menu.draw()
 	clear()
 
 	for i = 1, #game_menu.categories do
@@ -291,5 +291,3 @@ function main.draws.game_menu()
 	menu_render:draw(PADDING, PADDING)
 	palt()
 end
-
-return game_menu

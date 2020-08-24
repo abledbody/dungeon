@@ -1,7 +1,7 @@
 -- math imports--
 local abs = math.abs
 
-local particleSys = {}
+particle_sys = {}
 
 -- Data--
 local particles = {}
@@ -21,7 +21,7 @@ local particleBase = {
 particleBase.__index = particleBase
 
 -- Particle constructor--
-function particleSys.newParticle(x, y, z, vx, vy, vz, col, bounce, life, gravity)
+function particle_sys.newParticle(x, y, z, vx, vy, vz, col, bounce, life, gravity)
     -- If we feed this function parameters they'll get set here in the table declaration.
     -- Otherwise, the metatable values will be used.
     local particle = {
@@ -99,11 +99,11 @@ function particleBase:draw()
 	point(self.x, self.y - self.z)
 end
 
-function particleSys.clear()
+function particle_sys.clear()
 	particles = {}
 end
 
-function particleSys.update(dt)
+function particle_sys.update(dt)
     for k, v in pairs(particles) do
         -- If the update returns true then
         -- we can get rid of the particle.
@@ -113,11 +113,9 @@ function particleSys.update(dt)
     end
 end
 
-function particleSys.draw()
+function particle_sys.draw()
     -- Drawing all the active particles
     for k, v in pairs(particles) do
         v:draw()
     end
 end
-
-return particleSys

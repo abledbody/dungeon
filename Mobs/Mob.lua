@@ -1,5 +1,5 @@
 	--Localization--
-local DIRX,DIRY = const.DIRX,const.DIRY
+local DIR_X,DIR_Y = const.DIR_X,const.DIR_Y
 local rand = math.random
 
 	--Class--
@@ -22,7 +22,7 @@ function Mob:initialize(x,y,aSet)
 	
 	self.animator = game.Animator:new(aSet,"idle",{})
 
-	gMap.setSquare(x,y,self)
+	game_map.setSquare(x,y,self)
 end
 
 function Mob:update(dt)
@@ -38,7 +38,7 @@ function Mob:update(dt)
 	self.t_disable:update(dt)
 	self.animator:update(dt)
 
-	if not gMap.is_loaded(self.room) then
+	if not game_map.is_loaded(self.room) then
 		self:remove()
 	end
 end
@@ -52,7 +52,7 @@ end
 function Mob:move(dir)
 	local t_disable = self.t_disable
 	
-	local xM,yM = DIRX[dir],DIRY[dir]
+	local xM,yM = DIR_X[dir],DIR_Y[dir]
 	
 	local couldMove = false
 
@@ -61,10 +61,10 @@ function Mob:move(dir)
 		local x,y = self.x,self.y
 		local xNew,yNew = x+xM,y+yM
 		
-		if not gMap.getSquare(xNew,yNew) then
-			gMap.setSquare(x, y, nil)
+		if not game_map.getSquare(xNew,yNew) then
+			game_map.setSquare(x, y, nil)
 			self.x, self.y = xNew, yNew
-			gMap.setSquare(xNew, yNew, self)
+			game_map.setSquare(xNew, yNew, self)
 			couldMove = true
 		end
 
@@ -76,7 +76,7 @@ function Mob:move(dir)
 		self:flipCheck(xM)
 	end
 
-	local new_room = gMap.find_room(self.room, self.x, self.y)
+	local new_room = game_map.find_room(self.room, self.x, self.y)
 	if new_room then
 		self.room = new_room
 	end
@@ -90,10 +90,10 @@ function Mob:out_of_bounds()
 end
 
 function Mob:hit(dir,damage)
-	local xM,yM = DIRX[dir],DIRY[dir]
+	local xM,yM = DIR_X[dir],DIR_Y[dir]
 
 	for i = 1, 3 do
-		particleSys.newParticle(
+		particle_sys.newParticle(
 			self.sx+4, self.sy+4, 4,
 			rand()*30-15+xM*rand()*40, rand()*30-15+yM*rand()*40, 17,
 			self.blood_color, 0, rand()+3)
@@ -113,19 +113,19 @@ function Mob:kill()
 end
 
 function Mob:remove()
-	gMap.setSquare(self.x, self.y, nil)
+	game_map.setSquare(self.x, self.y, nil)
 	self.remove_me = true
 end
 
 function Mob:trigger_interact(dir)
 	local x,y = self.x,self.y
 	
-	local xM,yM = DIRX[dir],DIRY[dir]
+	local xM,yM = DIR_X[dir],DIR_Y[dir]
 	x,y = x+xM,y+yM
 	
 	self:flipCheck(xM)
 	
-	local occupant = gMap.getSquare(x,y)
+	local occupant = game_map.getSquare(x,y)
 	
 	if occupant and occupant.interact then
 		occupant:interact(self)

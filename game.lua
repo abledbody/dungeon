@@ -1,12 +1,12 @@
 	--Localization--
 local sin,abs,round,min = math.sin,math.abs,math.round,math.min
-local HSW,HSH,DIRX,DIRY = const.HSW,const.HSH,const.DIRX,const.DIRY
+local HSW,HSH,DIR_X,DIR_Y = const.HSW,const.HSH,const.DIR_X,const.DIR_Y
 
 	--Constants--
 local CLASSPATH = PATH.."Game/"
 
 
-local game = {
+game = {
 	camSmooth = 0.16,
 	darkness = 3.99,
 	fade_speed = 10,
@@ -88,7 +88,7 @@ function game.screenshot()
 end
 
 	--States--
-function main.updates.game(dt)
+function game.update(dt)
 	time = time+dt
 	things.indicatorY = sin(time*7)+0.5
 	
@@ -127,14 +127,14 @@ function main.updates.game(dt)
 	mobs.update(dt)
 	things.update(dt)
 
-	gMap.update(dt)
+	game_map.update(dt)
 
-	particleSys.update(dt)
+	particle_sys.update(dt)
 
 	game.darkness = math.max(game.darkness - game.fade_speed * dt, 0)
 end
 
-function main.draws.game()
+function game.draw()
 	clear()
 
 	brightness(game.darkness)
@@ -142,17 +142,17 @@ function main.draws.game()
 	pushMatrix()
 	game.camera_transform()
 	
-	gMap.draw()
-	particleSys.draw()
+	game_map.draw()
+	particle_sys.draw()
 	mobs.doAll("draw")
 	things.doAll("draw")
 	
 	local xCheck,yCheck
 	
 	for i = 1, 4 do
-		xCheck = game.player.x + DIRX[i]
-		yCheck = game.player.y + DIRY[i]
-		local occupant = gMap.getSquare(xCheck,yCheck)
+		xCheck = game.player.x + DIR_X[i]
+		yCheck = game.player.y + DIR_Y[i]
+		local occupant = game_map.getSquare(xCheck,yCheck)
 		if occupant and occupant.interact then
 			occupant:drawIndicator()
 		end
@@ -170,5 +170,3 @@ game.setCamTarget = setCamTarget
 
 game.Timer = dofile(CLASSPATH.."Timer.lua")
 game.Animator = dofile(CLASSPATH.."Animator.lua")
-
-return game

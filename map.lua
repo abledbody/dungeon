@@ -1,12 +1,12 @@
 local LAVA_SPRITE = 25
 
-local gMap = {}
+game_map = {}
 
 local mdat = dofile(PATH.."mdat.lua")
 
 	--Localization--
 local band = bit.band
-local DIRX, DIRY = const.DIRX, const.DIRY
+local DIR_X, DIR_Y = const.DIR_X, const.DIR_Y
 local abs = math.abs
 
 	--Variables--
@@ -15,7 +15,7 @@ local bg = sheetImage:batch()
 
 local special_tiles = {
 	[LAVA_SPRITE] = {
-		animator = game.Animator:new(aData.lava, "anim"),
+		animator = game.Animator:new(a_data.lava, "anim"),
 		update = function(self, dt)
 			self.animator:update(dt)
 			for i = 1, #self.tiles do
@@ -37,22 +37,22 @@ local gridData = {}
 
 
 	--Functions--
-function gMap.dist(x1,y1,x2,y2)
+function game_map.dist(x1,y1,x2,y2)
 	local dx = abs(x2-x1)
 	local dy = abs(y2-y1)
 
 	return dx+dy
 end
 
-function gMap.ray_cast(x, y, dir, max_dist)
-	local delta_x = DIRX[dir]
-	local delta_y = DIRY[dir]
+function game_map.ray_cast(x, y, dir, max_dist)
+	local delta_x = DIR_X[dir]
+	local delta_y = DIR_Y[dir]
 
 	for dist = 1, max_dist do
 		local target_x =  x + delta_x * dist
 		local target_y =  y + delta_y * dist
 
-		if dist == max_dist or gMap.getSquare(target_x, target_y) then
+		if dist == max_dist or game_map.getSquare(target_x, target_y) then
 			return target_x, target_y, dist
 		end
 	end
@@ -106,8 +106,8 @@ local function tileIter(x,y,spr)
 		local flags = fget(spr)
 		
 		if checkBit(flags,0) then
-			if not gMap.getSquare(x, y) then
-				gMap.setSquare(x, y, gridData)
+			if not game_map.getSquare(x, y) then
+				game_map.setSquare(x, y, gridData)
 			end
 		end
 	end
@@ -158,15 +158,15 @@ local function inBounds(xT, yT, room_index)
 	return yT>=y and xT>=x and yT<y+h and xT<x+w
 end
 
-function gMap.setSquare(x,y,value)
+function game_map.setSquare(x,y,value)
 	gridData[x.." "..y] = value
 end
 
-function gMap.getSquare(x, y)
+function game_map.getSquare(x, y)
 	return gridData[x.." "..y]
 end
 
-function gMap.bulk(obj,x,y,w,h,action)
+function game_map.bulk(obj,x,y,w,h,action)
 	for i = x, x+w-1 do
 		for j = y, y+h-1 do
 			action(i,j,obj)
@@ -174,7 +174,7 @@ function gMap.bulk(obj,x,y,w,h,action)
 	end
 end
 
-function gMap.switchRoom(new_room)
+function game_map.switchRoom(new_room)
 	current_room = new_room
 	
 	local room = mdat.rooms[current_room]
@@ -217,7 +217,7 @@ function gMap.switchRoom(new_room)
 	game.setCamTarget(x + room.cx, y + room.cy)
 end
 
-function gMap.find_room(current, x, y)
+function game_map.find_room(current, x, y)
 	if inBounds(x, y, current) then
 		return false
 	else
@@ -242,27 +242,25 @@ function gMap.find_room(current, x, y)
 	end
 end
 
-function gMap.plMoved(x,y)
-	local new_room = gMap.find_room(current_room, x, y)
+function game_map.plMoved(x,y)
+	local new_room = game_map.find_room(current_room, x, y)
 	if new_room then
-		gMap.switchRoom(new_room)
+		game_map.switchRoom(new_room)
 	end
 end
 
-function gMap.is_loaded(room_index)
+function game_map.is_loaded(room_index)
 	return loaded_rooms[room_index]
 end
 
-function gMap.draw()
+function game_map.draw()
 	bg:draw()
 end
 
-function gMap.update(dt)
+function game_map.update(dt)
 	for _,v in pairs(special_tiles) do
 		if v.update then
 			v:update(dt)
 		end
 	end
 end
-
-return gMap

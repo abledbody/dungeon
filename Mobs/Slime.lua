@@ -36,7 +36,7 @@ end
 
 function Slime:kill()
 	for i = 1, 10 do
-		particleSys.newParticle(self.sx+4,self.sy+8,4,rand()*20-10,rand()*20-10,28,11,0,rand()+3)
+		particle_sys.newParticle(self.sx+4,self.sy+8,4,rand()*20-10,rand()*20-10,28,11,0,rand()+3)
 	end
 
 	Mob.kill(self)

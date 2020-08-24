@@ -15,7 +15,7 @@ class = Library("class")
 --== Load external libraries ==--
 
 --Animation system
-anim = dofile(PATH.."anim.lua")
+dofile(PATH.."anim.lua")
 --Extended math library
 dofile(PATH.."amath.lua")
 
@@ -23,37 +23,39 @@ dofile(PATH.."amath.lua")
 --== Load external files ==--
 
 --Animation data
-aData = dofile(PATH.."adat.lua")
+dofile(PATH.."adat.lua")
 --Game constants
-const = dofile(PATH.."gameConsts.lua")
+dofile(PATH.."gameConsts.lua")
 
 brightness = dofile(PATH.."brightness.lua")
 
 --== Load game modules ==--
 
-main = dofile(PATH.."main.lua")
-game = dofile(PATH.."game.lua")
-throw_select = dofile(PATH.."throwselect.lua")
-main_menu = dofile(PATH.."mainmenu.lua")
-game_over = dofile(PATH.."gameover.lua")
-game_menu = dofile(PATH.."gamemenu.lua")
-quit_prompt = dofile(PATH.."quitprompt.lua")
+--States--
+dofile(PATH.."main.lua")
+dofile(PATH.."game.lua")
+dofile(PATH.."throwselect.lua")
+dofile(PATH.."mainmenu.lua")
+dofile(PATH.."gameover.lua")
+dofile(PATH.."gamemenu.lua")
+dofile(PATH.."quitprompt.lua")
 
-menu = dofile(PATH.."menu.lua")
-diBox = dofile(PATH.."diBox.lua")
-gMap = dofile(PATH.."map.lua")
-components = dofile(PATH.."components.lua")
-mobs = dofile(PATH.."mobs.lua")
-things = dofile(PATH.."things.lua")
-items = dofile(PATH.."items.lua")
-particleSys = dofile(PATH.."particles.lua")
+--Others--
+dofile(PATH.."menu.lua")
+dofile(PATH.."diBox.lua")
+dofile(PATH.."map.lua")
+dofile(PATH.."components.lua")
+dofile(PATH.."mobs.lua")
+dofile(PATH.."things.lua")
+dofile(PATH.."items.lua")
+dofile(PATH.."particles.lua")
 
 
 --== Start the program ==--
 
 function _init()
-	main.setState("main_menu")
-	gMap.switchRoom("entry")
+	main.set_state(main_menu)
+	game_map.switchRoom("entry")
 	mobs.spawn("Player", 59, 1, nil, "entry")
 	items.types.water_flask:add(20)
 end

@@ -1,7 +1,7 @@
 local ExTile = class("ExTile", things.Thing)
 
 function ExTile:initialize(x,y,dat)
-	gMap.setSquare(x, y, self)
+	game_map.setSquare(x, y, self)
 	
 	components.examable(self, dat)
 	
@@ -12,7 +12,7 @@ function ExTile:draw()
 end
 
 function ExTile:remove()
-	gMap.setSquare(self.x, self.y, nil)
+	game_map.setSquare(self.x, self.y, nil)
 	things.Thing.remove(self)
 end
 
