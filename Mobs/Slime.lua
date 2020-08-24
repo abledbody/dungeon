@@ -4,7 +4,7 @@ local rand = math.random
 local Mob = mobs.Mob
 local melee = components.melee
 local health = components.health
-local ai = dofile(MOBS_PATH.."AI/SlimeAI.lua")
+local ai = dofile(MOBS_PATH.."AI/Slime_AI.lua")
 
 local anim_set = {
 	idle = {

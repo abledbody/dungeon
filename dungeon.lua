@@ -23,9 +23,9 @@ dofile(PATH.."amath.lua")
 --== Load external files ==--
 
 --Animation data
-dofile(PATH.."adat.lua")
+dofile(PATH.."a_data.lua")
 --Game constants
-dofile(PATH.."gameConsts.lua")
+dofile(PATH.."const.lua")
 
 brightness = dofile(PATH.."brightness.lua")
 
@@ -34,15 +34,15 @@ brightness = dofile(PATH.."brightness.lua")
 --States--
 dofile(PATH.."main.lua")
 dofile(PATH.."game.lua")
-dofile(PATH.."throwselect.lua")
-dofile(PATH.."mainmenu.lua")
-dofile(PATH.."gameover.lua")
-dofile(PATH.."gamemenu.lua")
-dofile(PATH.."quitprompt.lua")
+dofile(PATH.."throw_select.lua")
+dofile(PATH.."main_menu.lua")
+dofile(PATH.."game_over.lua")
+dofile(PATH.."game_menu.lua")
+dofile(PATH.."quit_prompt.lua")
 
 --Others--
 dofile(PATH.."menu.lua")
-dofile(PATH.."diBox.lua")
+dofile(PATH.."di_box.lua")
 dofile(PATH.."map.lua")
 dofile(PATH.."components.lua")
 dofile(PATH.."mobs.lua")
