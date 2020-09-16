@@ -40,6 +40,7 @@ local HSW, HSH = screenWidth() / 2, screenHeight() /2
 local view_x, view_y = HSW, HSH
 local view_scale = 1
 local dragging = false
+local show_room_data = false
 
 local function Sprite(id, x, y)
     id = id - 1
@@ -59,10 +60,15 @@ local function draw_tilemap()
     Map:map(tile_draw)
 end
 
-local function press_square(x, y)
-    Sprite(193, x * 8, y * 8)
-    sleep(0.2)
+local function find_mouse(x, y)
+	return (x - HSW) / view_scale + view_x, (y - HSH) / view_scale + view_y
 end
+
+local function press_square(x, y)
+	
+end
+
+------LOVE events------
 
 local function _mousepressed(x, y, button)
     if button == 2 then
@@ -70,7 +76,7 @@ local function _mousepressed(x, y, button)
         cursor("hand")
     end
     if button == 1 then
-        press_square(floor((view_x + x) / 8), floor((view_y + y) / 8))
+        press_square(find_mouse(floor(x / 8), floor(y / 8)))
     end
 end
 
@@ -100,6 +106,20 @@ local function _wheelmoved(_, delta)
 	end
 end
 
+local function _keypressed(key)
+	if key == "lalt" then
+		show_room_data = true
+	end
+end
+
+local function _keyreleased(key)
+	if key == "lalt" then
+		show_room_data = false
+	end
+end
+
+------Main loops------
+
 local function _update(dt)
 
 end
@@ -122,6 +142,28 @@ local function _draw()
 
     draw_tilemap()
 
+	for room_name, room in pairs(mdat.rooms) do
+		local room_px, room_py = room.x * 8, room.y * 8
+		local room_pw, room_ph = room.w * 8, room.h * 8
+		local room_prx, room_pry = room.rx * 8, room.ry * 8
+		local room_prw, room_prh = room.rw * 8, room.rh * 8
+
+		if show_room_data then
+			color(11)
+			rect(room_prx, room_pry, room_prw, room_prh, true)
+			color(8)
+			rect(room_px, room_py, room_pw, room_ph, true)
+			
+			color(0)
+			rect(room_px + 1, room_py + 1, room_name:len() * 5, 7)
+			color(7)
+			print(room_name, room_px + 1, room_py + 1)
+		end
+	end
+
+	local x, y = find_mouse(getMPos())
+	Sprite(193, x, y)
+
     popMatrix()
 end
 
@@ -134,6 +176,8 @@ local events = {
     mousereleased = _mousereleased,
 	mousemoved = _mousemoved,
 	wheelmoved = _wheelmoved,
+	keypressed = _keypressed,
+	keyreleased = _keyreleased,
 }
 
 while true do
