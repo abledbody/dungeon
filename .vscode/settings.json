@@ -25,7 +25,9 @@
 		"ellipse",
 		"imagedata",
 		"quad",
-		"palt"
+		"palt",
+		"pullEvent",
+		"getMPos"
 	],
     "Lua.diagnostics.disable": [
         "lowercase-global"
