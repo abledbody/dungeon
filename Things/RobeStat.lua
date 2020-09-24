@@ -1,4 +1,4 @@
-local RobeStat = class("RobeStat", things.Thing)
+local RobeStat = class("RobeStat", objects.Thing)
 
 local exam_dat = {
 	"It's a statue of a robed figure.",
@@ -17,7 +17,7 @@ function RobeStat:initialize(x, y)
 	
 	dat = self.dat
 	
-	things.Thing.initialize(self, x, y)
+	objects.Thing.initialize(self, x, y)
 end
 
 function RobeStat:draw()
@@ -30,14 +30,14 @@ function RobeStat:drawIndicator()
 	local x,y = self.x,self.y
 	
 	x = x*8+4
-	y = y*8-5+things.indicatorY
+	y = y*8-5+objects.indicatorY
 	
 	Sprite(361,x,y)
 end
 
 function RobeStat:remove()
 	game_map.bulk(nil, self.x, self.y + 1, 2, 2, game_map.setSquare)
-	things.Thing.remove(self)
+	objects.Thing.remove(self)
 end
 
 return RobeStat

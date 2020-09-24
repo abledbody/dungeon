@@ -1,6 +1,6 @@
 local DIR_X, DIR_Y = const.DIR_X, const.DIR_Y
 
-local FlyingFlask = class("FlyingFlask", things.Thing)
+local FlyingFlask = class("FlyingFlask", objects.Thing)
 
 local THROW_SPEED = 160
 local GRAVITY = 200
@@ -26,7 +26,7 @@ function FlyingFlask:initialize(x, y, dir, item)
 	self.y_vel = DIR_Y[dir] * THROW_SPEED
 	self.z_vel = get_zvel(distance * 8)
 
-	things.Thing.initialize(self, target_x, target_y)
+	objects.Thing.initialize(self, target_x, target_y)
 end
 
 function FlyingFlask:update(dt)

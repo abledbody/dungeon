@@ -1,4 +1,4 @@
-local Mob = mobs.Mob
+local Mob = objects.Mob
 local melee = components.melee
 local health = components.health
 local thrower = components.thrower
