@@ -27,7 +27,7 @@ rooms.entry = {
 	}
 }
 
-rooms.entryHall = {
+rooms.entry_hall = {
 	x = 58, y = 11,
 	w = 4, h = 7,
 
@@ -71,7 +71,7 @@ rooms.slime = {
 	}
 }
 
-rooms.lavaBridge = {
+rooms.lava_bridge = {
 	x = 52, y = 18,
 	w = 10, h = 13,
 
@@ -84,7 +84,7 @@ rooms.lavaBridge = {
 	},
 }
 
-rooms.lavaCave = {
+rooms.lava_cave = {
 	x = 44, y = 18,
 	w = 8, h = 8,
 
@@ -100,12 +100,12 @@ rooms.lavaCave = {
 --Connections
 
 local connections = {
-	{"entry", "entryHall"},
-	{"entryHall", "text"},
-	{"entryHall", "slime"},
-	{"entryHall", "lavaBridge"},
-	{"slime", "lavaCave"},
-	{"lavaBridge", "lavaCave"}
+	{"entry", "entry_hall"},
+	{"entry_hall", "text"},
+	{"entry_hall", "slime"},
+	{"entry_hall", "lava_bridge"},
+	{"slime", "lava_cave"},
+	{"lava_bridge", "lava_cave"}
 }
 
 --Moving the connection data to the rooms themselves.

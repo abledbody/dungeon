@@ -95,19 +95,11 @@ local function press_square(x, y)
 			selected = room
 			selected_rect = {x = room.x * 8, y = room.y * 8, w = room.w * 8, h = room.h * 8}
 			selected_name = room_name
-			for _, mob in pairs(room.mobs) do
-				if x == mob[2] + room.x and y == mob[3] + room.y then
-					selected = mob
-					selected_rect = {x = (mob[2] + room.x) * 8, y = (mob[3] + room.y) * 8, w = 8, h = 8}
-					selected_name = mob[1]
-					break
-				end
-			end
-			for _, thing in pairs(room.things) do
-				if x == thing[2] + room.x and y == thing[3] + room.y then
-					selected = thing
-					selected_rect = {x = (thing[2] + room.x) * 8, y = (thing[3] + room.y) * 8, w = 8, h = 8}
-					selected_name = thing[1]
+			for _, object in pairs(room.objects) do
+				if x == object[2] + room.x and y == object[3] + room.y then
+					selected = object
+					selected_rect = {x = (object[2] + room.x) * 8, y = (object[3] + room.y) * 8, w = 8, h = 8}
+					selected_name = object[1]
 					break
 				end
 			end
@@ -209,18 +201,11 @@ local function _draw()
 			print(room_name, room_px + 1, room_py + 1)
 		end
 
-		for _, mob in pairs(room.mobs) do
-			if sprite_lookup[mob[1]] then
-				sprite_lookup[mob[1]](room.x + mob[2], room.y + mob[3])
+		for _, object in pairs(room.objects) do
+			if sprite_lookup[object[1]] then
+				sprite_lookup[object[1]](room.x + object[2], room.y + object[3])
 			else
-				Sprite(384, (room.x + mob[2]) * 8, (room.y + mob[3]) * 8)
-			end
-		end
-		for _, thing in pairs(room.things) do
-			if sprite_lookup[thing[1]] then
-				sprite_lookup[thing[1]](room.x + thing[2], room.y + thing[3])
-			else
-				Sprite(384, (room.x + thing[2]) * 8, (room.y + thing[3]) * 8)
+				Sprite(384, (room.x + object[2]) * 8, (room.y + object[3]) * 8)
 			end
 		end
 	end
