@@ -1,8 +1,10 @@
 local PATH = "D:/dungeon/"
 
 cursor("normal")
+dofile(PATH .. "Rayleigh.lua")
 
-local mdat = dofile("D:/dungeon/mdat.lua")
+local mdat = dofile(PATH .. "mdat.lua")
+dofile(PATH .. "roomedit_dat.lua")
 
 local MapObj = require("Libraries.map")
 local Map = MapObj(144, 128)
@@ -44,7 +46,9 @@ local selected = nil
 local selected_rect = nil
 local selected_name = nil
 
-local function Sprite(id, x, y)
+f = {}
+
+function f.Sprite(id, x, y)
     id = id - 1
     local quad_x = floor(id) % 24 * 8
     local quad_y = floor(id / 24) * 8
@@ -52,7 +56,7 @@ local function Sprite(id, x, y)
     spr_sheet:draw(x, y, 0, 1, 1, q)
 end
 
-local function SpriteGroup(id, w, h, x, y)
+function f.SpriteGroup(id, w, h, x, y)
     id = id - 1
     local quad_x = floor(id) % 24 * 8
     local quad_y = floor(id / 24) * 8
@@ -60,16 +64,9 @@ local function SpriteGroup(id, w, h, x, y)
     spr_sheet:draw(x, y, 0, 1, 1, q)
 end
 
-local sprite_lookup = {
-	Slime = function(x, y) Sprite(202, x * 8, y * 8) end,
-	RobeStat = function(x, y) SpriteGroup(97, 2, 3, x * 8, y * 8) end,
-	Chest = function(x, y) palt(0, false) palt(1, true) Sprite(169, x * 8, y * 8) palt() end,
-	Barrel = function(x, y) Sprite(123, x * 8, y * 8) end,
-}
-
 local function tile_draw(x, y, id)
     if id > 0 then
-        Sprite(id, x * 8, y * 8)
+        f.Sprite(id, x * 8, y * 8)
     end
 end
 
@@ -92,14 +89,18 @@ local function press_square(x, y)
 
 	for room_name, room in pairs(mdat.rooms) do
 		if in_room(room, x, y) then
+			--We're going to assume that we've just selected the room
 			selected = room
 			selected_rect = {x = room.x * 8, y = room.y * 8, w = room.w * 8, h = room.h * 8}
 			selected_name = room_name
+
+			--And then we'll check to see if we've actually selected an object, and replace the selection data with that if we have.
 			for _, object in pairs(room.objects) do
-				if x == object[2] + room.x and y == object[3] + room.y then
+				if data.test_occupancy(object[1], x, y, object[2] + room.x, object[3] + room.y) then
 					selected = object
-					selected_rect = {x = (object[2] + room.x) * 8, y = (object[3] + room.y) * 8, w = 8, h = 8}
 					selected_name = object[1]
+					local rect_x, rect_y, rect_w, rect_h = data.get_object_bounds(selected_name, (object[2] + room.x) * 8, (object[3] + room.y) * 8)
+					selected_rect = {x = rect_x, y = rect_y, w = rect_w, h = rect_h}
 					break
 				end
 			end
@@ -168,21 +169,25 @@ end
 local function _draw()
 	clear()
 
+	local inv_scale = 1 / view_scale
+
+	--Camera transformations
 	pushMatrix()
 	cam("translate", HSW, HSH)
 	cam("scale", view_scale, view_scale)
-    cam("translate", floor(-view_x * view_scale) / view_scale, floor(-view_y * view_scale) / view_scale)
+    cam("translate", -floor(view_x * view_scale) * inv_scale, -floor(view_y * view_scale) * inv_scale)
 
 	--Border
 	color(7)
-	local inv_scale = 1 / view_scale
 	rect(-inv_scale, -inv_scale, 1152 + inv_scale * 2, inv_scale)
 	rect(-inv_scale, -inv_scale, inv_scale, 1024 + inv_scale * 2)
 	rect(-inv_scale, 1025, 1152 + inv_scale * 2, inv_scale)
 	rect(1153, -inv_scale, inv_scale, 1024 + inv_scale * 2)
 
+	--Tilemap
     draw_tilemap()
 
+	--Rooms
 	for room_name, room in pairs(mdat.rooms) do
 		local room_px, room_py = room.x * 8, room.y * 8
 		local room_pw, room_ph = room.w * 8, room.h * 8
@@ -202,11 +207,7 @@ local function _draw()
 		end
 
 		for _, object in pairs(room.objects) do
-			if sprite_lookup[object[1]] then
-				sprite_lookup[object[1]](room.x + object[2], room.y + object[3])
-			else
-				Sprite(384, (room.x + object[2]) * 8, (room.y + object[3]) * 8)
-			end
+			data.draw_object(object[1], object[2] + room.x, object[3] + room.y)
 		end
 	end
 	
