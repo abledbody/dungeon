@@ -11,57 +11,93 @@ local Map = MapObj(144, 128)
 
 local floor = math.floor
 
-local dungeon = HDD.read(PATH .. "dungeon.lk12")
-local spr_sheet
+local function get_sheet(file)
+	local start = file:find("LK12;GPUIMG;")
+    local stop = file:find("___sfx___") or file:len()
 
-do
-    local start = dungeon:find("LK12;GPUIMG;")
-    local stop = dungeon:find("___sfx___")
+    local ss_data = file:sub(start, stop)
 
-    local ss_data = dungeon:sub(start, stop)
-
-    spr_sheet = GPU.imagedata(ss_data)
+    return GPU.imagedata(ss_data)
 end
 
-spr_sheet = spr_sheet:image()
+local function get_tilemap(file)
+	local start = file:find("LK12;TILEMAP;")
+    local stop = file:find("___spritesheet___")
 
-do
-    local start = dungeon:find("LK12;TILEMAP;")
-    local stop = dungeon:find("___spritesheet___")
-
-    local tm_data = dungeon:sub(start, stop)
+    local tm_data = file:sub(start, stop)
 
     Map:import(tm_data)
 end
 
+local dungeon = HDD.read(PATH .. "dungeon.lk12")
+local roomedit_sheet_file = HDD.read(PATH .. "roomedit_sheet.lk12")
+
+local spr_sheets = {
+	get_sheet(dungeon):image(),
+	get_sheet(roomedit_sheet_file):image(),
+}
+get_tilemap(dungeon)
+
 --------------------------------------
 
 local HSW, HSH = screenWidth() / 2, screenHeight() /2
+local TOOLBAR_WIDTH = 10
 
 local view_x, view_y = HSW, HSH
 local view_scale = 1
 local dragging = false
 local show_room_data = false
+local show_objects = true
 local selected = nil
 local selected_rect = nil
 local selected_name = nil
 
+
+local selected_tool = 1
+local toolbar = {
+	{
+		sprite = 2,
+	},
+	{
+		sprite = 4,
+		on_selected = function()
+			show_objects = false
+		end,
+		on_deselected = function()
+			show_objects = true
+		end,
+	},
+}
+
+local toggles = {
+	{
+		sprite = 5,
+		enabled = false,
+		on_pressed = function(self)
+			self:set_enabled(not self.enabled)
+		end,
+		set_enabled = function(self, value)
+			show_room_data, self.enabled = value, value
+		end,
+	}
+}
+
 f = {}
 
-function f.Sprite(id, x, y)
+function f.Sprite(id, x, y, sheet_index)
     id = id - 1
     local quad_x = floor(id) % 24 * 8
     local quad_y = floor(id / 24) * 8
     local q = GPU.quad(quad_x, quad_y, 8, 8, 192, 128)
-    spr_sheet:draw(x, y, 0, 1, 1, q)
+    spr_sheets[sheet_index or 1]:draw(x, y, 0, 1, 1, q)
 end
 
-function f.SpriteGroup(id, w, h, x, y)
+function f.SpriteGroup(id, w, h, x, y, sheet_index)
     id = id - 1
     local quad_x = floor(id) % 24 * 8
     local quad_y = floor(id / 24) * 8
     local q = GPU.quad(quad_x, quad_y, w * 8, h * 8, 192, 128)
-    spr_sheet:draw(x, y, 0, 1, 1, q)
+    spr_sheets[sheet_index or 1]:draw(x, y, 0, 1, 1, q)
 end
 
 local function tile_draw(x, y, id)
@@ -95,17 +131,39 @@ local function press_square(x, y)
 			selected_name = room_name
 
 			--And then we'll check to see if we've actually selected an object, and replace the selection data with that if we have.
-			for _, object in pairs(room.objects) do
-				if data.test_occupancy(object[1], x, y, object[2] + room.x, object[3] + room.y) then
-					selected = object
-					selected_name = object[1]
-					local rect_x, rect_y, rect_w, rect_h = data.get_object_bounds(selected_name, (object[2] + room.x) * 8, (object[3] + room.y) * 8)
-					selected_rect = {x = rect_x, y = rect_y, w = rect_w, h = rect_h}
-					break
+			if show_objects then
+				for _, object in pairs(room.objects) do
+					if data.test_occupancy(object[1], x, y, object[2] + room.x, object[3] + room.y) then
+						selected = object
+						selected_name = object[1]
+						local rect_x, rect_y, rect_w, rect_h = data.get_object_bounds(selected_name, (object[2] + room.x) * 8, (object[3] + room.y) * 8)
+						selected_rect = {x = rect_x, y = rect_y, w = rect_w, h = rect_h}
+						break
+					end
 				end
 			end
 			break
 		end
+	end
+end
+
+local function press_tool(x)
+	if x >= 0 and x < #toolbar * 10 then
+		local tool = toolbar[selected_tool]
+		if tool.on_deselected then
+			tool.on_deselected()
+		end
+
+		selected_tool = floor(x / 10) + 1
+
+		local tool = toolbar[selected_tool]
+		if tool.on_selected then
+			tool.on_selected()
+		end
+	elseif x < screenWidth() and x > screenWidth() - #toggles * 10 then
+		local toggle_index = floor((screenWidth() - x) / 10) + 1
+		local toggle = toggles[toggle_index]
+		toggle:on_pressed()
 	end
 end
 
@@ -117,8 +175,12 @@ local function _mousepressed(x, y, button)
         cursor("hand")
     end
 	if button == 1 then
-		local square_x, square_y = find_mouse(x, y)
-        press_square(floor(square_x / 8), floor(square_y / 8))
+		if y >= screenHeight() - TOOLBAR_WIDTH then
+			press_tool(x)
+		else
+			local square_x, square_y = find_mouse(x, y)
+			press_square(floor(square_x / 8), floor(square_y / 8))
+		end
     end
 end
 
@@ -150,13 +212,13 @@ end
 
 local function _keypressed(key)
 	if key == "lalt" then
-		show_room_data = true
+		toggles[1]:set_enabled(true)
 	end
 end
 
 local function _keyreleased(key)
 	if key == "lalt" then
-		show_room_data = false
+		toggles[1]:set_enabled(false)
 	end
 end
 
@@ -171,23 +233,23 @@ local function _draw()
 
 	local inv_scale = 1 / view_scale
 
-	--Camera transformations
+	--Camera transformations--
 	pushMatrix()
 	cam("translate", HSW, HSH)
 	cam("scale", view_scale, view_scale)
     cam("translate", -floor(view_x * view_scale) * inv_scale, -floor(view_y * view_scale) * inv_scale)
 
-	--Border
+	--Border--
 	color(7)
 	rect(-inv_scale, -inv_scale, 1152 + inv_scale * 2, inv_scale)
 	rect(-inv_scale, -inv_scale, inv_scale, 1024 + inv_scale * 2)
 	rect(-inv_scale, 1025, 1152 + inv_scale * 2, inv_scale)
 	rect(1153, -inv_scale, inv_scale, 1024 + inv_scale * 2)
 
-	--Tilemap
+	--Tilemap--
     draw_tilemap()
 
-	--Rooms
+	--Rooms--
 	for room_name, room in pairs(mdat.rooms) do
 		local room_px, room_py = room.x * 8, room.y * 8
 		local room_pw, room_ph = room.w * 8, room.h * 8
@@ -206,8 +268,10 @@ local function _draw()
 			print(room_name, room_px + 1, room_py + 1)
 		end
 
-		for _, object in pairs(room.objects) do
-			data.draw_object(object[1], object[2] + room.x, object[3] + room.y)
+		if show_objects then
+			for _, object in pairs(room.objects) do
+				data.draw_object(object[1], object[2] + room.x, object[3] + room.y)
+			end
 		end
 	end
 	
@@ -225,6 +289,37 @@ local function _draw()
 		rect(HSW - str_len * 2.5 - 1, 0, str_len * 5 + 1, 8)
 		color(7)
 		print(selected_name, HSW - str_len * 2.5, 1)
+	end
+
+	--Toolbar--
+	color(2)
+	local toolbar_y = screenHeight() - TOOLBAR_WIDTH
+	rect(0, toolbar_y, screenWidth(), TOOLBAR_WIDTH)
+
+	for i = 1, #toolbar do
+		local tool = toolbar[i]
+
+		local x = (i - 1) * 10
+		if selected_tool == i then
+			pal(2, 15)
+			pal(15, 2)
+			rect(x, toolbar_y, 10, 10)
+		end
+		f.Sprite(tool.sprite, x + 1, toolbar_y + 1, 2)
+		pal()
+	end
+
+	for i = 1, #toggles do
+		local toggle = toggles[i]
+
+		local x = screenWidth() - 10 - (i - 1) * 10
+		if toggle.enabled then
+			pal(2, 15)
+			pal(15, 2)
+			rect(x, toolbar_y, 10, 10)
+		end
+		f.Sprite(toggle.sprite, x + 1, toolbar_y + 1, 2)
+		pal()
 	end
 end
 
