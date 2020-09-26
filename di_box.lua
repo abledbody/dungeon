@@ -55,6 +55,7 @@ end
 
 --Dialogue box trigger
 function di_box.show(text)
+	game.draw()
 	--We keep a screenshot of the game to display behind the text box.
 	game.screenshot()
 	main.set_state(di_box)

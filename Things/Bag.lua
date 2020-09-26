@@ -1,4 +1,4 @@
-local Bag = class("Bag", things.Thing)
+local Bag = class("Bag", objects.Thing)
 
 local BAG_GRAVITY = 300
 local BAG_JUMP = -60
@@ -13,7 +13,7 @@ function Bag:initialize(x, y, contains)
 
 	components.searchable(self, item)
 
-	things.Thing.initialize(self, x, y)
+	objects.Thing.initialize(self, x, y)
 end
 
 function Bag:on_searched()
@@ -35,7 +35,7 @@ end
 
 function Bag:remove()
 	game_map.setSquare(self.x, self.y, nil)
-	things.Thing.remove(self)
+	objects.Thing.remove(self)
 end
 
 return Bag

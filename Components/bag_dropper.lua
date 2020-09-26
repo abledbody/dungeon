@@ -1,5 +1,5 @@
 local function drop_bag(self)
-	things.spawn("Bag", self.x, self.y, {self.bag_dropper.contains})
+	objects.spawn("Bag", self.x, self.y, {self.bag_dropper.contains})
 end
 
 local function attach(object, item)

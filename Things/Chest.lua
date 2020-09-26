@@ -1,4 +1,4 @@
-local Chest = class("Chest", things.Thing)
+local Chest = class("Chest", objects.Thing)
 
 function Chest:initialize(x, y, contains)
 	game_map.setSquare(x, y, self)
@@ -7,7 +7,7 @@ function Chest:initialize(x, y, contains)
 
 	components.searchable(self, item)
 
-	things.Thing.initialize(self, x, y)
+	objects.Thing.initialize(self, x, y)
 end
 
 function Chest:on_searched()
@@ -31,7 +31,7 @@ end
 
 function Chest:remove()
 	game_map.setSquare(self.x, self.y, nil)
-	things.Thing.remove(self)
+	objects.Thing.remove(self)
 end
 
 

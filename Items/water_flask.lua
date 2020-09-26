@@ -21,7 +21,7 @@ end
 
 function water_flask:throw(object, dir)
 	self:remove()
-	things.spawn("FlyingFlask", object.x, object.y, {dir, self})
+	objects.spawn("FlyingFlask", object.x, object.y, {dir, self})
 end
 
 function water_flask:smash(x, y)

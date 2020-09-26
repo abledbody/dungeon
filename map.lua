@@ -67,25 +67,16 @@ local function load_room_contents(room_index)
 	local room = mdat.rooms[room_index]
 	local x, y = room.x, room.y
 
-	local room_contents = loaded_rooms[room_index]
-
-	for i = 1, #room.mobs do
-		local item = room.mobs[i]
+	for i = 1, #room.objects do
+		local item = room.objects[i]
 		
 		local name, xT, yT, meta = unpack(item)
 		if not (name and xT and yT and meta) then error("Room data requires the name of the class, the x and y positions, and a table with spawning metadata.") end
 		
-		local new_mob = mobs.spawn(name, x+xT, y+yT, meta, room_index)
-	end
-
-	for i = 1, #room.things do
-		local item = room.things[i]
-		
-		local name,xT,yT,meta = unpack(item)
-		if not (name and xT and yT and meta) then error("Room data requires the name of the class, the x and y positions, and a table with spawning metadata.") end
-		
-		local new_thing = things.spawn(name, x+xT, y+yT, meta, room_index)
-		table.insert(room_contents.things, new_thing)
+		local object = objects.spawn(name, x+xT, y+yT, meta, room_index)
+		if object.static_object then
+			table.insert(loaded_rooms[room_index].static_objects, object)
+		end
 	end
 end
 
@@ -133,7 +124,7 @@ end
 local function load_room(room_index)
 	loaded_rooms[room_index] = {
 		tiles = {},
-		things = {},
+		static_objects = {},
 	}
 	
 	load_room_contents(room_index)
@@ -142,7 +133,7 @@ end
 local function unload_room(room_index)
 	local room = loaded_rooms[room_index]
 
-	for _, v in pairs(room.things) do
+	for _, v in pairs(room.static_objects) do
 		v:remove()
 	end
 

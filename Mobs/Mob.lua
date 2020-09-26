@@ -5,6 +5,8 @@ local rand = math.random
 	--Class--
 local Mob = class("Mob")
 
+Mob.layer = 2 --[2] Mobs
+
 Mob.smoove_rate = 0.06
 Mob.blood_color = 8
 Mob.move_speed = 0.22

@@ -1,13 +1,13 @@
 local rand = math.random
 
-local Barrel = class("Barrel", things.Thing)
+local Barrel = class("Barrel", objects.Thing)
 
 function Barrel:initialize(x, y, contains)
 	game_map.setSquare(x, y, self)
 
 	components.bag_dropper(self, contains)
 
-	things.Thing.initialize(self, x, y)
+	objects.Thing.initialize(self, x, y)
 end
 
 function Barrel:hit()
@@ -29,7 +29,7 @@ end
 
 function Barrel:remove()
 	game_map.setSquare(self.x, self.y, nil)
-	things.Thing.remove(self)
+	objects.Thing.remove(self)
 end
 
 return Barrel

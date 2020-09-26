@@ -90,7 +90,7 @@ end
 	--States--
 function game.update(dt)
 	time = time+dt
-	things.indicatorY = sin(time*7)+0.5
+	objects.indicatorY = sin(time*7)+0.5
 	
 	--Camera--
 	game.camera_smoove(dt)
@@ -104,12 +104,8 @@ function game.update(dt)
 
 	local attack = btn(5)
 	local interact = btn(6)
-	
-	local vMove = (btn(3) and -1 or 0) + (btn(4) and 1 or 0)
-	local hMove = (btn(1) and -1 or 0) + (btn(2) and 1 or 0)
-	
+
 	for i = 1, 4 do
-		
 		if btn_down(i) then
 			if interact then
 				game.player:trigger_interact(i)
@@ -124,8 +120,7 @@ function game.update(dt)
 		end
 	end
 	
-	mobs.update(dt)
-	things.update(dt)
+	objects.update(dt)
 
 	game_map.update(dt)
 
@@ -144,8 +139,7 @@ function game.draw()
 	
 	game_map.draw()
 	particle_sys.draw()
-	mobs.doAll("draw")
-	things.doAll("draw")
+	objects.doAll("draw")
 	
 	local xCheck,yCheck
 	

@@ -1,4 +1,4 @@
-local ItemPreview = class("ItemPreview", things.Thing)
+local ItemPreview = class("ItemPreview", objects.Thing)
 
 local RISE_HEIGHT = 10
 local RISE_SMOOVE = 0.25
@@ -17,7 +17,7 @@ function ItemPreview:initialize(x, y, item)
 	self.flash = game.Timer:new()
 	self.flash:trigger(FLASH_TIME)
 
-	things.Thing.initialize(self, x, y)
+	objects.Thing.initialize(self, x, y)
 end
 
 function ItemPreview:update(dt)

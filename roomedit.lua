@@ -1,75 +1,125 @@
 local PATH = "D:/dungeon/"
 
 cursor("normal")
+dofile(PATH .. "Rayleigh.lua")
 
-local mdat = dofile("D:/dungeon/mdat.lua")
+local mdat = dofile(PATH .. "mdat.lua")
+dofile(PATH .. "roomedit_dat.lua")
 
 local MapObj = require("Libraries.map")
 local Map = MapObj(144, 128)
 
 local floor = math.floor
 
-local dungeon = HDD.read(PATH .. "dungeon.lk12")
-local spr_sheet
+local function get_sheet(file)
+	local start = file:find("LK12;GPUIMG;")
+    local stop = file:find("___sfx___") or file:len()
 
-do
-    local start = dungeon:find("LK12;GPUIMG;")
-    local stop = dungeon:find("___sfx___")
+    local ss_data = file:sub(start, stop)
 
-    local ss_data = dungeon:sub(start, stop)
-
-    spr_sheet = GPU.imagedata(ss_data)
+    return GPU.imagedata(ss_data)
 end
 
-spr_sheet = spr_sheet:image()
+local function get_tilemap(file)
+	local start = file:find("LK12;TILEMAP;")
+    local stop = file:find("___spritesheet___")
 
-do
-    local start = dungeon:find("LK12;TILEMAP;")
-    local stop = dungeon:find("___spritesheet___")
-
-    local tm_data = dungeon:sub(start, stop)
+    local tm_data = file:sub(start, stop)
 
     Map:import(tm_data)
 end
 
+local dungeon = HDD.read(PATH .. "dungeon.lk12")
+local roomedit_sheet_file = HDD.read(PATH .. "roomedit_sheet.lk12")
+
+local spr_sheets = {
+	get_sheet(dungeon):image(),
+	get_sheet(roomedit_sheet_file):image(),
+}
+get_tilemap(dungeon)
+
 --------------------------------------
 
-local HSW, HSH = screenWidth() / 2, screenHeight() /2
+local SW, SH = screenSize()
+local HSW, HSH = SW / 2, SH / 2
+local FONT_WIDTH = fontWidth() + 1
+local FONT_HEIGHT = fontHeight()
+local TOOLBAR_WIDTH = 10
 
 local view_x, view_y = HSW, HSH
 local view_scale = 1
 local dragging = false
 local show_room_data = false
-local selected = nil
+local show_reveal_bounds = true
+local show_objects = true
+local selected_room = nil
+local selected_index = 1
 local selected_rect = nil
-local selected_name = nil
+local selected_object_name = nil
 
-local function Sprite(id, x, y)
+
+local toggles = {
+	{
+		sprite = 5,
+		enabled = false,
+		on_pressed = function(self)
+			self:set_enabled(not self.enabled)
+		end,
+		set_enabled = function(self, value)
+			show_room_data, self.enabled = value, value
+		end,
+	},
+	{
+		sprite = 6,
+		enabled = true,
+		on_pressed = function(self)
+			self:set_enabled(not self.enabled)
+		end,
+		set_enabled = function(self, value)
+			show_reveal_bounds, self.enabled = value, value
+		end,
+	},
+}
+
+local selected_tool = 1
+local toolbar = {
+	{
+		sprite = 2,
+	},
+	{
+		sprite = 4,
+		on_selected = function()
+			show_objects = false
+			toggles[1]:set_enabled(true)
+		end,
+		on_deselected = function()
+			show_objects = true
+			toggles[1]:set_enabled(false)
+		end,
+	},
+}
+
+f = {}
+
+function f.Sprite(id, x, y, sheet_index)
     id = id - 1
     local quad_x = floor(id) % 24 * 8
     local quad_y = floor(id / 24) * 8
     local q = GPU.quad(quad_x, quad_y, 8, 8, 192, 128)
-    spr_sheet:draw(x, y, 0, 1, 1, q)
+    spr_sheets[sheet_index or 1]:draw(x, y, 0, 1, 1, q)
 end
 
-local function SpriteGroup(id, w, h, x, y)
+function f.SpriteGroup(id, w, h, x, y, sheet_index)
     id = id - 1
     local quad_x = floor(id) % 24 * 8
     local quad_y = floor(id / 24) * 8
     local q = GPU.quad(quad_x, quad_y, w * 8, h * 8, 192, 128)
-    spr_sheet:draw(x, y, 0, 1, 1, q)
+    spr_sheets[sheet_index or 1]:draw(x, y, 0, 1, 1, q)
 end
-
-local sprite_lookup = {
-	Slime = function(x, y) Sprite(202, x * 8, y * 8) end,
-	RobeStat = function(x, y) SpriteGroup(97, 2, 3, x * 8, y * 8) end,
-	Chest = function(x, y) palt(0, false) palt(1, true) Sprite(169, x * 8, y * 8) palt() end,
-	Barrel = function(x, y) Sprite(123, x * 8, y * 8) end,
-}
 
 local function tile_draw(x, y, id)
     if id > 0 then
-        Sprite(id, x * 8, y * 8)
+        f.Sprite(id, x * 8, y * 8)
     end
 end
 
@@ -88,31 +138,54 @@ end
 local function press_square(x, y)
 	selected = nil
 	selected_rect = nil
-	selected_name = nil
+	selected_object_name = nil
 
 	for room_name, room in pairs(mdat.rooms) do
 		if in_room(room, x, y) then
-			selected = room
+			--We're going to assume that we've just selected the room
+			selected_room = room
+			selected_object_name = nil
 			selected_rect = {x = room.x * 8, y = room.y * 8, w = room.w * 8, h = room.h * 8}
-			selected_name = room_name
-			for _, mob in pairs(room.mobs) do
-				if x == mob[2] + room.x and y == mob[3] + room.y then
-					selected = mob
-					selected_rect = {x = (mob[2] + room.x) * 8, y = (mob[3] + room.y) * 8, w = 8, h = 8}
-					selected_name = mob[1]
-					break
-				end
-			end
-			for _, thing in pairs(room.things) do
-				if x == thing[2] + room.x and y == thing[3] + room.y then
-					selected = thing
-					selected_rect = {x = (thing[2] + room.x) * 8, y = (thing[3] + room.y) * 8, w = 8, h = 8}
-					selected_name = thing[1]
-					break
+			selected_object_name = room_name
+
+			--And then we'll check to see if we've actually selected an object, and replace the selection data with that if we have.
+			if show_objects then
+				for object_index, object in pairs(room.objects) do
+					if data.test_occupancy(object[1], x, y, object[2] + room.x, object[3] + room.y) then
+						selected_index = object_index
+						selected_object_name = object[1]
+						local rect_x, rect_y, rect_w, rect_h = data.get_object_bounds(selected_object_name, (object[2] + room.x) * 8, (object[3] + room.y) * 8)
+						selected_rect = {x = rect_x, y = rect_y, w = rect_w, h = rect_h}
+						break
+					end
 				end
 			end
 			break
 		end
+	end
+end
+
+local function select_tool(index)
+	local tool = toolbar[selected_tool]
+	if tool.on_deselected then
+		tool.on_deselected()
+	end
+	
+	selected_tool = index
+	
+	tool = toolbar[selected_tool]
+	if tool.on_selected then
+		tool.on_selected()
+	end
+end
+
+local function press_tool(x)
+	if x >= 0 and x < #toolbar * 10 then
+		select_tool(floor(x / 10) + 1)
+	elseif x < SW and x > SW - #toggles * 10 then
+		local toggle_index = floor((SW - x) / 10) + 1
+		local toggle = toggles[toggle_index]
+		toggle:on_pressed()
 	end
 end
 
@@ -124,8 +197,12 @@ local function _mousepressed(x, y, button)
         cursor("hand")
     end
 	if button == 1 then
-		local square_x, square_y = find_mouse(x, y)
-        press_square(floor(square_x / 8), floor(square_y / 8))
+		if y >= SH - TOOLBAR_WIDTH then
+			press_tool(x)
+		else
+			local square_x, square_y = find_mouse(x, y)
+			press_square(floor(square_x / 8), floor(square_y / 8))
+		end
     end
 end
 
@@ -155,15 +232,26 @@ local function _wheelmoved(_, delta)
 	end
 end
 
+local keypress_actions = {
+	lalt = function() toggles[1]:set_enabled(true) end,
+	["1"] = function() select_tool(1) end,
+	["2"] = function() select_tool(2) end,
+	r = function() toggles[2]:on_pressed() end,
+}
+
 local function _keypressed(key)
-	if key == "lalt" then
-		show_room_data = true
+	if keypress_actions[key] then
+		keypress_actions[key]()
 	end
 end
 
+local keyrelease_actions = {
+	lalt = function() toggles[1]:set_enabled(false) end,
+}
+
 local function _keyreleased(key)
-	if key == "lalt" then
-		show_room_data = false
+	if keyrelease_actions[key] then
+		keyrelease_actions[key]()
 	end
 end
 
@@ -176,52 +264,50 @@ end
 local function _draw()
 	clear()
 
+	local inv_scale = 1 / view_scale
+
+	--Camera transformations--
 	pushMatrix()
 	cam("translate", HSW, HSH)
 	cam("scale", view_scale, view_scale)
-    cam("translate", floor(-view_x * view_scale) / view_scale, floor(-view_y * view_scale) / view_scale)
+    cam("translate", -floor(view_x * view_scale) * inv_scale, -floor(view_y * view_scale) * inv_scale)
 
-	--Border
+	--Border--
 	color(7)
-	local inv_scale = 1 / view_scale
 	rect(-inv_scale, -inv_scale, 1152 + inv_scale * 2, inv_scale)
 	rect(-inv_scale, -inv_scale, inv_scale, 1024 + inv_scale * 2)
 	rect(-inv_scale, 1025, 1152 + inv_scale * 2, inv_scale)
 	rect(1153, -inv_scale, inv_scale, 1024 + inv_scale * 2)
 
+	--Tilemap--
     draw_tilemap()
 
+	--Rooms--
 	for room_name, room in pairs(mdat.rooms) do
 		local room_px, room_py = room.x * 8, room.y * 8
 		local room_pw, room_ph = room.w * 8, room.h * 8
 		local room_prx, room_pry = room.rx * 8, room.ry * 8
 		local room_prw, room_prh = room.rw * 8, room.rh * 8
 
+		if show_objects then
+			for _, object in pairs(room.objects) do
+				data.draw_object(object[1], object[2] + room.x, object[3] + room.y)
+			end
+		end
+
 		if show_room_data then
-			color(11)
-			rect(room_prx, room_pry, room_prw, room_prh, true)
+			if show_reveal_bounds then
+				color(11)
+				rect(room_prx, room_pry, room_prw, room_prh, true)
+			end
+			
 			color(8)
 			rect(room_px, room_py, room_pw, room_ph, true)
 			
 			color(0)
-			rect(room_px + 1, room_py + 1, room_name:len() * 5, 7)
+			rect(room_px + 1, room_py + 1, room_name:len() * FONT_WIDTH, FONT_HEIGHT)
 			color(7)
 			print(room_name, room_px + 1, room_py + 1)
-		end
-
-		for _, mob in pairs(room.mobs) do
-			if sprite_lookup[mob[1]] then
-				sprite_lookup[mob[1]](room.x + mob[2], room.y + mob[3])
-			else
-				Sprite(384, (room.x + mob[2]) * 8, (room.y + mob[3]) * 8)
-			end
-		end
-		for _, thing in pairs(room.things) do
-			if sprite_lookup[thing[1]] then
-				sprite_lookup[thing[1]](room.x + thing[2], room.y + thing[3])
-			else
-				Sprite(384, (room.x + thing[2]) * 8, (room.y + thing[3]) * 8)
-			end
 		end
 	end
 	
@@ -232,13 +318,44 @@ local function _draw()
 
     popMatrix()
 
-	if selected_name then
-		local str_len = selected_name:len()
+	if selected_object_name then
+		local str_len = selected_object_name:len()
 
 		color(0)
-		rect(HSW - str_len * 2.5 - 1, 0, str_len * 5 + 1, 8)
+		rect(HSW - str_len * 2.5 - 1, 0, str_len * FONT_WIDTH + 1, FONT_HEIGHT + 1)
 		color(7)
-		print(selected_name, HSW - str_len * 2.5, 1)
+		print(selected_object_name, HSW - str_len * FONT_WIDTH/2, 1)
+	end
+
+	--Toolbar--
+	color(2)
+	local toolbar_y = SH - TOOLBAR_WIDTH
+	rect(0, toolbar_y, SW, TOOLBAR_WIDTH)
+
+	for i = 1, #toolbar do
+		local tool = toolbar[i]
+
+		local x = (i - 1) * 10
+		if selected_tool == i then
+			pal(2, 15)
+			pal(15, 2)
+			rect(x, toolbar_y, 10, 10)
+		end
+		f.Sprite(tool.sprite, x + 1, toolbar_y + 1, 2)
+		pal()
+	end
+
+	for i = 1, #toggles do
+		local toggle = toggles[i]
+
+		local x = SW - 10 - (i - 1) * 10
+		if toggle.enabled then
+			pal(2, 15)
+			pal(15, 2)
+			rect(x, toolbar_y, 10, 10)
+		end
+		f.Sprite(toggle.sprite, x + 1, toolbar_y + 1, 2)
+		pal()
 	end
 end
 
