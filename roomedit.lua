@@ -58,22 +58,6 @@ local selected_rect = nil
 local selected_object_name = nil
 
 
-local selected_tool = 1
-local toolbar = {
-	{
-		sprite = 2,
-	},
-	{
-		sprite = 4,
-		on_selected = function()
-			show_objects = false
-		end,
-		on_deselected = function()
-			show_objects = true
-		end,
-	},
-}
-
 local toggles = {
 	{
 		sprite = 5,
@@ -93,6 +77,24 @@ local toggles = {
 		end,
 		set_enabled = function(self, value)
 			show_reveal_bounds, self.enabled = value, value
+		end,
+	},
+}
+
+local selected_tool = 1
+local toolbar = {
+	{
+		sprite = 2,
+	},
+	{
+		sprite = 4,
+		on_selected = function()
+			show_objects = false
+			toggles[1]:set_enabled(true)
+		end,
+		on_deselected = function()
+			show_objects = true
+			toggles[1]:set_enabled(false)
 		end,
 	},
 }
@@ -234,6 +236,7 @@ local keypress_actions = {
 	lalt = function() toggles[1]:set_enabled(true) end,
 	["1"] = function() select_tool(1) end,
 	["2"] = function() select_tool(2) end,
+	r = function() toggles[2]:on_pressed() end,
 }
 
 local function _keypressed(key)
@@ -242,9 +245,13 @@ local function _keypressed(key)
 	end
 end
 
+local keyrelease_actions = {
+	lalt = function() toggles[1]:set_enabled(false) end,
+}
+
 local function _keyreleased(key)
-	if key == "lalt" then
-		toggles[1]:set_enabled(false)
+	if keyrelease_actions[key] then
+		keyrelease_actions[key]()
 	end
 end
 
