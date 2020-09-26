@@ -40,17 +40,22 @@ get_tilemap(dungeon)
 
 --------------------------------------
 
-local HSW, HSH = screenWidth() / 2, screenHeight() /2
+local SW, SH = screenSize()
+local HSW, HSH = SW / 2, SH / 2
+local FONT_WIDTH = fontWidth() + 1
+local FONT_HEIGHT = fontHeight()
 local TOOLBAR_WIDTH = 10
 
 local view_x, view_y = HSW, HSH
 local view_scale = 1
 local dragging = false
 local show_room_data = false
+local show_reveal_bounds = true
 local show_objects = true
-local selected = nil
+local selected_room = nil
+local selected_index = 1
 local selected_rect = nil
-local selected_name = nil
+local selected_object_name = nil
 
 
 local selected_tool = 1
@@ -79,7 +84,17 @@ local toggles = {
 		set_enabled = function(self, value)
 			show_room_data, self.enabled = value, value
 		end,
-	}
+	},
+	{
+		sprite = 6,
+		enabled = true,
+		on_pressed = function(self)
+			self:set_enabled(not self.enabled)
+		end,
+		set_enabled = function(self, value)
+			show_reveal_bounds, self.enabled = value, value
+		end,
+	},
 }
 
 f = {}
@@ -121,22 +136,23 @@ end
 local function press_square(x, y)
 	selected = nil
 	selected_rect = nil
-	selected_name = nil
+	selected_object_name = nil
 
 	for room_name, room in pairs(mdat.rooms) do
 		if in_room(room, x, y) then
 			--We're going to assume that we've just selected the room
-			selected = room
+			selected_room = room
+			selected_object_name = nil
 			selected_rect = {x = room.x * 8, y = room.y * 8, w = room.w * 8, h = room.h * 8}
-			selected_name = room_name
+			selected_object_name = room_name
 
 			--And then we'll check to see if we've actually selected an object, and replace the selection data with that if we have.
 			if show_objects then
-				for _, object in pairs(room.objects) do
+				for object_index, object in pairs(room.objects) do
 					if data.test_occupancy(object[1], x, y, object[2] + room.x, object[3] + room.y) then
-						selected = object
-						selected_name = object[1]
-						local rect_x, rect_y, rect_w, rect_h = data.get_object_bounds(selected_name, (object[2] + room.x) * 8, (object[3] + room.y) * 8)
+						selected_index = object_index
+						selected_object_name = object[1]
+						local rect_x, rect_y, rect_w, rect_h = data.get_object_bounds(selected_object_name, (object[2] + room.x) * 8, (object[3] + room.y) * 8)
 						selected_rect = {x = rect_x, y = rect_y, w = rect_w, h = rect_h}
 						break
 					end
@@ -153,15 +169,15 @@ local function press_tool(x)
 		if tool.on_deselected then
 			tool.on_deselected()
 		end
-
+		
 		selected_tool = floor(x / 10) + 1
-
+		
 		local tool = toolbar[selected_tool]
 		if tool.on_selected then
 			tool.on_selected()
 		end
-	elseif x < screenWidth() and x > screenWidth() - #toggles * 10 then
-		local toggle_index = floor((screenWidth() - x) / 10) + 1
+	elseif x < SW and x > SW - #toggles * 10 then
+		local toggle_index = floor((SW - x) / 10) + 1
 		local toggle = toggles[toggle_index]
 		toggle:on_pressed()
 	end
@@ -175,7 +191,7 @@ local function _mousepressed(x, y, button)
         cursor("hand")
     end
 	if button == 1 then
-		if y >= screenHeight() - TOOLBAR_WIDTH then
+		if y >= SH - TOOLBAR_WIDTH then
 			press_tool(x)
 		else
 			local square_x, square_y = find_mouse(x, y)
@@ -256,22 +272,25 @@ local function _draw()
 		local room_prx, room_pry = room.rx * 8, room.ry * 8
 		local room_prw, room_prh = room.rw * 8, room.rh * 8
 
-		if show_room_data then
-			color(11)
-			rect(room_prx, room_pry, room_prw, room_prh, true)
-			color(8)
-			rect(room_px, room_py, room_pw, room_ph, true)
-			
-			color(0)
-			rect(room_px + 1, room_py + 1, room_name:len() * 5, 7)
-			color(7)
-			print(room_name, room_px + 1, room_py + 1)
-		end
-
 		if show_objects then
 			for _, object in pairs(room.objects) do
 				data.draw_object(object[1], object[2] + room.x, object[3] + room.y)
 			end
+		end
+
+		if show_room_data then
+			if show_reveal_bounds then
+				color(11)
+				rect(room_prx, room_pry, room_prw, room_prh, true)
+			end
+			
+			color(8)
+			rect(room_px, room_py, room_pw, room_ph, true)
+			
+			color(0)
+			rect(room_px + 1, room_py + 1, room_name:len() * FONT_WIDTH, FONT_HEIGHT)
+			color(7)
+			print(room_name, room_px + 1, room_py + 1)
 		end
 	end
 	
@@ -282,19 +301,19 @@ local function _draw()
 
     popMatrix()
 
-	if selected_name then
-		local str_len = selected_name:len()
+	if selected_object_name then
+		local str_len = selected_object_name:len()
 
 		color(0)
-		rect(HSW - str_len * 2.5 - 1, 0, str_len * 5 + 1, 8)
+		rect(HSW - str_len * 2.5 - 1, 0, str_len * FONT_WIDTH + 1, FONT_HEIGHT + 1)
 		color(7)
-		print(selected_name, HSW - str_len * 2.5, 1)
+		print(selected_object_name, HSW - str_len * FONT_WIDTH/2, 1)
 	end
 
 	--Toolbar--
 	color(2)
-	local toolbar_y = screenHeight() - TOOLBAR_WIDTH
-	rect(0, toolbar_y, screenWidth(), TOOLBAR_WIDTH)
+	local toolbar_y = SH - TOOLBAR_WIDTH
+	rect(0, toolbar_y, SW, TOOLBAR_WIDTH)
 
 	for i = 1, #toolbar do
 		local tool = toolbar[i]
@@ -312,7 +331,7 @@ local function _draw()
 	for i = 1, #toggles do
 		local toggle = toggles[i]
 
-		local x = screenWidth() - 10 - (i - 1) * 10
+		local x = SW - 10 - (i - 1) * 10
 		if toggle.enabled then
 			pal(2, 15)
 			pal(15, 2)

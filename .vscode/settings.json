@@ -27,9 +27,13 @@
 		"quad",
 		"palt",
 		"pullEvent",
-		"getMPos"
+		"getMPos",
+		"GPU",
+		"fontWidth",
+		"cursor"
 	],
     "Lua.diagnostics.disable": [
-        "lowercase-global"
-    ]
+		"lowercase-global",
+		"trailing-space"
+	]
 }
