@@ -30,7 +30,9 @@
 		"getMPos",
 		"GPU",
 		"fontWidth",
-		"cursor"
+		"cursor",
+		"fontHeight",
+		"HDD"
 	],
     "Lua.diagnostics.disable": [
 		"lowercase-global",

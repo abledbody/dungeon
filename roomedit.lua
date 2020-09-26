@@ -163,19 +163,23 @@ local function press_square(x, y)
 	end
 end
 
+local function select_tool(index)
+	local tool = toolbar[selected_tool]
+	if tool.on_deselected then
+		tool.on_deselected()
+	end
+	
+	selected_tool = index
+	
+	tool = toolbar[selected_tool]
+	if tool.on_selected then
+		tool.on_selected()
+	end
+end
+
 local function press_tool(x)
 	if x >= 0 and x < #toolbar * 10 then
-		local tool = toolbar[selected_tool]
-		if tool.on_deselected then
-			tool.on_deselected()
-		end
-		
-		selected_tool = floor(x / 10) + 1
-		
-		local tool = toolbar[selected_tool]
-		if tool.on_selected then
-			tool.on_selected()
-		end
+		select_tool(floor(x / 10) + 1)
 	elseif x < SW and x > SW - #toggles * 10 then
 		local toggle_index = floor((SW - x) / 10) + 1
 		local toggle = toggles[toggle_index]
@@ -226,9 +230,15 @@ local function _wheelmoved(_, delta)
 	end
 end
 
+local keypress_actions = {
+	lalt = function() toggles[1]:set_enabled(true) end,
+	["1"] = function() select_tool(1) end,
+	["2"] = function() select_tool(2) end,
+}
+
 local function _keypressed(key)
-	if key == "lalt" then
-		toggles[1]:set_enabled(true)
+	if keypress_actions[key] then
+		keypress_actions[key]()
 	end
 end
 
