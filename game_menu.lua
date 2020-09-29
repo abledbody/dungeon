@@ -46,7 +46,6 @@ game_menu.categories = {
 					end,
 
 					select = function(self)
-						game_menu.close()
 					end
 				},
 			},

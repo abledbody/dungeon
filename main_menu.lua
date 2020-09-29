@@ -6,26 +6,33 @@ local OPTIONS = {
 		select = function()
 			main.set_state(game)
 			SFX(10,3)
-		end
+		end,
+	},
+	{
+		name = "Help",
+		select = function()
+		end,
 	},
 	{
 		name = "Options",
 		select = function()
-			main.set_state(game)
-		end
+		end,
 	},
 	{
 		name = "Quit",
 		select = function()
 			clear()
 			exit()
-		end
+		end,
 	}
 }
 
 local OPTIONS_X = 16
 local OPTIONS_Y = screenHeight() - (#OPTIONS + 1)*8 - 16
-local OPTIONS_WIDTH = 40
+local OPTIONS_WIDTH = 0
+for i = 1, #OPTIONS do
+	OPTIONS_WIDTH = math.max(OPTIONS_WIDTH, OPTIONS[i].name:len() * (fontWidth() + 1) + 3)
+end
 local TITLE_X = screenWidth()/2 - 8*3
 local TITLE_Y = 32
 local DRIP_GRAVITY = 200
