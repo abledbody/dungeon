@@ -45,15 +45,23 @@ local HSW, HSH = SW / 2, SH / 2
 local FONT_WIDTH = fontWidth() + 1
 local FONT_HEIGHT = fontHeight()
 local TOOLBAR_WIDTH = 10
+local ROOM_HANDLE_PAD = -1
+local ROOM_HANDLE_SIZE = 5
 
 local view_x, view_y = HSW, HSH
 local view_scale = 1
 local dragging = false
+
+local room_handle_grabbed = false
+local room_wx = nil
+local room_hy = nil
+
 local show_room_data = false
 local show_reveal_bounds = true
 local show_objects = true
+
 local selected_room = nil
-local selected_index = 1
+local selected_index = nil
 local selected_rect = nil
 local selected_object_name = nil
 
@@ -135,32 +143,74 @@ local function find_mouse(x, y)
 	return (x - HSW) / view_scale + view_x, (y - HSH) / view_scale + view_y
 end
 
-local function press_square(x, y)
-	selected = nil
-	selected_rect = nil
-	selected_object_name = nil
-
-	for room_name, room in pairs(mdat.rooms) do
-		if in_room(room, x, y) then
-			--We're going to assume that we've just selected the room
-			selected_room = room
-			selected_object_name = nil
-			selected_rect = {x = room.x * 8, y = room.y * 8, w = room.w * 8, h = room.h * 8}
-			selected_object_name = room_name
-
-			--And then we'll check to see if we've actually selected an object, and replace the selection data with that if we have.
-			if show_objects then
-				for object_index, object in pairs(room.objects) do
-					if data.test_occupancy(object[1], x, y, object[2] + room.x, object[3] + room.y) then
-						selected_index = object_index
-						selected_object_name = object[1]
-						local rect_x, rect_y, rect_w, rect_h = data.get_object_bounds(selected_object_name, (object[2] + room.x) * 8, (object[3] + room.y) * 8)
-						selected_rect = {x = rect_x, y = rect_y, w = rect_w, h = rect_h}
-						break
-					end
+local function handle_clicked(x, y)
+	if selected_tool == 2 and selected_room and selected_index == nil then
+		local left_handle_x = selected_rect.x - ROOM_HANDLE_SIZE - ROOM_HANDLE_PAD
+		local right_handle_x = selected_rect.x + selected_rect.w + ROOM_HANDLE_PAD
+		--If we're within the x coordinates that could possibly select a handle
+		if x >= left_handle_x and x < right_handle_x + ROOM_HANDLE_SIZE then
+			local top_handle_y = selected_rect.y - ROOM_HANDLE_SIZE - ROOM_HANDLE_PAD
+			local bottom_handle_y = selected_rect.y + selected_rect.h + ROOM_HANDLE_PAD
+			--If we're within the y coordinates that could possibly select a handle
+			if y >= top_handle_y and y < bottom_handle_y + ROOM_HANDLE_SIZE then
+				local is_top = y < top_handle_y + ROOM_HANDLE_SIZE
+				local is_bottom = y >= bottom_handle_y
+				--If we're on the left side
+				if x < left_handle_x + ROOM_HANDLE_SIZE then
+					if is_top then return 1
+					elseif is_bottom then return 3 end
+				--If we're on the right side
+				elseif x >= right_handle_x then
+					if is_top then return 2
+					elseif is_bottom then return 4 end
 				end
 			end
-			break
+		end
+	end
+	return false
+end
+
+local function select_room_bounds(room)
+	selected_rect = {x = room.x * 8, y = room.y * 8, w = room.w * 8, h = room.h * 8}
+end
+
+local function press_screen(x, y)
+	local selected_handle = handle_clicked(x, y)
+	if selected_handle then
+		room_wx = selected_room.x + selected_room.w
+		room_hy = selected_room.y + selected_room.h
+		room_handle_grabbed = selected_handle
+	else
+		--Pixel world-space to grid world-space
+		x, y = floor(x / 8), floor(y / 8)
+		
+		selected_room = nil
+		selected_rect = nil
+		selected_object_name = nil
+		selected_index = nil
+
+		for room_name, room in pairs(mdat.rooms) do
+			if in_room(room, x, y) then
+				--We're going to assume that we've just selected the room
+				selected_room = room
+				select_room_bounds(room)
+				selected_object_name = room_name
+
+				--And then we'll check to see if we've actually selected an object, and replace the selection data with that if we have.
+				if show_objects then
+					for object_index, object in pairs(room.objects) do
+						if data.test_occupancy(object[1], x, y, object[2] + room.x, object[3] + room.y) then
+							selected_index = object_index
+							selected_object_name = object[1]
+							
+							local rect_x, rect_y, rect_w, rect_h = data.get_object_bounds(selected_object_name, (object[2] + room.x) * 8, (object[3] + room.y) * 8)
+							selected_rect = {x = rect_x, y = rect_y, w = rect_w, h = rect_h}
+							break
+						end
+					end
+				end
+				break
+			end
 		end
 	end
 end
@@ -192,21 +242,26 @@ end
 ------LOVE events------
 
 local function _mousepressed(x, y, button)
-    if button == 2 then
-        dragging = true
-        cursor("hand")
-    end
 	if button == 1 then
 		if y >= SH - TOOLBAR_WIDTH then
 			press_tool(x)
 		else
-			local square_x, square_y = find_mouse(x, y)
-			press_square(floor(square_x / 8), floor(square_y / 8))
+			local world_x, world_y = find_mouse(x, y)
+			press_screen(world_x, world_y)
 		end
+	end
+	
+    if button == 2 then
+        dragging = true
+        cursor("hand")
     end
 end
 
 local function _mousereleased(x, y, button)
+	if button == 1 then
+		room_handle_grabbed = false
+	end
+	
     if button == 2 then
         dragging = false
         cursor("normal")
@@ -220,7 +275,59 @@ local function _mousemoved(x, y, dx, dy)
 		
 		view_x = math.min(math.max(view_x, 0), 1152)
 		view_y = math.min(math.max(view_y, 0), 1024)
-    end
+	end
+	
+	if room_handle_grabbed then
+		local world_x, world_y = find_mouse(x, y)
+		
+		if room_handle_grabbed == 1 then
+			local new_x = floor(world_x / 8 + 0.5)
+			local new_y = floor(world_y / 8 + 0.5)
+			local new_w = room_wx - new_x
+			local new_h = room_hy - new_y
+			if new_w > 0 then
+				selected_room.x = new_x
+				selected_room.w = new_w
+			end
+			if new_h > 0 then
+				selected_room.y = new_y
+				selected_room.h = new_h
+			end
+		elseif room_handle_grabbed == 2 then
+			local new_y = floor(world_y / 8 + 0.5)
+			local new_w = floor(world_x / 8 + 0.5) - selected_room.x
+			local new_h = room_hy - new_y
+			if new_w > 0 then
+				selected_room.w = new_w
+			end
+			if new_h > 0 then
+				selected_room.y = new_y
+				selected_room.h = new_h
+			end
+		elseif room_handle_grabbed == 3 then
+			local new_x = floor(world_x / 8 + 0.5)
+			local new_w = room_wx - new_x
+			local new_h = floor(world_y / 8 + 0.5) - selected_room.y
+			if new_w > 0 then
+				selected_room.x = new_x
+				selected_room.w = new_w
+			end
+			if new_h > 0 then
+				selected_room.h = new_h
+			end
+		else
+			local new_w = floor(world_x / 8 + 0.5) - selected_room.x
+			local new_h = floor(world_y / 8 + 0.5) - selected_room.y
+			if new_w > 0 then
+				selected_room.w = new_w
+			end
+			if new_h > 0 then
+				selected_room.h = new_h
+			end
+		end
+		
+		select_room_bounds(selected_room)
+	end
 end
 
 local function _wheelmoved(_, delta)
@@ -289,12 +396,14 @@ local function _draw()
 		local room_prx, room_pry = room.rx * 8, room.ry * 8
 		local room_prw, room_prh = room.rw * 8, room.rh * 8
 
+		--Objects--
 		if show_objects then
 			for _, object in pairs(room.objects) do
 				data.draw_object(object[1], object[2] + room.x, object[3] + room.y)
 			end
 		end
 
+		--Room data--
 		if show_room_data then
 			if show_reveal_bounds then
 				color(11)
@@ -311,9 +420,25 @@ local function _draw()
 		end
 	end
 	
+	--Selection bounds--
 	if selected_rect then
 		color(7)
 		rect(selected_rect.x - 1, selected_rect.y - 1, selected_rect.w + 2, selected_rect.h + 2, true)
+		
+		if selected_tool == 2 and selected_room and not selected_index then
+			f.Sprite(7,
+				selected_rect.x - ROOM_HANDLE_SIZE - ROOM_HANDLE_PAD,
+				selected_rect.y - ROOM_HANDLE_SIZE - ROOM_HANDLE_PAD, 2)
+			f.Sprite(7,
+				selected_rect.x + selected_rect.w + ROOM_HANDLE_PAD,
+				selected_rect.y - ROOM_HANDLE_SIZE - ROOM_HANDLE_PAD, 2)
+			f.Sprite(7,
+				selected_rect.x - ROOM_HANDLE_SIZE - ROOM_HANDLE_PAD,
+				selected_rect.y + selected_rect.h + ROOM_HANDLE_PAD, 2)
+			f.Sprite(7,
+				selected_rect.x + selected_rect.w + ROOM_HANDLE_PAD,
+				selected_rect.y + selected_rect.h + ROOM_HANDLE_PAD, 2)
+		end
 	end
 
     popMatrix()
