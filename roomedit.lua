@@ -53,16 +53,15 @@ local view_scale = 1
 local dragging = false
 
 local room_handle_grabbed = false
-local room_wx = nil
-local room_hy = nil
 
 local show_room_data = false
 local show_reveal_bounds = true
-local show_objects = true
+local objects_selectable = true
 
 local selected_room = nil
 local selected_index = nil
 local selected_rect = nil
+local selected_room_name = nil
 local selected_object_name = nil
 
 
@@ -97,11 +96,11 @@ local toolbar = {
 	{
 		sprite = 4,
 		on_selected = function()
-			show_objects = false
+			objects_selectable = false
 			toggles[1]:set_enabled(true)
 		end,
 		on_deselected = function()
-			show_objects = true
+			objects_selectable = true
 			toggles[1]:set_enabled(false)
 		end,
 	},
@@ -136,7 +135,7 @@ local function draw_tilemap()
 end
 
 local function in_room(room, x, y)
-	return x >= room.x and y >= room.y and x < room.x + room.w and y < room.y + room.h
+	return x >= room.x1 and y >= room.y1 and x < room.x2 and y < room.y2
 end
 
 local function find_mouse(x, y)
@@ -145,12 +144,12 @@ end
 
 local function handle_clicked(x, y)
 	if selected_tool == 2 and selected_room and selected_index == nil then
-		local left_handle_x = selected_rect.x - ROOM_HANDLE_SIZE - ROOM_HANDLE_PAD
-		local right_handle_x = selected_rect.x + selected_rect.w + ROOM_HANDLE_PAD
+		local left_handle_x = selected_rect.x1 - ROOM_HANDLE_SIZE - ROOM_HANDLE_PAD
+		local right_handle_x = selected_rect.x2 + ROOM_HANDLE_PAD
 		--If we're within the x coordinates that could possibly select a handle
 		if x >= left_handle_x and x < right_handle_x + ROOM_HANDLE_SIZE then
-			local top_handle_y = selected_rect.y - ROOM_HANDLE_SIZE - ROOM_HANDLE_PAD
-			local bottom_handle_y = selected_rect.y + selected_rect.h + ROOM_HANDLE_PAD
+			local top_handle_y = selected_rect.y1 - ROOM_HANDLE_SIZE - ROOM_HANDLE_PAD
+			local bottom_handle_y = selected_rect.y2 + ROOM_HANDLE_PAD
 			--If we're within the y coordinates that could possibly select a handle
 			if y >= top_handle_y and y < bottom_handle_y + ROOM_HANDLE_SIZE then
 				local is_top = y < top_handle_y + ROOM_HANDLE_SIZE
@@ -171,14 +170,12 @@ local function handle_clicked(x, y)
 end
 
 local function select_room_bounds(room)
-	selected_rect = {x = room.x * 8, y = room.y * 8, w = room.w * 8, h = room.h * 8}
+	selected_rect = {x1 = room.x1 * 8, y1 = room.y1 * 8, x2 = room.x2 * 8, y2 = room.y2 * 8}
 end
 
 local function press_screen(x, y)
 	local selected_handle = handle_clicked(x, y)
 	if selected_handle then
-		room_wx = selected_room.x + selected_room.w
-		room_hy = selected_room.y + selected_room.h
 		room_handle_grabbed = selected_handle
 	else
 		--Pixel world-space to grid world-space
@@ -186,6 +183,7 @@ local function press_screen(x, y)
 		
 		selected_room = nil
 		selected_rect = nil
+		selected_room_name = nil
 		selected_object_name = nil
 		selected_index = nil
 
@@ -194,17 +192,17 @@ local function press_screen(x, y)
 				--We're going to assume that we've just selected the room
 				selected_room = room
 				select_room_bounds(room)
-				selected_object_name = room_name
+				selected_room_name = room_name
 
 				--And then we'll check to see if we've actually selected an object, and replace the selection data with that if we have.
-				if show_objects then
+				if objects_selectable then
 					for object_index, object in pairs(room.objects) do
-						if data.test_occupancy(object[1], x, y, object[2] + room.x, object[3] + room.y) then
+						if data.test_occupancy(object[1], x, y, object[2], object[3]) then
 							selected_index = object_index
 							selected_object_name = object[1]
 							
-							local rect_x, rect_y, rect_w, rect_h = data.get_object_bounds(selected_object_name, (object[2] + room.x) * 8, (object[3] + room.y) * 8)
-							selected_rect = {x = rect_x, y = rect_y, w = rect_w, h = rect_h}
+							local rect_x, rect_y, rect_w, rect_h = data.get_object_bounds(selected_object_name, (object[2]) * 8, (object[3]) * 8)
+							selected_rect = {x1 = rect_x, y1 = rect_y, x2 = rect_x + rect_w, y2 = rect_y + rect_h}
 							break
 						end
 					end
@@ -237,6 +235,23 @@ local function press_tool(x)
 		local toggle = toggles[toggle_index]
 		toggle:on_pressed()
 	end
+end
+
+local function red_tint()
+	pal(1, 2)
+	pal(2, 2)
+	pal(3, 2)
+	pal(4, 8)
+	pal(5, 2)
+	pal(6, 8)
+	pal(7, 9)
+	pal(9, 8)
+	pal(10, 9)
+	pal(11, 8)
+	pal(12, 9)
+	pal(13, 8)
+	pal(14, 9)
+	pal(15, 9)
 end
 
 ------LOVE events------
@@ -280,49 +295,35 @@ local function _mousemoved(x, y, dx, dy)
 	if room_handle_grabbed then
 		local world_x, world_y = find_mouse(x, y)
 		
+		local grid_x, grid_y = floor(world_x / 8 + 0.5), floor(world_y / 8 + 0.5)
+		
 		if room_handle_grabbed == 1 then
-			local new_x = floor(world_x / 8 + 0.5)
-			local new_y = floor(world_y / 8 + 0.5)
-			local new_w = room_wx - new_x
-			local new_h = room_hy - new_y
-			if new_w > 0 then
-				selected_room.x = new_x
-				selected_room.w = new_w
+			if grid_x < selected_room.x2 then
+				selected_room.x1 = grid_x
 			end
-			if new_h > 0 then
-				selected_room.y = new_y
-				selected_room.h = new_h
+			if grid_y < selected_room.y2 then
+				selected_room.y1 = grid_y
 			end
 		elseif room_handle_grabbed == 2 then
-			local new_y = floor(world_y / 8 + 0.5)
-			local new_w = floor(world_x / 8 + 0.5) - selected_room.x
-			local new_h = room_hy - new_y
-			if new_w > 0 then
-				selected_room.w = new_w
+			if grid_x > selected_room.x1 then
+				selected_room.x2 = grid_x
 			end
-			if new_h > 0 then
-				selected_room.y = new_y
-				selected_room.h = new_h
+			if grid_y < selected_room.y2 then
+				selected_room.y1 = grid_y
 			end
 		elseif room_handle_grabbed == 3 then
-			local new_x = floor(world_x / 8 + 0.5)
-			local new_w = room_wx - new_x
-			local new_h = floor(world_y / 8 + 0.5) - selected_room.y
-			if new_w > 0 then
-				selected_room.x = new_x
-				selected_room.w = new_w
+			if grid_x < selected_room.x2 then
+				selected_room.x1 = grid_x
 			end
-			if new_h > 0 then
-				selected_room.h = new_h
+			if grid_y > selected_room.y1 then
+				selected_room.y2 = grid_y
 			end
 		else
-			local new_w = floor(world_x / 8 + 0.5) - selected_room.x
-			local new_h = floor(world_y / 8 + 0.5) - selected_room.y
-			if new_w > 0 then
-				selected_room.w = new_w
+			if grid_x > selected_room.x1 then
+				selected_room.x2 = grid_x
 			end
-			if new_h > 0 then
-				selected_room.h = new_h
+			if grid_y > selected_room.y1 then
+				selected_room.y2 = grid_y
 			end
 		end
 		
@@ -391,65 +392,85 @@ local function _draw()
 
 	--Rooms--
 	for room_name, room in pairs(mdat.rooms) do
-		local room_px, room_py = room.x * 8, room.y * 8
-		local room_pw, room_ph = room.w * 8, room.h * 8
-		local room_prx, room_pry = room.rx * 8, room.ry * 8
-		local room_prw, room_prh = room.rw * 8, room.rh * 8
+		local room_px1,		room_py1 =	room.x1 * 8,	room.y1 * 8
+		local room_px2,		room_py2 =	room.x2 * 8,	room.y2 * 8
+		
+		local room_prx1,	room_pry1 =	room.rx1 * 8,	room.ry1 * 8
+		local room_prx2,	room_pry2 =	room.rx2 * 8,	room.ry2 * 8
+		
+		local room_pw,		room_ph =	room_px2 - room_px1,	room_py2 - room_py1
+		local room_prw,		room_prh =	room_prx2 - room_prx1,	room_pry2 - room_pry1
 
 		--Objects--
-		if show_objects then
-			for _, object in pairs(room.objects) do
-				data.draw_object(object[1], object[2] + room.x, object[3] + room.y)
+		for _, object in pairs(room.objects) do
+			if not in_room(room, object[2], object[3]) then
+				red_tint()
 			end
+			data.draw_object(object[1], object[2], object[3])
+			pal()
 		end
 
 		--Room data--
 		if show_room_data then
 			if show_reveal_bounds then
 				color(11)
-				rect(room_prx, room_pry, room_prw, room_prh, true)
+				rect(room_prx1, room_pry1, room_prw, room_prh, true)
 			end
 			
 			color(8)
-			rect(room_px, room_py, room_pw, room_ph, true)
+			rect(room_px1, room_py1, room_pw, room_ph, true)
 			
 			color(0)
-			rect(room_px + 1, room_py + 1, room_name:len() * FONT_WIDTH, FONT_HEIGHT)
+			rect(room_px1 + 1, room_py1 + 1, room_name:len() * FONT_WIDTH, FONT_HEIGHT)
 			color(7)
-			print(room_name, room_px + 1, room_py + 1)
+			print(room_name, room_px1 + 1, room_py1 + 1)
 		end
 	end
 	
 	--Selection bounds--
 	if selected_rect then
 		color(7)
-		rect(selected_rect.x - 1, selected_rect.y - 1, selected_rect.w + 2, selected_rect.h + 2, true)
+		rect(
+			selected_rect.x1 - 1,
+			selected_rect.y1 - 1,
+			selected_rect.x2 - selected_rect.x1 + 2,
+			selected_rect.y2 - selected_rect.y1 + 2,
+			true)
 		
 		if selected_tool == 2 and selected_room and not selected_index then
 			f.Sprite(7,
-				selected_rect.x - ROOM_HANDLE_SIZE - ROOM_HANDLE_PAD,
-				selected_rect.y - ROOM_HANDLE_SIZE - ROOM_HANDLE_PAD, 2)
+				selected_rect.x1 - ROOM_HANDLE_SIZE - ROOM_HANDLE_PAD,
+				selected_rect.y1 - ROOM_HANDLE_SIZE - ROOM_HANDLE_PAD, 2)
 			f.Sprite(7,
-				selected_rect.x + selected_rect.w + ROOM_HANDLE_PAD,
-				selected_rect.y - ROOM_HANDLE_SIZE - ROOM_HANDLE_PAD, 2)
+				selected_rect.x2 + ROOM_HANDLE_PAD,
+				selected_rect.y1 - ROOM_HANDLE_SIZE - ROOM_HANDLE_PAD, 2)
 			f.Sprite(7,
-				selected_rect.x - ROOM_HANDLE_SIZE - ROOM_HANDLE_PAD,
-				selected_rect.y + selected_rect.h + ROOM_HANDLE_PAD, 2)
+				selected_rect.x1 - ROOM_HANDLE_SIZE - ROOM_HANDLE_PAD,
+				selected_rect.y2 + ROOM_HANDLE_PAD, 2)
 			f.Sprite(7,
-				selected_rect.x + selected_rect.w + ROOM_HANDLE_PAD,
-				selected_rect.y + selected_rect.h + ROOM_HANDLE_PAD, 2)
+				selected_rect.x2 + ROOM_HANDLE_PAD,
+				selected_rect.y2 + ROOM_HANDLE_PAD, 2)
 		end
 	end
 
     popMatrix()
 
-	if selected_object_name then
-		local str_len = selected_object_name:len()
+	if selected_room_name then
+		local str_len = selected_room_name:len()
 
 		color(0)
 		rect(HSW - str_len * 2.5 - 1, 0, str_len * FONT_WIDTH + 1, FONT_HEIGHT + 1)
 		color(7)
-		print(selected_object_name, HSW - str_len * FONT_WIDTH/2, 1)
+		print(selected_room_name, HSW - str_len * FONT_WIDTH/2, 1)
+	end
+	
+	if selected_object_name then
+		local str_len = selected_object_name:len()
+
+		color(0)
+		rect(HSW - str_len * 2.5 - 1, FONT_HEIGHT + 1, str_len * FONT_WIDTH + 1, FONT_HEIGHT + 1)
+		color(7)
+		print(selected_object_name, HSW - str_len * FONT_WIDTH/2, FONT_HEIGHT + 2)
 	end
 
 	--Toolbar--

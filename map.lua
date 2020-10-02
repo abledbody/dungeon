@@ -65,15 +65,14 @@ end
 
 local function load_room_contents(room_index)
 	local room = mdat.rooms[room_index]
-	local x, y = room.x, room.y
 
 	for i = 1, #room.objects do
 		local item = room.objects[i]
 		
-		local name, xT, yT, meta = unpack(item)
-		if not (name and xT and yT and meta) then error("Room data requires the name of the class, the x and y positions, and a table with spawning metadata.") end
+		local name, x, y, meta = unpack(item)
+		if not (name and x and y and meta) then error("Room data requires the name of the class, the x and y positions, and a table with spawning metadata.") end
 		
-		local object = objects.spawn(name, x+xT, y+yT, meta, room_index)
+		local object = objects.spawn(name, x, y, meta, room_index)
 		if object.static_object then
 			table.insert(loaded_rooms[room_index].static_objects, object)
 		end
@@ -114,8 +113,8 @@ local function reload_batch()
 		loading_room = k
 		local room = mdat.rooms[k]
 
-		local rx, ry = room.rx, room.ry
-		local rw, rh = room.rw, room.rh
+		local rx, ry = room.rx1,	room.ry1
+		local rw, rh = room.rx2-rx,	room.ry2-ry
 
 		TileMap:map(tileIter,rx,ry,rw,rh)
 	end
@@ -140,13 +139,13 @@ local function unload_room(room_index)
 	loaded_rooms[room_index] = nil
 end
 
-local function inBounds(xT, yT, room_index)
+local function inBounds(test_x, test_y, room_index)
 	local room = mdat.rooms[room_index]
 
-	local x, y = room.x, room.y
-	local w, h = room.w, room.h
+	local x1, y1 = room.x1, room.y1
+	local x2, y2 = room.x2, room.y2
 	
-	return yT>=y and xT>=x and yT<y+h and xT<x+w
+	return test_y >= y1 and test_x >= x1 and test_y < y2 and test_x < x2
 end
 
 function game_map.setSquare(x,y,value)
@@ -173,8 +172,6 @@ function game_map.switchRoom(new_room)
 	if not room then
 		error("switchRoom: No such room "..new_room)
 	end
-	
-	local x, y = room.x, room.y
 	
 	if not loaded_rooms[current_room] then
 		load_room(current_room)
@@ -205,7 +202,7 @@ function game_map.switchRoom(new_room)
 
 	reload_batch()
 	
-	game.setCamTarget(x + room.cx, y + room.cy)
+	game.setCamTarget(room.cx, room.cy)
 end
 
 function game_map.find_room(current, x, y)
