@@ -99,7 +99,7 @@ rooms.lava_cave = {
 
 --Connections
 
-local connections = {
+mdat.connections = {
 	{"entry", "entry_hall"},
 	{"entry_hall", "text"},
 	{"entry_hall", "slime"},
@@ -110,7 +110,7 @@ local connections = {
 
 --Moving the connection data to the rooms themselves.
 
-for k,v in ipairs(connections) do
+for _, v in ipairs(mdat.connections) do
 	local room_a = v[1]
 	local room_b = v[2]
 

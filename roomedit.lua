@@ -50,12 +50,14 @@ local ROOM_HANDLE_SIZE = 5
 
 local view_x, view_y = HSW, HSH
 local view_scale = 1
+
 local dragging = false
+local ctrl_pressed = false
 
 local room_handle_grabbed = false
 
 local show_room_data = false
-local show_reveal_bounds = true
+local show_reveal_bounds = false
 local objects_selectable = true
 
 local selected_room = nil
@@ -78,7 +80,7 @@ local toggles = {
 	},
 	{
 		sprite = 6,
-		enabled = true,
+		enabled = false,
 		on_pressed = function(self)
 			self:set_enabled(not self.enabled)
 		end,
@@ -122,6 +124,103 @@ function f.SpriteGroup(id, w, h, x, y, sheet_index)
     local quad_y = floor(id / 24) * 8
     local q = GPU.quad(quad_x, quad_y, w * 8, h * 8, 192, 128)
     spr_sheets[sheet_index or 1]:draw(x, y, 0, 1, 1, q)
+end
+
+local function binary_search(tab, value)
+	if #tab > 0 then
+		local ret_tab = {}
+		local i_start, i_stop = 1, #tab
+		while true do
+			local check = floor((i_stop - i_start) / 2 + i_start)
+			local pointer = tab[check]
+			
+			if pointer[1] == value then
+				local first_check = check
+				while true do
+					if pointer[1] == value then
+						table.insert(ret_tab, pointer)
+						check = check - 1
+						pointer = tab[check]
+					else
+						break
+					end
+				end
+				check = first_check + 1
+				pointer = tab[check]
+				while true do
+					if pointer[1] == value then
+						table.insert(ret_tab, pointer)
+						check = check + 1
+						pointer = tab[check]
+					else
+						return ret_tab
+					end
+				end
+			elseif pointer[1] > value then
+				i_stop = check - 1
+			elseif pointer[1] < value then
+				i_start = check + 1
+			end
+			if i_start > i_stop then
+				return ret_tab
+			end
+		end
+	else
+		return {}
+	end
+end
+
+local function write_table(str, tab)
+	str = str.."{"
+		for _, v in pairs(tab) do
+			if type(v) == "table" then
+				str = write_table(str, v)
+			elseif type(v) == "string" then
+				local new_string = v:gsub("\n", "\\n")
+				str = str.."\""..new_string.."\", "
+				
+			else
+				str = str..v..", "
+			end
+		end
+	str = str.."}"
+	return str
+end
+
+local function export(path)
+	local compiled = "local mdat = {}\nlocal rooms = {}\n\n"
+	
+	--Each room--
+	for room_k, room in pairs(mdat.rooms) do
+		compiled = compiled..
+			"rooms."..room_k..
+			" = {\n\tx1 = "..room.x1..", y1 = "..room.y1..
+			",\n\tx2 = "..room.x2..", y2 = "..room.y2..
+			",\n\n\t rx1 = "..room.rx1..", ry1 = "..room.ry1..
+			",\n\t rx2 = "..room.rx2..", ry2 = "..room.ry2..
+			",\n\n\tcx = "..room.cx..", cy = "..room.cy..
+			",\n\n\t objects = {"
+		
+		for _, obj in pairs(room.objects) do
+			compiled = compiled..
+				"\n\t\t{\""..obj[1].."\", "..obj[2]..", "..obj[3]..", "
+			compiled = write_table(compiled, obj[4])
+			compiled = compiled.."},"
+		end
+		compiled = compiled.."\n\t}\n}\n\n"
+	end
+	
+	compiled = compiled.."--Connections\nmdat.connections = {\n"
+	
+	for i = 1, #mdat.connections do
+		local connection = mdat.connections[i]
+		compiled = compiled.."\t{\""..connection[1].."\", \""..connection[2].."\"},\n"
+	end
+	
+	compiled = compiled.."}\n\nfor _, v in ipairs(mdat.connections) do\n\tlocal room_a = v[1]\n\tlocal room_b = v[2]\n\n\trooms[room_a].con = rooms[room_a].con or {}\n\trooms[room_b].con = rooms[room_b].con or {}\n\n\ttable.insert(rooms[room_a].con, room_b)\n\ttable.insert(rooms[room_b].con, room_a)\nend\n\nmdat.rooms = rooms\n\nreturn mdat"
+	
+	HDD.write(PATH..path, compiled)
+	selected_object_name = "Exported to "..PATH..path
 end
 
 local function tile_draw(x, y, id)
@@ -345,6 +444,8 @@ local keypress_actions = {
 	["1"] = function() select_tool(1) end,
 	["2"] = function() select_tool(2) end,
 	r = function() toggles[2]:on_pressed() end,
+	lctrl = function() ctrl_pressed = true end,
+	s = function() if ctrl_pressed then export("mdat.lua") end end
 }
 
 local function _keypressed(key)
@@ -355,6 +456,7 @@ end
 
 local keyrelease_actions = {
 	lalt = function() toggles[1]:set_enabled(false) end,
+	lctrl = function() ctrl_pressed = false end,
 }
 
 local function _keyreleased(key)
@@ -412,10 +514,6 @@ local function _draw()
 
 		--Room data--
 		if show_room_data then
-			if show_reveal_bounds then
-				color(11)
-				rect(room_prx1, room_pry1, room_prw, room_prh, true)
-			end
 			
 			color(8)
 			rect(room_px1, room_py1, room_pw, room_ph, true)
@@ -424,6 +522,10 @@ local function _draw()
 			rect(room_px1 + 1, room_py1 + 1, room_name:len() * FONT_WIDTH, FONT_HEIGHT)
 			color(7)
 			print(room_name, room_px1 + 1, room_py1 + 1)
+			if show_reveal_bounds then
+				color(11)
+				rect(room_prx1, room_pry1, room_prw, room_prh, true)
+			end
 		end
 	end
 	
