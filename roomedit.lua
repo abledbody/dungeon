@@ -2,11 +2,12 @@ PATH = "D:/dungeon/"
 ROOMEDIT_PATH = PATH.."roomedit/"
 
 local floor = math.floor
+local abs = math.abs
 
 cursor("normal")
 dofile(PATH .. "Rayleigh.lua")
 
-local mdat = dofile(PATH .. "mdat.lua")
+mdat = dofile(PATH .. "mdat.lua")
 dofile(ROOMEDIT_PATH .. "object_data.lua")
 
 local MapObj = require("Libraries.map")
@@ -33,10 +34,12 @@ dofile(ROOMEDIT_PATH.."consts.lua")
 
 local view_x, view_y = HSW, HSH
 local view_scale = 1
+local double_click_time = 0
+local last_click_x, last_click_y = 0, 0
 
 dofile(ROOMEDIT_PATH.."state.lua")
-
 dofile(ROOMEDIT_PATH.."toolbar.lua")
+dofile(ROOMEDIT_PATH.."render.lua")
 
 local function binary_search(tab, value)
 	if #tab > 0 then
@@ -80,6 +83,10 @@ local function binary_search(tab, value)
 	else
 		return {}
 	end
+end
+
+local function mouse_unmoved(x, y)
+	return abs(last_click_x - x) < MOUSE_MOVE_THRESHOLD and abs(last_click_y - y) < MOUSE_MOVE_THRESHOLD
 end
 
 local function write_table(str, tab)
@@ -178,10 +185,35 @@ local function handle_clicked(x, y, x1, y1, x2, y2)
 	return false
 end
 
+local function new_room(x, y)
+	local room_name_index = 0
+	local room_name = "unnamed_room_"..room_name_index
+	while (mdat.rooms[room_name]) do
+		room_name_index = room_name_index + 1
+		room_name = "unnamed_room_"..room_name_index
+	end
+	mdat.rooms[room_name] = {
+		x1 = x,		y1 = y,
+		x2 = x+1,	y2 = y+1,
+	
+		rx1 = x,	ry1 = y,
+		rx2 = x+1,	ry2 = y+1,
+	
+		cx = x,	cy = y,
+		objects = {
+			
+		}
+	}
+	state.select_room(room_name)
+end
+
 local function press_screen(x, y)
+	--Pixel world-space to grid world-space
+	local gx, gy = floor(x / 8), floor(y / 8)
+	
 	local selected_handle
 	local room = state.selected_room
-	if room and not state.object_index then
+	if room and not state.selected_index then
 		if state.show_reveal_bounds then
 			selected_handle = handle_clicked(x, y, room.rx1 * 8, room.ry1 * 8, room.rx2 * 8, room.ry2 * 8)
 		else
@@ -192,26 +224,17 @@ local function press_screen(x, y)
 	if selected_handle then
 		state.room_handle_grabbed = selected_handle
 	else
-		--Pixel world-space to grid world-space
-		x, y = floor(x / 8), floor(y / 8)
-		
-		state.selected_room = nil
-		state.selected_rect = nil
-		state.selected_room_name = nil
-		state.selected_object_name = nil
-		state.selected_index = nil
+		state.deselect()
 
 		for room_name, room in pairs(mdat.rooms) do
-			if in_room(room, x, y) then
+			if in_room(room, gx, gy) then
 				--We're going to assume that we've just selected the room
-				state.selected_room = room
-				state.select_room_bounds(room)
-				state.selected_room_name = room_name
+				state.select_room(room_name)
 
 				--And then we'll check to see if we've actually selected an object, and replace the selection data with that if we have.
 				if state.objects_selectable then
 					for object_index, object in pairs(room.objects) do
-						if object_data.test_occupancy(object[1], x, y, object[2], object[3]) then
+						if object_data.test_occupancy(object[1], gx, gy, object[2], object[3]) then
 							state.selected_index = object_index
 							state.selected_object_name = object[1]
 							
@@ -225,6 +248,16 @@ local function press_screen(x, y)
 			end
 		end
 	end
+	
+	if not state.selected_room and double_click_time > 0 and mouse_unmoved(x, y) then
+		double_click_time = 0
+		new_room(gx, gy)
+	else
+		double_click_time = DOUBLE_CLICK_THRESHOLD
+	end
+	
+	last_click_x = x
+	last_click_y = y
 end
 
 local function selection_resize(x, y, x1, y1, x2, y2)
@@ -325,12 +358,15 @@ local function _mousemoved(x, y, dx, dy)
 		
 		local room = state.selected_room
 		local rect = state.selected_rect
+		
+		local x1, y1, x2, y2 = selection_resize(world_x, world_y, floor(rect.x1 / 8), floor(rect.y1 / 8), floor(rect.x2 / 8), floor(rect.y2 / 8))
+		
 		if state.show_reveal_bounds then
-			room.rx1, room.ry1, room.rx2, room.ry2 =
-				selection_resize(world_x, world_y, floor(rect.x1 / 8), floor(rect.y1 / 8), floor(rect.x2 / 8), floor(rect.y2 / 8))
+			room.rx1, room.ry1, room.rx2, room.ry2 = x1, y1, x2, y2
 		else
-			room.x1, room.y1, room.x2, room.y2 =
-				selection_resize(world_x, world_y, floor(rect.x1 / 8), floor(rect.y1 / 8), floor(rect.x2 / 8), floor(rect.y2 / 8))
+			room.x1, room.y1, room.x2, room.y2 = x1, y1, x2, y2
+			room.cx = floor((x2 - x1) / 2) + x1
+			room.cy = floor((y2 - y1) / 2) + y1
 		end
 		
 		state.select_room_bounds(room)
@@ -352,11 +388,21 @@ local keypress_actions = {
 	["2"] = function() toolbar.select_tool(2) end,
 	r = function() toolbar.toggles[2]:on_pressed() end,
 	lctrl = function() state.ctrl_pressed = true end,
-	s = function() if state.ctrl_pressed then export("mdat.lua") end end
+	s = function() if state.ctrl_pressed then export("mdat.lua") end end,
+	delete = function()
+		if state.selected_index then
+			table.remove(state.selected_room.objects, state.selected_index)
+		elseif state.selected_room then
+			mdat.rooms[state.selected_room_name] = nil
+		end
+		state.deselect()
+	end,
 }
 
 local function _keypressed(key)
-	if keypress_actions[key] then
+	if state.active_string then
+		state.active_string = state.active_string..key
+	elseif keypress_actions[key] then
 		keypress_actions[key]()
 	end
 end
@@ -375,7 +421,7 @@ end
 ------Main loops------
 
 local function _update(dt)
-
+	double_click_time = math.max(double_click_time - dt, 0)
 end
 
 local function _draw()
@@ -429,10 +475,13 @@ local function _draw()
 			rect(room_px1 + 1, room_py1 + 1, room_name:len() * FONT_WIDTH, FONT_HEIGHT)
 			color(7)
 			print(room_name, room_px1 + 1, room_py1 + 1)
+			
 			if state.show_reveal_bounds or (state.selected_room_name == room_name and state.room_handle_grabbed) then
 				color(11)
 				rect(room_prx1, room_pry1, room_prw, room_prh, true)
 			end
+			
+			f.Sprite(8, room.cx * 8 - 2, room.cy * 8 - 2, 2)
 		end
 	end
 	

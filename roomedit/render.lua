@@ -1,6 +1,6 @@
 local floor = math.floor
 
-local roomedit_sheet_file = HDD.read(ROOMEDIT_PATH .. "roomedit_sheet.lk12")
+local roomedit_sheet_file = HDD.read(ROOMEDIT_PATH .. "sheet.lk12")
 
 local function get_sheet(file)
 	local start = file:find("LK12;GPUIMG;")

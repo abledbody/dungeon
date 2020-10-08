@@ -13,10 +13,27 @@ state = {
 	selected_rect = nil,
 	selected_room_name = nil,
 	selected_object_name = nil,
+	active_string = nil,
 }
 
 local this = state
 
+
+
+function this.deselect()
+	this.selected_room = nil
+	this.selected_rect = nil
+	this.selected_room_name = nil
+	this.selected_object_name = nil
+	this.selected_index = nil
+end
+
+function this.select_room(room_name)
+	local room = mdat.rooms[room_name]
+	state.selected_room = room
+	state.select_room_bounds(room)
+	state.selected_room_name = room_name
+end
 
 function this.select_room_bounds(room)
 	if room then
