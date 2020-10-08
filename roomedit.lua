@@ -1,10 +1,11 @@
 local PATH = "D:/dungeon/"
+local ROOMEDIT_PATH = PATH.."roomedit/"
 
 cursor("normal")
 dofile(PATH .. "Rayleigh.lua")
 
 local mdat = dofile(PATH .. "mdat.lua")
-dofile(PATH .. "roomedit_dat.lua")
+dofile(ROOMEDIT_PATH .. "roomedit_dat.lua")
 
 local MapObj = require("Libraries.map")
 local Map = MapObj(144, 128)
@@ -30,7 +31,7 @@ local function get_tilemap(file)
 end
 
 local dungeon = HDD.read(PATH .. "dungeon.lk12")
-local roomedit_sheet_file = HDD.read(PATH .. "roomedit_sheet.lk12")
+local roomedit_sheet_file = HDD.read(ROOMEDIT_PATH .. "roomedit_sheet.lk12")
 
 local spr_sheets = {
 	get_sheet(dungeon):image(),
