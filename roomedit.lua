@@ -153,40 +153,42 @@ local function find_mouse(x, y)
 	return (x - HSW) / view_scale + view_x, (y - HSH) / view_scale + view_y
 end
 
-local function handle_clicked(x, y)
-	if toolbar.get_mode() == "room" and state.selected_room and state.selected_index == nil then
-		local selected_rect = state.selected_rect
-		local left_handle_x = selected_rect.x1 - ROOM_HANDLE_SIZE - ROOM_HANDLE_PAD
-		local right_handle_x = selected_rect.x2 + ROOM_HANDLE_PAD
-		--If we're within the x coordinates that could possibly select a handle
-		if x >= left_handle_x and x < right_handle_x + ROOM_HANDLE_SIZE then
-			local top_handle_y = selected_rect.y1 - ROOM_HANDLE_SIZE - ROOM_HANDLE_PAD
-			local bottom_handle_y = selected_rect.y2 + ROOM_HANDLE_PAD
-			--If we're within the y coordinates that could possibly select a handle
-			if y >= top_handle_y and y < bottom_handle_y + ROOM_HANDLE_SIZE then
-				local is_top = y < top_handle_y + ROOM_HANDLE_SIZE
-				local is_bottom = y >= bottom_handle_y
-				--If we're on the left side
-				if x < left_handle_x + ROOM_HANDLE_SIZE then
-					if is_top then return 1
-					elseif is_bottom then return 3 end
-				--If we're on the right side
-				elseif x >= right_handle_x then
-					if is_top then return 2
-					elseif is_bottom then return 4 end
-				end
+local function handle_clicked(x, y, x1, y1, x2, y2)
+	local left_handle_x = x1 - ROOM_HANDLE_SIZE - ROOM_HANDLE_PAD
+	local right_handle_x = x2 + ROOM_HANDLE_PAD
+	--If we're within the x coordinates that could possibly select a handle
+	if x >= left_handle_x and x < right_handle_x + ROOM_HANDLE_SIZE then
+		local top_handle_y = y1 - ROOM_HANDLE_SIZE - ROOM_HANDLE_PAD
+		local bottom_handle_y = y2 + ROOM_HANDLE_PAD
+		--If we're within the y coordinates that could possibly select a handle
+		if y >= top_handle_y and y < bottom_handle_y + ROOM_HANDLE_SIZE then
+			local is_top = y < top_handle_y + ROOM_HANDLE_SIZE
+			local is_bottom = y >= bottom_handle_y
+			--If we're on the left side
+			if x < left_handle_x + ROOM_HANDLE_SIZE then
+				if is_top then return 1
+				elseif is_bottom then return 3 end
+			--If we're on the right side
+			elseif x >= right_handle_x then
+				if is_top then return 2
+				elseif is_bottom then return 4 end
 			end
 		end
 	end
 	return false
 end
 
-local function select_room_bounds(room)
-	state.selected_rect = {x1 = room.x1 * 8, y1 = room.y1 * 8, x2 = room.x2 * 8, y2 = room.y2 * 8}
-end
-
 local function press_screen(x, y)
-	local selected_handle = handle_clicked(x, y)
+	local selected_handle
+	local room = state.selected_room
+	if room and not state.object_index then
+		if state.show_reveal_bounds then
+			selected_handle = handle_clicked(x, y, room.rx1 * 8, room.ry1 * 8, room.rx2 * 8, room.ry2 * 8)
+		else
+			selected_handle = handle_clicked(x, y, room.x1 * 8, room.y1 * 8, room.x2 * 8, room.y2 * 8)
+		end
+	end
+	
 	if selected_handle then
 		state.room_handle_grabbed = selected_handle
 	else
@@ -203,7 +205,7 @@ local function press_screen(x, y)
 			if in_room(room, x, y) then
 				--We're going to assume that we've just selected the room
 				state.selected_room = room
-				select_room_bounds(room)
+				state.select_room_bounds(room)
 				state.selected_room_name = room_name
 
 				--And then we'll check to see if we've actually selected an object, and replace the selection data with that if we have.
@@ -223,6 +225,44 @@ local function press_screen(x, y)
 			end
 		end
 	end
+end
+
+local function selection_resize(x, y, x1, y1, x2, y2)
+	local grid_x, grid_y = floor(x / 8 + 0.5), floor(y / 8 + 0.5)
+	
+	local handle = state.room_handle_grabbed
+	
+	if handle == 1 then
+		if grid_x < x2 then
+			x1 = grid_x
+		end
+		if grid_y < y2 then
+			y1 = grid_y
+		end
+	elseif handle == 2 then
+		if grid_x > x1 then
+			x2 = grid_x
+		end
+		if grid_y < y2 then
+			y1 = grid_y
+		end
+	elseif handle == 3 then
+		if grid_x < x2 then
+			x1 = grid_x
+		end
+		if grid_y > y1 then
+			y2 = grid_y
+		end
+	else
+		if grid_x > x1 then
+			x2 = grid_x
+		end
+		if grid_y > y1 then
+			y2 = grid_y
+		end
+	end
+	
+	return x1, y1, x2, y2
 end
 
 local function red_tint()
@@ -283,42 +323,17 @@ local function _mousemoved(x, y, dx, dy)
 	if state.room_handle_grabbed then
 		local world_x, world_y = find_mouse(x, y)
 		
-		local grid_x, grid_y = floor(world_x / 8 + 0.5), floor(world_y / 8 + 0.5)
-		
 		local room = state.selected_room
-		local handle = state.room_handle_grabbed
-		
-		if handle == 1 then
-			if grid_x < room.x2 then
-				room.x1 = grid_x
-			end
-			if grid_y < room.y2 then
-				room.y1 = grid_y
-			end
-		elseif handle == 2 then
-			if grid_x > room.x1 then
-				room.x2 = grid_x
-			end
-			if grid_y < room.y2 then
-				room.y1 = grid_y
-			end
-		elseif handle == 3 then
-			if grid_x < room.x2 then
-				room.x1 = grid_x
-			end
-			if grid_y > room.y1 then
-				room.y2 = grid_y
-			end
+		local rect = state.selected_rect
+		if state.show_reveal_bounds then
+			room.rx1, room.ry1, room.rx2, room.ry2 =
+				selection_resize(world_x, world_y, floor(rect.x1 / 8), floor(rect.y1 / 8), floor(rect.x2 / 8), floor(rect.y2 / 8))
 		else
-			if grid_x > room.x1 then
-				room.x2 = grid_x
-			end
-			if grid_y > room.y1 then
-				room.y2 = grid_y
-			end
+			room.x1, room.y1, room.x2, room.y2 =
+				selection_resize(world_x, world_y, floor(rect.x1 / 8), floor(rect.y1 / 8), floor(rect.x2 / 8), floor(rect.y2 / 8))
 		end
 		
-		select_room_bounds(room)
+		state.select_room_bounds(room)
 	end
 end
 
