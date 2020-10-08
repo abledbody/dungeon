@@ -429,7 +429,7 @@ local function _draw()
 			rect(room_px1 + 1, room_py1 + 1, room_name:len() * FONT_WIDTH, FONT_HEIGHT)
 			color(7)
 			print(room_name, room_px1 + 1, room_py1 + 1)
-			if state.show_reveal_bounds then
+			if state.show_reveal_bounds or (state.selected_room_name == room_name and state.room_handle_grabbed) then
 				color(11)
 				rect(room_prx1, room_pry1, room_prw, room_prh, true)
 			end
