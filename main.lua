@@ -32,7 +32,6 @@ local state_update
 local state_draw
 
 	--Functions--
---Just to change _update and _draw in the same line
 function main.set_state(new_state)
 	state_update = new_state.update
 	state_draw = new_state.draw

@@ -3,6 +3,7 @@
 
 --Define PATH (Used for loading)
 PATH = "D:/dungeon/"
+local STATE_PATH = PATH.."States/"
 
 --Apply the custom Rayleigh palette
 dofile(PATH.."Rayleigh.lua")
@@ -31,18 +32,19 @@ brightness = dofile(PATH.."brightness.lua")
 
 --== Load game modules ==--
 
---States--
 dofile(PATH.."main.lua")
-dofile(PATH.."game.lua")
-dofile(PATH.."throw_select.lua")
-dofile(PATH.."main_menu.lua")
-dofile(PATH.."game_over.lua")
-dofile(PATH.."game_menu.lua")
-dofile(PATH.."quit_prompt.lua")
+
+--States--
+dofile(STATE_PATH.."di_box.lua")
+dofile(STATE_PATH.."game.lua")
+dofile(STATE_PATH.."throw_select.lua")
+dofile(STATE_PATH.."main_menu.lua")
+dofile(STATE_PATH.."game_over.lua")
+dofile(STATE_PATH.."game_menu.lua")
+dofile(STATE_PATH.."quit_prompt.lua")
 
 --Others--
 dofile(PATH.."menu.lua")
-dofile(PATH.."di_box.lua")
 dofile(PATH.."map.lua")
 dofile(PATH.."components.lua")
 dofile(PATH.."objects.lua")
