@@ -1,9 +1,9 @@
 NO_SPRITE = 384
 
-data = {}
+object_data = {}
 
-function data.draw_object(object_name, x, y)
-	local object = data.objects[object_name]
+function object_data.draw_object(object_name, x, y)
+	local object = object_data.objects[object_name]
 	
 	if object then
 		if object.draw then
@@ -16,8 +16,8 @@ function data.draw_object(object_name, x, y)
 	end
 end
 
-function data.get_object_bounds(object_name, x, y)
-	local object = data.objects[object_name]
+function object_data.get_object_bounds(object_name, x, y)
+	local object = object_data.objects[object_name]
 	
 	if object and object.get_bounds then
 		return object.get_bounds(x, y)
@@ -26,8 +26,8 @@ function data.get_object_bounds(object_name, x, y)
 	end
 end
 
-function data.test_occupancy(object_name, test_x, test_y, object_x, object_y)
-	local object = data.objects[object_name]
+function object_data.test_occupancy(object_name, test_x, test_y, object_x, object_y)
+	local object = object_data.objects[object_name]
 	
 	if object and object.test_occupancy then
 		return object.test_occupancy(test_x, test_y, object_x, object_y)
@@ -36,8 +36,8 @@ function data.test_occupancy(object_name, test_x, test_y, object_x, object_y)
 	end
 end
 
-function data.get_object_layer(object_name)
-	local object = data.objects[object_name]
+function object_data.get_object_layer(object_name)
+	local object = object_data.objects[object_name]
 	
 	if object then
 		return object.layer or 3
@@ -46,29 +46,29 @@ function data.get_object_layer(object_name)
 	end
 end
 
-data.objects = {}
+object_data.objects = {}
 
 --Mobs
-data.objects.Slime = {
+object_data.objects.Slime = {
 	sprite = 202,
 	layer = 2,
 }
 
 --Things
-data.objects.RobeStat = {
+object_data.objects.RobeStat = {
 	sprite = 97,
 	draw = function(self, x, y) f.SpriteGroup(self.sprite, 2, 3, x, y) end,
 	get_bounds = function(x, y) return x, y, 16, 24 end,
 	test_occupancy = function(test_x, test_y, object_x, object_y) return (test_x >= object_x and test_x < object_x + 2) and (test_y >= object_y + 1 and test_y < object_y + 3) end
 }
-data.objects.Chest = {
+object_data.objects.Chest = {
 	sprite = 169,
 	draw = function(self, x, y) palt(0, false) palt(1, true) f.Sprite(self.sprite, x, y) palt() end,
 }
-data.objects.Barrel = {
+object_data.objects.Barrel = {
 	sprite = 123,
 }
-data.objects.Bag = {
+object_data.objects.Bag = {
 	sprite = 147,
 }
-data.objects.ExTile = {}
+object_data.objects.ExTile = {}
