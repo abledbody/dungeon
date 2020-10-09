@@ -115,8 +115,8 @@ local function export(path)
 			"rooms."..room_k..
 			" = {\n\tx1 = "..room.x1..", y1 = "..room.y1..
 			",\n\tx2 = "..room.x2..", y2 = "..room.y2..
-			",\n\n\t rx1 = "..room.rx1..", ry1 = "..room.ry1..
-			",\n\t rx2 = "..room.rx2..", ry2 = "..room.ry2..
+			",\n\n\trx1 = "..room.rx1..", ry1 = "..room.ry1..
+			",\n\trx2 = "..room.rx2..", ry2 = "..room.ry2..
 			",\n\n\tcx = "..room.cx..", cy = "..room.cy..
 			",\n\n\t objects = {"
 		
@@ -207,6 +207,18 @@ local function new_room(x, y)
 	state.select_room(room_name)
 end
 
+local function edit_room_name()
+	state.editing_room_name = true
+	state.active_string = state.selected_room_name
+end
+
+local function rename_room(room_name, new_name)
+	if not mdat.rooms[new_name] then
+		mdat.rooms[new_name] = mdat.rooms[room_name]
+		mdat.rooms[room_name] = nil
+	end
+end
+
 local function press_screen(x, y)
 	--Pixel world-space to grid world-space
 	local gx, gy = floor(x / 8), floor(y / 8)
@@ -244,6 +256,12 @@ local function press_screen(x, y)
 						end
 					end
 				end
+				
+				if not state.selected_index and toolbar.get_mode() == "room" and double_click_time > 0 and mouse_unmoved(x, y) then
+					double_click_time = 0
+					edit_room_name()
+				end
+				
 				break
 			end
 		end
@@ -400,8 +418,24 @@ local keypress_actions = {
 }
 
 local function _keypressed(key)
-	if state.active_string then
-		state.active_string = state.active_string..key
+	if state.editing_room_name then
+		local active_string = state.active_string
+		
+		if key:len() == 1 then
+			active_string = active_string..key
+		elseif key == "backspace" then
+			if active_string ~= "" then
+				active_string = active_string:sub(1, active_string:len() - 1)
+			end
+		elseif key == "return" then
+			rename_room(state.selected_room_name, active_string)
+			state.select_room(active_string)
+			state.editing_room_name = false
+		elseif key == "escape" then
+			state.editing_room_name = false
+		end
+		
+		state.active_string = active_string
 	elseif keypress_actions[key] then
 		keypress_actions[key]()
 	end
@@ -471,10 +505,16 @@ local function _draw()
 			color(8)
 			rect(room_px1, room_py1, room_pw, room_ph, true)
 			
+			local room_name_str = room_name
+			
+			if state.editing_room_name and state.selected_room_name == room_name then
+				room_name_str = state.active_string
+			end
+			
 			color(0)
-			rect(room_px1 + 1, room_py1 + 1, room_name:len() * FONT_WIDTH, FONT_HEIGHT)
+			rect(room_px1 + 1, room_py1 + 1, room_name_str:len() * FONT_WIDTH, FONT_HEIGHT)
 			color(7)
-			print(room_name, room_px1 + 1, room_py1 + 1)
+			print(room_name_str, room_px1 + 1, room_py1 + 1)
 			
 			if state.show_reveal_bounds or (state.selected_room_name == room_name and state.room_handle_grabbed) then
 				color(11)
@@ -548,13 +588,19 @@ local events = {
 	keyreleased = _keyreleased,
 }
 
+local quit = false
+
 while true do
     local event, a, b, c, d, e = pullEvent()
 
-    if event == "keypressed" and a == "escape" then
-        break
+    if event == "keypressed" and a == "escape" and not state.editing_room_name then
+        quit = true
     end
     if events[event] then
         events[event](a, b, c, d, e)
-    end
+	end
+	
+	if quit then
+		break
+	end
 end

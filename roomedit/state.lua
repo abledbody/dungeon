@@ -13,7 +13,9 @@ state = {
 	selected_rect = nil,
 	selected_room_name = nil,
 	selected_object_name = nil,
+	
 	active_string = nil,
+	editing_room_name = nil,
 }
 
 local this = state
