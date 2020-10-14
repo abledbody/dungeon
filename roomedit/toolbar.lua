@@ -25,6 +25,16 @@ this.toggles = {
 			selection.select_room_bounds(selection.room)
 		end,
 	},
+	{
+		sprite = 9,
+		enabled = false,
+		on_pressed = function(self)
+			self:set_enabled(not self.enabled)
+		end,
+		set_enabled = function(self, value)
+			state.show_connections, self.enabled = value, value
+		end,
+	}
 }
 
 local mode_index = 1

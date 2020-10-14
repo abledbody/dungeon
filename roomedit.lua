@@ -160,6 +160,7 @@ local keypress_actions = {
 	["1"] = function() toolbar.select_tool(1) end,
 	["2"] = function() toolbar.select_tool(2) end,
 	r = function() toolbar.toggles[2]:on_pressed() end,
+	c = function() toolbar.toggles[3]:on_pressed() end,
 	lctrl = function() state.ctrl_pressed = true end,
 	s = function() if state.ctrl_pressed then export("mdat.lua") end end,
 	delete = function()
@@ -232,6 +233,18 @@ local function _draw()
 	--Tilemap--
     render.draw_tilemap()
 
+	--Connections--
+	if state.show_connections then
+		for i = 1, #mdat.connections do
+			local connection = mdat.connections[i]
+			local room_a = mdat.rooms[connection[1]]
+			local room_b = mdat.rooms[connection[2]]
+			
+			color(14)
+			line(room_a.cx * 8, room_a.cy * 8, room_b.cx * 8, room_b.cy * 8)
+		end
+	end
+	
 	--Rooms--
 	for room_name, room in pairs(mdat.rooms) do
 		local room_px1,		room_py1 =	room.x1 * 8,	room.y1 * 8
@@ -273,7 +286,9 @@ local function _draw()
 				color(11)
 				rect(room_prx1, room_pry1, room_prw, room_prh, true)
 			end
-			
+		end
+		
+		if state.show_room_data or state.show_connections then
 			f.Sprite(8, room.cx * 8 - 2, room.cy * 8 - 2, 2)
 		end
 	end
