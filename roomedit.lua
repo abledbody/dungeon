@@ -10,23 +10,7 @@ dofile(PATH .. "Rayleigh.lua")
 mdat = dofile(PATH .. "mdat.lua")
 dofile(ROOMEDIT_PATH .. "object_data.lua")
 
-local MapObj = require("Libraries.map")
-local Map = MapObj(144, 128)
-
-
 dungeon = HDD.read(PATH .. "dungeon.lk12")
-
-local function get_tilemap(file)
-	local start = file:find("LK12;TILEMAP;")
-    local stop = file:find("___spritesheet___")
-
-    local tm_data = file:sub(start, stop)
-
-    Map:import(tm_data)
-end
-
-
-get_tilemap(dungeon)
 
 --------------------------------------
 
@@ -107,13 +91,23 @@ local function write_table(str, tab)
 end
 
 local function export(path)
-	local compiled = "local mdat = {}\nlocal rooms = {}\n\n"
+	local compiled = "local mdat = {}\nlocal rooms = {}\nmdat.initial_room = \""..mdat.initial_room.."\"\n\n"
 	
 	--Each room--
-	for room_k, room in pairs(mdat.rooms) do
+	local room_k = mdat.initial_room
+	local room = mdat.rooms[room_k]
+	while room do
+		local next_room_name
+		if room.next then
+			next_room_name = "\""..room.next.."\""
+		else
+			next_room_name = "nil"
+		end
+		
 		compiled = compiled..
 			"rooms."..room_k..
-			" = {\n\tx1 = "..room.x1..", y1 = "..room.y1..
+			" = {\n\tnext = "..next_room_name..
+			",\n\n\tx1 = "..room.x1..", y1 = "..room.y1..
 			",\n\tx2 = "..room.x2..", y2 = "..room.y2..
 			",\n\n\trx1 = "..room.rx1..", ry1 = "..room.ry1..
 			",\n\trx2 = "..room.rx2..", ry2 = "..room.ry2..
@@ -127,6 +121,9 @@ local function export(path)
 			compiled = compiled.."},"
 		end
 		compiled = compiled.."\n\t}\n}\n\n"
+		
+		room_k = room.next
+		room = mdat.rooms[room_k]
 	end
 	
 	compiled = compiled.."--Connections\nmdat.connections = {\n"
@@ -140,16 +137,6 @@ local function export(path)
 	
 	HDD.write(PATH..path, compiled)
 	state.selected_object_name = "Exported to "..PATH..path
-end
-
-local function tile_draw(x, y, id)
-    if id > 0 then
-        f.Sprite(id, x * 8, y * 8)
-    end
-end
-
-local function draw_tilemap()
-    Map:map(tile_draw)
 end
 
 local function in_room(room, x, y)
@@ -192,7 +179,18 @@ local function new_room(x, y)
 		room_name_index = room_name_index + 1
 		room_name = "unnamed_room_"..room_name_index
 	end
+	
+	do
+		local room = mdat.rooms[mdat.initial_room]
+		while room.next do
+			room = mdat.rooms[room.next]
+		end
+		room.next = room_name
+	end
+	
 	mdat.rooms[room_name] = {
+		next = nil,
+		
 		x1 = x,		y1 = y,
 		x2 = x+1,	y2 = y+1,
 	
@@ -207,15 +205,48 @@ local function new_room(x, y)
 	state.select_room(room_name)
 end
 
+local function delete_room(room_name)
+	local new_target_room = mdat.rooms[state.selected_room_name].next
+	
+	mdat.rooms[state.selected_room_name] = nil
+	
+	do
+		local room = mdat.rooms[mdat.initial_room]
+		while room.next and room.next ~= room_name do
+			room = mdat.rooms[room.next]
+		end
+		room.next = new_target_room
+	end
+end
+
 local function edit_room_name()
 	state.editing_room_name = true
 	state.active_string = state.selected_room_name
 end
 
-local function rename_room(room_name, new_name)
+local function apply_room_name(room_name, new_name)
 	if not mdat.rooms[new_name] then
 		mdat.rooms[new_name] = mdat.rooms[room_name]
 		mdat.rooms[room_name] = nil
+	end
+	
+	do
+		local room = mdat.rooms[mdat.initial_room]
+		while room.next and room.next ~= room_name do
+			room = mdat.rooms[room.next]
+		end
+		if room.next == room_name then
+			room.next = new_name
+		end
+	end
+	
+	for i = 1, #mdat.connections do
+		local connection = mdat.connections[i]
+		if connection[1] == room_name then
+			connection[1] = new_name
+		elseif connection[2] == room_name then
+			connection[2] = new_name
+		end
 	end
 end
 
@@ -411,7 +442,7 @@ local keypress_actions = {
 		if state.selected_index then
 			table.remove(state.selected_room.objects, state.selected_index)
 		elseif state.selected_room then
-			mdat.rooms[state.selected_room_name] = nil
+			delete_room(state.selected_room_name)
 		end
 		state.deselect()
 	end,
@@ -428,7 +459,7 @@ local function _keypressed(key)
 				active_string = active_string:sub(1, active_string:len() - 1)
 			end
 		elseif key == "return" then
-			rename_room(state.selected_room_name, active_string)
+			apply_room_name(state.selected_room_name, active_string)
 			state.select_room(active_string)
 			state.editing_room_name = false
 		elseif key == "escape" then
@@ -477,7 +508,7 @@ local function _draw()
 	rect(1153, -inv_scale, inv_scale, 1024 + inv_scale * 2)
 
 	--Tilemap--
-    draw_tilemap()
+    render.draw_tilemap()
 
 	--Rooms--
 	for room_name, room in pairs(mdat.rooms) do
