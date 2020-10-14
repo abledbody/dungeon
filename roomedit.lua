@@ -15,15 +15,16 @@ dungeon = HDD.read(PATH .. "dungeon.lk12")
 --------------------------------------
 
 dofile(ROOMEDIT_PATH.."consts.lua")
+dofile(PATH.."amath.lua")
 
-local view_x, view_y = HSW, HSH
-local view_scale = 1
-local double_click_time = 0
-local last_click_x, last_click_y = 0, 0
-
+dofile(ROOMEDIT_PATH.."camera.lua")
 dofile(ROOMEDIT_PATH.."state.lua")
 dofile(ROOMEDIT_PATH.."toolbar.lua")
 dofile(ROOMEDIT_PATH.."render.lua")
+dofile(ROOMEDIT_PATH.."rooms.lua")
+dofile(ROOMEDIT_PATH.."mouse.lua")
+dofile(ROOMEDIT_PATH.."selection.lua")
+dofile(ROOMEDIT_PATH.."room_mode.lua")
 
 local function binary_search(tab, value)
 	if #tab > 0 then
@@ -67,10 +68,6 @@ local function binary_search(tab, value)
 	else
 		return {}
 	end
-end
-
-local function mouse_unmoved(x, y)
-	return abs(last_click_x - x) < MOUSE_MOVE_THRESHOLD and abs(last_click_y - y) < MOUSE_MOVE_THRESHOLD
 end
 
 local function write_table(str, tab)
@@ -136,215 +133,7 @@ local function export(path)
 	compiled = compiled.."}\n\nfor _, v in ipairs(mdat.connections) do\n\tlocal room_a = v[1]\n\tlocal room_b = v[2]\n\n\trooms[room_a].con = rooms[room_a].con or {}\n\trooms[room_b].con = rooms[room_b].con or {}\n\n\ttable.insert(rooms[room_a].con, room_b)\n\ttable.insert(rooms[room_b].con, room_a)\nend\n\nmdat.rooms = rooms\n\nreturn mdat"
 	
 	HDD.write(PATH..path, compiled)
-	state.selected_object_name = "Exported to "..PATH..path
-end
-
-local function in_room(room, x, y)
-	return x >= room.x1 and y >= room.y1 and x < room.x2 and y < room.y2
-end
-
-local function find_mouse(x, y)
-	return (x - HSW) / view_scale + view_x, (y - HSH) / view_scale + view_y
-end
-
-local function handle_clicked(x, y, x1, y1, x2, y2)
-	local left_handle_x = x1 - ROOM_HANDLE_SIZE - ROOM_HANDLE_PAD
-	local right_handle_x = x2 + ROOM_HANDLE_PAD
-	--If we're within the x coordinates that could possibly select a handle
-	if x >= left_handle_x and x < right_handle_x + ROOM_HANDLE_SIZE then
-		local top_handle_y = y1 - ROOM_HANDLE_SIZE - ROOM_HANDLE_PAD
-		local bottom_handle_y = y2 + ROOM_HANDLE_PAD
-		--If we're within the y coordinates that could possibly select a handle
-		if y >= top_handle_y and y < bottom_handle_y + ROOM_HANDLE_SIZE then
-			local is_top = y < top_handle_y + ROOM_HANDLE_SIZE
-			local is_bottom = y >= bottom_handle_y
-			--If we're on the left side
-			if x < left_handle_x + ROOM_HANDLE_SIZE then
-				if is_top then return 1
-				elseif is_bottom then return 3 end
-			--If we're on the right side
-			elseif x >= right_handle_x then
-				if is_top then return 2
-				elseif is_bottom then return 4 end
-			end
-		end
-	end
-	return false
-end
-
-local function new_room(x, y)
-	local room_name_index = 0
-	local room_name = "unnamed_room_"..room_name_index
-	while (mdat.rooms[room_name]) do
-		room_name_index = room_name_index + 1
-		room_name = "unnamed_room_"..room_name_index
-	end
-	
-	do
-		local room = mdat.rooms[mdat.initial_room]
-		while room.next do
-			room = mdat.rooms[room.next]
-		end
-		room.next = room_name
-	end
-	
-	mdat.rooms[room_name] = {
-		next = nil,
-		
-		x1 = x,		y1 = y,
-		x2 = x+1,	y2 = y+1,
-	
-		rx1 = x,	ry1 = y,
-		rx2 = x+1,	ry2 = y+1,
-	
-		cx = x,	cy = y,
-		objects = {
-			
-		}
-	}
-	state.select_room(room_name)
-end
-
-local function delete_room(room_name)
-	local new_target_room = mdat.rooms[state.selected_room_name].next
-	
-	mdat.rooms[state.selected_room_name] = nil
-	
-	do
-		local room = mdat.rooms[mdat.initial_room]
-		while room.next and room.next ~= room_name do
-			room = mdat.rooms[room.next]
-		end
-		room.next = new_target_room
-	end
-end
-
-local function edit_room_name()
-	state.editing_room_name = true
-	state.active_string = state.selected_room_name
-end
-
-local function apply_room_name(room_name, new_name)
-	if not mdat.rooms[new_name] then
-		mdat.rooms[new_name] = mdat.rooms[room_name]
-		mdat.rooms[room_name] = nil
-	end
-	
-	do
-		local room = mdat.rooms[mdat.initial_room]
-		while room.next and room.next ~= room_name do
-			room = mdat.rooms[room.next]
-		end
-		if room.next == room_name then
-			room.next = new_name
-		end
-	end
-	
-	for i = 1, #mdat.connections do
-		local connection = mdat.connections[i]
-		if connection[1] == room_name then
-			connection[1] = new_name
-		elseif connection[2] == room_name then
-			connection[2] = new_name
-		end
-	end
-end
-
-local function press_screen(x, y)
-	--Pixel world-space to grid world-space
-	local gx, gy = floor(x / 8), floor(y / 8)
-	
-	local selected_handle
-	local room = state.selected_room
-	if room and not state.selected_index then
-		if state.show_reveal_bounds then
-			selected_handle = handle_clicked(x, y, room.rx1 * 8, room.ry1 * 8, room.rx2 * 8, room.ry2 * 8)
-		else
-			selected_handle = handle_clicked(x, y, room.x1 * 8, room.y1 * 8, room.x2 * 8, room.y2 * 8)
-		end
-	end
-	
-	if selected_handle then
-		state.room_handle_grabbed = selected_handle
-	else
-		state.deselect()
-
-		for room_name, room in pairs(mdat.rooms) do
-			if in_room(room, gx, gy) then
-				--We're going to assume that we've just selected the room
-				state.select_room(room_name)
-
-				--And then we'll check to see if we've actually selected an object, and replace the selection data with that if we have.
-				if state.objects_selectable then
-					for object_index, object in pairs(room.objects) do
-						if object_data.test_occupancy(object[1], gx, gy, object[2], object[3]) then
-							state.selected_index = object_index
-							state.selected_object_name = object[1]
-							
-							local rect_x, rect_y, rect_w, rect_h = object_data.get_object_bounds(state.selected_object_name, (object[2]) * 8, (object[3]) * 8)
-							state.selected_rect = {x1 = rect_x, y1 = rect_y, x2 = rect_x + rect_w, y2 = rect_y + rect_h}
-							break
-						end
-					end
-				end
-				
-				if not state.selected_index and toolbar.get_mode() == "room" and double_click_time > 0 and mouse_unmoved(x, y) then
-					double_click_time = 0
-					edit_room_name()
-				end
-				
-				break
-			end
-		end
-	end
-	
-	if not state.selected_room and double_click_time > 0 and mouse_unmoved(x, y) then
-		double_click_time = 0
-		new_room(gx, gy)
-	else
-		double_click_time = DOUBLE_CLICK_THRESHOLD
-	end
-	
-	last_click_x = x
-	last_click_y = y
-end
-
-local function selection_resize(x, y, x1, y1, x2, y2)
-	local grid_x, grid_y = floor(x / 8 + 0.5), floor(y / 8 + 0.5)
-	
-	local handle = state.room_handle_grabbed
-	
-	if handle == 1 then
-		if grid_x < x2 then
-			x1 = grid_x
-		end
-		if grid_y < y2 then
-			y1 = grid_y
-		end
-	elseif handle == 2 then
-		if grid_x > x1 then
-			x2 = grid_x
-		end
-		if grid_y < y2 then
-			y1 = grid_y
-		end
-	elseif handle == 3 then
-		if grid_x < x2 then
-			x1 = grid_x
-		end
-		if grid_y > y1 then
-			y2 = grid_y
-		end
-	else
-		if grid_x > x1 then
-			x2 = grid_x
-		end
-		if grid_y > y1 then
-			y2 = grid_y
-		end
-	end
-	
-	return x1, y1, x2, y2
+	selection.room_name = "Exported to "..PATH..path
 end
 
 local function red_tint()
@@ -366,71 +155,6 @@ end
 
 ------LOVE events------
 
-local function _mousepressed(x, y, button)
-	if button == 1 then
-		if y >= SH - TOOLBAR_WIDTH then
-			toolbar.press_tool(x)
-		else
-			local world_x, world_y = find_mouse(x, y)
-			press_screen(world_x, world_y)
-		end
-	end
-	
-    if button == 2 then
-        state.dragging = true
-        cursor("hand")
-    end
-end
-
-local function _mousereleased(x, y, button)
-	if button == 1 then
-		state.room_handle_grabbed = false
-	end
-	
-    if button == 2 then
-        state.dragging = false
-        cursor("normal")
-    end
-end
-
-local function _mousemoved(x, y, dx, dy)
-    if state.dragging then
-        view_x = view_x - dx / view_scale
-		view_y = view_y - dy / view_scale
-		
-		view_x = math.min(math.max(view_x, 0), 1152)
-		view_y = math.min(math.max(view_y, 0), 1024)
-	end
-	
-	if state.room_handle_grabbed then
-		local world_x, world_y = find_mouse(x, y)
-		
-		local room = state.selected_room
-		local rect = state.selected_rect
-		
-		local x1, y1, x2, y2 = selection_resize(world_x, world_y, floor(rect.x1 / 8), floor(rect.y1 / 8), floor(rect.x2 / 8), floor(rect.y2 / 8))
-		
-		if state.show_reveal_bounds then
-			room.rx1, room.ry1, room.rx2, room.ry2 = x1, y1, x2, y2
-		else
-			room.x1, room.y1, room.x2, room.y2 = x1, y1, x2, y2
-			room.cx = floor((x2 - x1) / 2) + x1
-			room.cy = floor((y2 - y1) / 2) + y1
-		end
-		
-		state.select_room_bounds(room)
-	end
-end
-
-local function _wheelmoved(_, delta)
-	if delta > 0 then
-		view_scale = 1
-	end
-	if delta < 0 then
-		view_scale = 0.25
-	end
-end
-
 local keypress_actions = {
 	lalt = function() toolbar.toggles[1]:set_enabled(true) end,
 	["1"] = function() toolbar.select_tool(1) end,
@@ -439,12 +163,12 @@ local keypress_actions = {
 	lctrl = function() state.ctrl_pressed = true end,
 	s = function() if state.ctrl_pressed then export("mdat.lua") end end,
 	delete = function()
-		if state.selected_index then
-			table.remove(state.selected_room.objects, state.selected_index)
-		elseif state.selected_room then
-			delete_room(state.selected_room_name)
+		if selection.object_index then
+			table.remove(selection.room.objects, selection.object_index)
+		elseif selection.room then
+			rooms.delete_room(selection.room_name)
 		end
-		state.deselect()
+		selection.deselect()
 	end,
 }
 
@@ -459,8 +183,8 @@ local function _keypressed(key)
 				active_string = active_string:sub(1, active_string:len() - 1)
 			end
 		elseif key == "return" then
-			apply_room_name(state.selected_room_name, active_string)
-			state.select_room(active_string)
+			rooms.apply_room_name(selection.room_name, active_string)
+			selection.select_room(active_string)
 			state.editing_room_name = false
 		elseif key == "escape" then
 			state.editing_room_name = false
@@ -486,19 +210,17 @@ end
 ------Main loops------
 
 local function _update(dt)
-	double_click_time = math.max(double_click_time - dt, 0)
+	mouse.update(dt)
 end
 
 local function _draw()
 	clear()
 
-	local inv_scale = 1 / view_scale
+	local inv_scale = 1 / camera.view_scale
 
 	--Camera transformations--
 	pushMatrix()
-	cam("translate", HSW, HSH)
-	cam("scale", view_scale, view_scale)
-    cam("translate", -floor(view_x * view_scale) * inv_scale, -floor(view_y * view_scale) * inv_scale)
+	camera.transform()
 
 	--Border--
 	color(7)
@@ -523,7 +245,7 @@ local function _draw()
 
 		--Objects--
 		for _, object in pairs(room.objects) do
-			if not in_room(room, object[2], object[3]) then
+			if not rooms.in_room(room, object[2], object[3]) then
 				red_tint()
 			end
 			object_data.draw_object(object[1], object[2], object[3])
@@ -538,7 +260,7 @@ local function _draw()
 			
 			local room_name_str = room_name
 			
-			if state.editing_room_name and state.selected_room_name == room_name then
+			if state.editing_room_name and selection.room_name == room_name then
 				room_name_str = state.active_string
 			end
 			
@@ -547,7 +269,7 @@ local function _draw()
 			color(7)
 			print(room_name_str, room_px1 + 1, room_py1 + 1)
 			
-			if state.show_reveal_bounds or (state.selected_room_name == room_name and state.room_handle_grabbed) then
+			if state.show_reveal_bounds or (selection.room_name == room_name and selection.handle_grabbed) then
 				color(11)
 				rect(room_prx1, room_pry1, room_prw, room_prh, true)
 			end
@@ -556,51 +278,26 @@ local function _draw()
 		end
 	end
 	
-	--Selection bounds--
-	local selected_rect = state.selected_rect
-	if selected_rect then
-		color(7)
-		rect(
-			selected_rect.x1 - 1,
-			selected_rect.y1 - 1,
-			selected_rect.x2 - selected_rect.x1 + 2,
-			selected_rect.y2 - selected_rect.y1 + 2,
-			true)
-		
-		if toolbar.get_mode() == "room" and state.selected_room and not state.selected_index then
-			f.Sprite(7,
-				selected_rect.x1 - ROOM_HANDLE_SIZE - ROOM_HANDLE_PAD,
-				selected_rect.y1 - ROOM_HANDLE_SIZE - ROOM_HANDLE_PAD, 2)
-			f.Sprite(7,
-				selected_rect.x2 + ROOM_HANDLE_PAD,
-				selected_rect.y1 - ROOM_HANDLE_SIZE - ROOM_HANDLE_PAD, 2)
-			f.Sprite(7,
-				selected_rect.x1 - ROOM_HANDLE_SIZE - ROOM_HANDLE_PAD,
-				selected_rect.y2 + ROOM_HANDLE_PAD, 2)
-			f.Sprite(7,
-				selected_rect.x2 + ROOM_HANDLE_PAD,
-				selected_rect.y2 + ROOM_HANDLE_PAD, 2)
-		end
-	end
+	selection.draw()
 
     popMatrix()
 
-	if state.selected_room_name then
-		local str_len = state.selected_room_name:len()
+	if selection.room_name then
+		local str_len = selection.room_name:len()
 
 		color(0)
 		rect(HSW - str_len * 2.5 - 1, 0, str_len * FONT_WIDTH + 1, FONT_HEIGHT + 1)
 		color(7)
-		print(state.selected_room_name, HSW - str_len * FONT_WIDTH/2, 1)
+		print(selection.room_name, HSW - str_len * FONT_WIDTH/2, 1)
 	end
 	
-	if state.selected_object_name then
-		local str_len = state.selected_object_name:len()
+	if selection.object_name then
+		local str_len = selection.object_name:len()
 
 		color(0)
 		rect(HSW - str_len * 2.5 - 1, FONT_HEIGHT + 1, str_len * FONT_WIDTH + 1, FONT_HEIGHT + 1)
 		color(7)
-		print(state.selected_object_name, HSW - str_len * FONT_WIDTH/2, FONT_HEIGHT + 2)
+		print(selection.object_name, HSW - str_len * FONT_WIDTH/2, FONT_HEIGHT + 2)
 	end
 
 	toolbar.draw()
@@ -611,10 +308,10 @@ local events = {
         _update(a)
         _draw()
     end,
-    mousepressed = _mousepressed,
-    mousereleased = _mousereleased,
-	mousemoved = _mousemoved,
-	wheelmoved = _wheelmoved,
+    mousepressed = mouse.pressed,
+    mousereleased = mouse.released,
+	mousemoved = mouse.moved,
+	wheelmoved = mouse.wheel_moved,
 	keypressed = _keypressed,
 	keyreleased = _keyreleased,
 }

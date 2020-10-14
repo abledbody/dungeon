@@ -4,7 +4,7 @@ mdat.initial_room = "entry"
 
 rooms.entry = {
 	next = "entry_hall",
-	
+
 	x1 = 54, y1 = 0,
 	x2 = 66, y2 = 11,
 
@@ -26,7 +26,7 @@ rooms.entry = {
 
 rooms.entry_hall = {
 	next = "slime",
-	
+
 	x1 = 58, y1 = 11,
 	x2 = 62, y2 = 18,
 
@@ -41,7 +41,7 @@ rooms.entry_hall = {
 
 rooms.slime = {
 	next = "text",
-	
+
 	x1 = 44, y1 = 11,
 	x2 = 58, y2 = 18,
 
@@ -59,7 +59,7 @@ rooms.slime = {
 
 rooms.text = {
 	next = "lava_bridge",
-	
+
 	x1 = 62, y1 = 15,
 	x2 = 70, y2 = 21,
 
@@ -78,7 +78,7 @@ rooms.text = {
 
 rooms.lava_bridge = {
 	next = "lava_cave",
-	
+
 	x1 = 52, y1 = 18,
 	x2 = 62, y2 = 31,
 
@@ -94,7 +94,7 @@ rooms.lava_bridge = {
 
 rooms.lava_cave = {
 	next = "testroom",
-	
+
 	x1 = 44, y1 = 18,
 	x2 = 52, y2 = 26,
 
@@ -109,12 +109,12 @@ rooms.lava_cave = {
 
 rooms.testroom = {
 	next = nil,
-	
+
 	x1 = 44, y1 = 0,
 	x2 = 54, y2 = 11,
 
-	rx1 = 43, ry1 = 0,
-	rx2 = 44, ry2 = 1,
+	rx1 = 44, ry1 = 0,
+	rx2 = 54, ry2 = 11,
 
 	cx = 49, cy = 5,
 

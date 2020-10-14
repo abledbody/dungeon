@@ -22,7 +22,7 @@ this.toggles = {
 		end,
 		set_enabled = function(self, value)
 			state.show_reveal_bounds, self.enabled = value, value
-			state.select_room_bounds(state.selected_room)
+			selection.select_room_bounds(selection.room)
 		end,
 	},
 }
