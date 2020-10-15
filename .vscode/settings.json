@@ -32,7 +32,8 @@
 		"fontWidth",
 		"cursor",
 		"fontHeight",
-		"HDD"
+		"HDD",
+		"line"
 	],
     "Lua.diagnostics.disable": [
 		"lowercase-global",

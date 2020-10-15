@@ -13,7 +13,7 @@ function mouse.unmoved(x, y)
 end
 
 function mouse.double_clicked(x, y)
-	if double_click_time > 0 and mouse.unmoved(x, y) then
+	if double_click_time > 0 and double_click_time < DOUBLE_CLICK_THRESHOLD and mouse.unmoved(x, y) then
 		double_click_time = 0
 		return true
 	else
@@ -33,7 +33,7 @@ function mouse.pressed(x, y, button)
 		if y >= SH - TOOLBAR_WIDTH then
 			toolbar.press_tool(x)
 		else
-			room_mode.press_screen(world_x, world_y)
+			state.active_mode.press_screen(world_x, world_y)
 		end
 	end
 	

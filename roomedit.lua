@@ -19,12 +19,14 @@ dofile(PATH.."amath.lua")
 
 dofile(ROOMEDIT_PATH.."camera.lua")
 dofile(ROOMEDIT_PATH.."state.lua")
+dofile(ROOMEDIT_PATH.."object_mode.lua")
+dofile(ROOMEDIT_PATH.."room_mode.lua")
 dofile(ROOMEDIT_PATH.."toolbar.lua")
 dofile(ROOMEDIT_PATH.."render.lua")
+dofile(ROOMEDIT_PATH.."objects.lua")
 dofile(ROOMEDIT_PATH.."rooms.lua")
 dofile(ROOMEDIT_PATH.."mouse.lua")
 dofile(ROOMEDIT_PATH.."selection.lua")
-dofile(ROOMEDIT_PATH.."room_mode.lua")
 
 local function binary_search(tab, value)
 	if #tab > 0 then
@@ -156,11 +158,11 @@ end
 ------LOVE events------
 
 local keypress_actions = {
-	lalt = function() toolbar.toggles[1]:set_enabled(true) end,
-	["1"] = function() toolbar.select_tool(1) end,
-	["2"] = function() toolbar.select_tool(2) end,
-	r = function() toolbar.toggles[2]:on_pressed() end,
-	c = function() toolbar.toggles[3]:on_pressed() end,
+	lalt = function() state.toggles[1]:set_enabled(true) end,
+	["1"] = function() state.set_mode(1) end,
+	["2"] = function() state.set_mode(2) end,
+	r = function() state.toggles[2]:on_pressed() end,
+	c = function() state.toggles[3]:on_pressed() end,
 	lctrl = function() state.ctrl_pressed = true end,
 	s = function() if state.ctrl_pressed then export("mdat.lua") end end,
 	delete = function()
@@ -198,7 +200,7 @@ local function _keypressed(key)
 end
 
 local keyrelease_actions = {
-	lalt = function() toolbar.toggles[1]:set_enabled(false) end,
+	lalt = function() state.toggles[1]:set_enabled(false) end,
 	lctrl = function() state.ctrl_pressed = false end,
 }
 
@@ -234,7 +236,7 @@ local function _draw()
     render.draw_tilemap()
 
 	--Connections--
-	if state.show_connections then
+	if state.show_connections and state.show_room_data then
 		for i = 1, #mdat.connections do
 			local connection = mdat.connections[i]
 			local room_a = mdat.rooms[connection[1]]
@@ -286,14 +288,12 @@ local function _draw()
 				color(11)
 				rect(room_prx1, room_pry1, room_prw, room_prh, true)
 			end
-		end
-		
-		if state.show_room_data or state.show_connections then
+			
 			f.Sprite(8, room.cx * 8 - 2, room.cy * 8 - 2, 2)
 		end
 	end
 	
-	selection.draw()
+	selection.draw(state.get_mode() == "room" and selection.room and not selection.object_index)
 
     popMatrix()
 
@@ -330,6 +330,8 @@ local events = {
 	keypressed = _keypressed,
 	keyreleased = _keyreleased,
 }
+
+state.set_mode(1)
 
 local quit = false
 

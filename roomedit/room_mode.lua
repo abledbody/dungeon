@@ -9,13 +9,9 @@ function this.press_screen(x, y)
 	local gx, gy = floor(x / 8), floor(y / 8)
 	
 	local selected_handle
-	local room = selection.room
-	if room and not selection.object_index then
-		if state.show_reveal_bounds then
-			selected_handle = selection.handle_clicked(x, y, room.rx1 * 8, room.ry1 * 8, room.rx2 * 8, room.ry2 * 8)
-		else
-			selected_handle = selection.handle_clicked(x, y, room.x1 * 8, room.y1 * 8, room.x2 * 8, room.y2 * 8)
-		end
+	if selection.room and not selection.object_index then
+		local sel_rect = selection.rect
+		selected_handle = selection.handle_clicked(x, y, sel_rect.x1, sel_rect.y1, sel_rect.x2, sel_rect.y2)
 	end
 	
 	if selected_handle then
@@ -23,26 +19,12 @@ function this.press_screen(x, y)
 	else
 		selection.deselect()
 
-		for room_name, room in pairs(mdat.rooms) do
-			if rooms.in_room(room, gx, gy) then
-				--We're going to assume that we've just selected the room
-				selection.select_room(room_name)
-
-				--And then we'll check to see if we've actually selected an object, and replace the selection data with that if we have.
-				if state.objects_selectable then
-					for object_index, object in pairs(room.objects) do
-						if object_data.test_occupancy(object[1], gx, gy, object[2], object[3]) then
-							selection.select_object(object_index, object)
-							break
-						end
-					end
-				end
-				
-				if not selection.object_index and toolbar.get_mode() == "room" and mouse.double_clicked(x, y) then
-					rooms.edit_room_name()
-				end
-				
-				break
+		if rooms.try_select(gx, gy) then
+			if state.objects_selectable then
+				objects.try_select(gx, gy)
+			end
+			if not selection.object_index and mouse.double_clicked(x, y) then
+				rooms.edit_room_name()
 			end
 		end
 	end

@@ -78,7 +78,7 @@ function this.handle_clicked(x, y, x1, y1, x2, y2)
 	return false
 end
 
-function this.draw()
+function this.draw(show_handles)
 	--Selection bounds--
 	local selection_rect = this.rect
 	if selection_rect then
@@ -90,7 +90,7 @@ function this.draw()
 			selection_rect.y2 - selection_rect.y1 + 2,
 			true)
 		
-		if toolbar.get_mode() == "room" and this.room and not this.object_index then
+		if show_handles then
 			f.Sprite(7,
 				selection_rect.x1 - ROOM_HANDLE_SIZE - ROOM_HANDLE_PAD,
 				selection_rect.y1 - ROOM_HANDLE_SIZE - ROOM_HANDLE_PAD, 2)
