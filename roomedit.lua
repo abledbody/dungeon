@@ -18,9 +18,9 @@ dofile(ROOMEDIT_PATH.."consts.lua")
 dofile(PATH.."amath.lua")
 
 dofile(ROOMEDIT_PATH.."camera.lua")
-dofile(ROOMEDIT_PATH.."state.lua")
 dofile(ROOMEDIT_PATH.."object_mode.lua")
 dofile(ROOMEDIT_PATH.."room_mode.lua")
+dofile(ROOMEDIT_PATH.."state.lua")
 dofile(ROOMEDIT_PATH.."toolbar.lua")
 dofile(ROOMEDIT_PATH.."render.lua")
 dofile(ROOMEDIT_PATH.."objects.lua")
@@ -245,6 +245,15 @@ local function _draw()
 			color(14)
 			line(room_a.cx * 8, room_a.cy * 8, room_b.cx * 8, room_b.cy * 8)
 		end
+	end
+	
+	if room_mode.connection_drag then
+		local mx, my = getMPos()
+		mx, my = mouse.screen_to_world(mx, my)
+		local room = mdat.rooms[room_mode.connection_drag]
+		
+		color(14)
+		line(room.cx * 8, room.cy * 8, mx, my)
 	end
 	
 	--Rooms--

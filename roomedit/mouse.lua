@@ -32,7 +32,7 @@ function mouse.pressed(x, y, button)
 	if button == 1 then
 		if y >= SH - TOOLBAR_WIDTH then
 			toolbar.press_tool(x)
-		else
+		elseif state.active_mode.press_screen then
 			state.active_mode.press_screen(world_x, world_y)
 		end
 	end
@@ -47,8 +47,13 @@ function mouse.pressed(x, y, button)
 end
 
 function mouse.released(x, y, button)
+	local world_x, world_y = mouse.screen_to_world(x, y)
+	
 	if button == 1 then
 		selection.handle_grabbed = false
+		if state.active_mode.unpress_screen then
+			state.active_mode.unpress_screen(world_x, world_y)
+		end
 	end
 	
     if button == 2 then

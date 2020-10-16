@@ -83,13 +83,21 @@ function this.apply_room_name(room_name, new_name)
 	end
 end
 
-function this.try_select(gx, gy)
+function this.find_room(gx, gy)
 	for room_name, room in pairs(mdat.rooms) do
 		if this.in_room(room, gx, gy) then
-			selection.select_room(room_name)
-			return true
+			return room_name
 		end
 	end
+end
+
+function this.try_select(gx, gy)
+	local found_room = this.find_room(gx, gy)
 	
-	return false
+	if found_room then
+		selection.select_room(found_room)
+		return true
+	else
+		return false
+	end
 end

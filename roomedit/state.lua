@@ -68,6 +68,7 @@ this.modes = {
 			this.toggles[1]:set_enabled(false)
 		end,
 		press_screen = room_mode.press_screen,
+		unpress_screen = room_mode.unpress_screen,
 	},
 }
 
