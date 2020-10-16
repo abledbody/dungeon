@@ -93,7 +93,7 @@ rooms.lava_bridge = {
 }
 
 rooms.lava_cave = {
-	next = "testroom",
+	next = "lavapool",
 
 	x1 = 44, y1 = 18,
 	x2 = 52, y2 = 26,
@@ -107,16 +107,61 @@ rooms.lava_cave = {
 	}
 }
 
-rooms.testroom = {
+rooms.lavapool = {
+	next = "emptylavaroom",
+
+	x1 = 62, y1 = 25,
+	x2 = 72, y2 = 35,
+
+	rx1 = 61, ry1 = 25,
+	rx2 = 72, ry2 = 36,
+
+	cx = 67, cy = 30,
+
+	 objects = {
+	}
+}
+
+rooms.emptylavaroom = {
+	next = "greentransition",
+
+	x1 = 61, y1 = 35,
+	x2 = 72, y2 = 44,
+
+	rx1 = 61, ry1 = 35,
+	rx2 = 72, ry2 = 44,
+
+	cx = 66, cy = 39,
+
+	 objects = {
+	}
+}
+
+rooms.greentransition = {
+	next = "greenroom",
+
+	x1 = 70, y1 = 18,
+	x2 = 81, y2 = 23,
+
+	rx1 = 69, ry1 = 18,
+	rx2 = 81, ry2 = 24,
+
+	cx = 75, cy = 20,
+
+	 objects = {
+	}
+}
+
+rooms.greenroom = {
 	next = nil,
 
-	x1 = 44, y1 = 0,
-	x2 = 54, y2 = 11,
+	x1 = 72, y1 = 23,
+	x2 = 78, y2 = 34,
 
-	rx1 = 44, ry1 = 0,
-	rx2 = 54, ry2 = 11,
+	rx1 = 71, ry1 = 23,
+	rx2 = 78, ry2 = 34,
 
-	cx = 49, cy = 5,
+	cx = 75, cy = 28,
 
 	 objects = {
 	}
@@ -130,6 +175,11 @@ mdat.connections = {
 	{"entry_hall", "lava_bridge"},
 	{"slime", "lava_cave"},
 	{"lava_bridge", "lava_cave"},
+	{"text", "greentransition"},
+	{"lavapool", "emptylavaroom"},
+	{"lavapool", "lava_bridge"},
+	{"lavapool", "greenroom"},
+	{"greentransition", "greenroom"},
 }
 
 for _, v in ipairs(mdat.connections) do

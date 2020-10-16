@@ -50,6 +50,13 @@ function this.delete_room(room_name)
 		end
 		room.next = new_target_room
 	end
+	
+	for i = #mdat.connections, 1, -1  do
+		local connection = mdat.connections[i]
+		if connection[1] == room_name or connection[2] == room_name then
+			table.remove(mdat.connections, i)
+		end
+	end
 end
 
 function this.edit_room_name()

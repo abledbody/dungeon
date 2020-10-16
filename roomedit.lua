@@ -288,15 +288,15 @@ local function _draw()
 				room_name_str = state.active_string
 			end
 			
-			color(0)
-			rect(room_px1 + 1, room_py1 + 1, room_name_str:len() * FONT_WIDTH, FONT_HEIGHT)
-			color(7)
-			print(room_name_str, room_px1 + 1, room_py1 + 1)
-			
 			if state.show_reveal_bounds or (selection.room_name == room_name and selection.handle_grabbed) then
 				color(11)
 				rect(room_prx1, room_pry1, room_prw, room_prh, true)
 			end
+			
+			color(0)
+			rect(room_px1 + 1, room_py1 + 1, room_name_str:len() * FONT_WIDTH, FONT_HEIGHT)
+			color(7)
+			print(room_name_str, room_px1 + 1, room_py1 + 1)
 			
 			f.Sprite(8, room.cx * 8 - 2, room.cy * 8 - 2, 2)
 		end
