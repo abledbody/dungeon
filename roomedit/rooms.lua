@@ -68,24 +68,24 @@ function this.apply_room_name(room_name, new_name)
 	if not mdat.rooms[new_name] then
 		mdat.rooms[new_name] = mdat.rooms[room_name]
 		mdat.rooms[room_name] = nil
-	end
 	
-	do
-		local room = mdat.rooms[mdat.initial_room]
-		while room.next and room.next ~= room_name do
-			room = mdat.rooms[room.next]
+		do
+			local room = mdat.rooms[mdat.initial_room]
+			while room.next and room.next ~= room_name do
+				room = mdat.rooms[room.next]
+			end
+			if room.next == room_name then
+				room.next = new_name
+			end
 		end
-		if room.next == room_name then
-			room.next = new_name
-		end
-	end
-	
-	for i = 1, #mdat.connections do
-		local connection = mdat.connections[i]
-		if connection[1] == room_name then
-			connection[1] = new_name
-		elseif connection[2] == room_name then
-			connection[2] = new_name
+		
+		for i = 1, #mdat.connections do
+			local connection = mdat.connections[i]
+			if connection[1] == room_name then
+				connection[1] = new_name
+			elseif connection[2] == room_name then
+				connection[2] = new_name
+			end
 		end
 	end
 end
