@@ -141,17 +141,21 @@ function Mob:draw()
 
 	local spr = animator:fetch("spr")
 	local offX = animator:fetch("offX")
+	local offY = animator:fetch("offY")
 	if offX then
 		--Apply to sprite x offset.
-		x = x+offX*xScale
+		x = x + offX * xScale
+	end
+	if offY then
+		y = y + offY
 	end
 	
 	--If the sprite is flipped, we need to account for the fact that the origin is on the upper left corner.
 	x = flip and x+8 or x
 	
-	Sprite(spr,x,y,0,xScale)
+	Sprite(spr, x, y, 0, xScale)
 
-	for _,v in pairs(self.draws) do
+	for _, v in pairs(self.draws) do
 		v(self)
 	end
 end

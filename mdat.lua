@@ -36,6 +36,7 @@ rooms.entry_hall = {
 	cx = 60, cy = 14,
 
 	 objects = {
+		{"Skull", 59, 14, {}},
 	}
 }
 

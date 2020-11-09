@@ -13,6 +13,7 @@ objects = {
 objects.types = {
 	Player = dofile(MOBS_PATH.."Player.lua"),
 	Slime = dofile(MOBS_PATH.."Slime.lua"),
+	Skull = dofile(MOBS_PATH.."Skull.lua"),
 
 	RobeStat = dofile(THINGS_PATH.."RobeStat.lua"),
 	ExTile = dofile(THINGS_PATH.."ExTile.lua"),

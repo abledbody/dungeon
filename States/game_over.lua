@@ -2,13 +2,15 @@ local rand = math.random
 
 game_over = {}
 
-local exploded = false
-local made_sound = false
+local exploded
+local made_sound
 
 local explode_timer = game.Timer:new()
 local text_timer = game.Timer:new()
 
 function game_over.trigger()
+	exploded = false
+	made_sound = false
 	game.setCamTarget(game.player.x+0.5, game.player.y+0.5)
 	explode_timer:trigger(1)
 	main.set_state(game_over)
