@@ -36,7 +36,6 @@ rooms.entry_hall = {
 	cx = 60, cy = 14,
 
 	 objects = {
-		{"Skull", 59, 14, {}},
 	}
 }
 
@@ -53,6 +52,7 @@ rooms.slime = {
 
 	 objects = {
 		{"Chest", 50, 12, {"health_flask", }},
+		{"Table", 56, 12, {}},
 		{"Slime", 51, 13, {}},
 		{"Slime", 52, 13, {}},
 	}
@@ -135,6 +135,7 @@ rooms.emptylavaroom = {
 	cx = 66, cy = 39,
 
 	 objects = {
+		{"Skull", 64, 42, {}},
 	}
 }
 

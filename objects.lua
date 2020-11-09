@@ -16,6 +16,7 @@ objects.types = {
 	Skull = dofile(MOBS_PATH.."Skull.lua"),
 
 	RobeStat = dofile(THINGS_PATH.."RobeStat.lua"),
+	Table = dofile(THINGS_PATH.."Table.lua"),
 	ExTile = dofile(THINGS_PATH.."ExTile.lua"),
 	Chest = dofile(THINGS_PATH.."Chest.lua"),
 	Barrel = dofile(THINGS_PATH.."Barrel.lua"),

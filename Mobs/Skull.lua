@@ -30,7 +30,7 @@
 	function Skull:initialize(x, y)
 		Mob.initialize(self, x, y, anim_set)
 	
-		melee(self, 0.6)
+		melee(self, 1.2, 3)
 		health(self, 3)
 		ai(self)
 	end

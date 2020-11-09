@@ -44,7 +44,9 @@ local function attach(object, max_hp, damage_calls)
 	}
 	object.damage = damage
 	object.heal = heal
-	table.insert(object.draws, draw)
+	if object.draws then
+		table.insert(object.draws, draw)
+	end
 end
 
 

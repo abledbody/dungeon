@@ -53,6 +53,16 @@ object_data.objects.Slime = {
 	sprite = 202,
 	layer = 2,
 }
+object_data.objects.Skull = {
+	sprite = 201,
+	layer = 2,
+	draw = function(self, x, y)
+		palt(0, false)
+		palt(1, true)
+		f.Sprite(self.sprite, x, y)
+		palt()
+	end
+}
 
 --Things
 object_data.objects.RobeStat = {
@@ -60,6 +70,12 @@ object_data.objects.RobeStat = {
 	draw = function(self, x, y) f.SpriteGroup(self.sprite, 2, 3, x, y) end,
 	get_bounds = function(x, y) return x, y, 16, 24 end,
 	test_occupancy = function(test_x, test_y, object_x, object_y) return (test_x >= object_x and test_x < object_x + 2) and (test_y >= object_y + 1 and test_y < object_y + 3) end
+}
+object_data.objects.Table = {
+	sprite = 99,
+	draw = function(self, x, y) f.SpriteGroup(self.sprite, 2, 1, x, y) end,
+	get_bounds = function(x, y) return x, y, 16, 8 end,
+	test_occupancy = function(test_x, test_y, object_x, object_y) return (test_x >= object_x and test_x < object_x + 2) and (test_y == object_y) end
 }
 object_data.objects.Chest = {
 	sprite = 169,
