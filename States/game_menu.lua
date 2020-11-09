@@ -17,44 +17,6 @@ local SLOT_COUNT_X = 10
 local SLOT_COUNT_Y = 9
 
 game_menu.categories = {
-	{
-		selected = 1,
-		name = "system",
-		index = 1,
-		slots = {
-			{
-				count = 1,
-				object = {
-					item_name = "Exit",
-					category = "system",
-					draw = function(self, x, y)
-						Sprite(315, x, y)
-					end,
-
-					select = function(self)
-						main.set_state(quit_prompt)
-					end,
-				},
-			},
-			{
-				count = 1,
-				object = {
-					item_name = "Options",
-					category = "system",
-					draw = function(self, x, y)
-						Sprite(316, x, y)
-					end,
-
-					select = function(self)
-					end
-				},
-			},
-		},
-	},
-}
-
-local category_indeces = {
-	system = 1,
 }
 
 local category_sort_values = {
@@ -62,9 +24,10 @@ local category_sort_values = {
 	flasks = 2,
 }
 
+local category_indeces = {
+}
+
 local item_lookup = {
-	Exit = game_menu.categories[1].slots[1],
-	Options = game_menu.categories[1].slots[2],
 }
 
 local selected_category = 1
@@ -192,6 +155,18 @@ end
 
 function game_menu.close()
 	main.set_state(game)
+end
+
+function game_menu.reset()
+	game_menu.categories = {}
+	category_indeces = {}
+	item_lookup = {}
+	
+	
+	items.types.exit:add(1)
+	items.types.options:add(1)
+	
+	
 end
 
 function game_menu.update(dt)

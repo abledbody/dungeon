@@ -56,7 +56,4 @@ dofile(PATH.."particles.lua")
 
 function _init()
 	main.set_state(main_menu)
-	game_map.switchRoom("entry")
-	objects.spawn("Player", 59, 1, nil, "entry")
-	items.types.water_flask:add(20)
 end

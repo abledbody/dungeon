@@ -33,7 +33,7 @@ local loading_room = nil
 
 --This table is for checking grid positions for their occupants.
 --Their position indeces are written as [x.." "..y]
-local gridData = {}
+local gridData
 
 
 	--Functions--
@@ -239,6 +239,20 @@ end
 
 function game_map.is_loaded(room_index)
 	return loaded_rooms[room_index]
+end
+
+function game_map.reset(room)
+	for _, st in pairs(special_tiles) do
+		st.tiles = {}
+	end
+	
+	for k in pairs(loaded_rooms) do
+		unload_room(k)
+	end
+	
+	gridData = {}
+	
+	game_map.switchRoom(room)
 end
 
 function game_map.draw()

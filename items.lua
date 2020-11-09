@@ -10,6 +10,8 @@ items.types = {
 	health_flask = dofile(ITEMPATH.."health_flask.lua"),
 	speed_flask = dofile(ITEMPATH.."speed_flask.lua"),
 	water_flask = dofile(ITEMPATH.."water_flask.lua"),
+	exit = dofile(ITEMPATH.."exit.lua"),
+	options = dofile(ITEMPATH.."options.lua"),
 }
 
 return items

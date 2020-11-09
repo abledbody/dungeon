@@ -4,6 +4,7 @@ local OPTIONS = {
 	{
 		name = "Start",
 		select = function()
+			main.new_game()
 			main.set_state(game)
 			SFX(10,3)
 		end,

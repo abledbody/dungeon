@@ -24,11 +24,7 @@ objects.types = {
 }
 
 	--Variables--
-local all = {
-	{}, --[1] Floor Things
-	{}, --[2] Mobs
-	{}, --[3] Things
-}
+local all
 local types = objects.types
 
 	--Functions--
@@ -75,6 +71,14 @@ function objects.spawn(object_type, x, y, meta, room)
 	table.insert(all[layer], object)
 
 	return object
+end
+
+function objects.reset()
+	all = {
+		{}, --[1] Floor Things
+		{}, --[2] Mobs
+		{}, --[3] Things
+	}
 end
 
 return objects

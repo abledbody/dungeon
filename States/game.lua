@@ -6,27 +6,21 @@ local HSW,HSH,DIR_X,DIR_Y = const.HSW,const.HSH,const.DIR_X,const.DIR_Y
 local CLASSPATH = PATH.."Game/"
 
 
-game = {
-	camSmooth = 0.16,
-	darkness = 3.99,
-	fade_speed = 10,
-	player = nil, --Player mob
-	scrImage = nil,
-}
+game = {}
 
 	--Parameters--
 
 	--Variables--
-local time = 0
+local time
 
 --The center of the camera in pixelspace
-local xCam,yCam = 480,48
+local xCam,yCam
 --The center of the room in gridspace
-local xCamTarget,yCamTarget = 0,0
+local xCamTarget,yCamTarget
 
 --The last Examable looked at
-local lastLook = nil
-local lookCount = 1
+local lastLook
+local lookCount
 
 	--Functions--
 --Returns the first position, but slightly closer to the
@@ -85,6 +79,20 @@ end
 function game.screenshot()
 	local imgDat = screenshot()
 	game.scrImage = imgDat:image()
+end
+
+function game.reset()
+	game.camSmooth = 0.16
+	game.darkness = 3.99
+	game.fade_speed = 10
+	game.player = nil
+	game.scrImage = nil
+	
+	time = 0
+	xCam,yCam = 480,48
+	xCamTarget,yCamTarget = 0,0
+	lastLook = nil
+	lookCount = 1
 end
 
 	--States--

@@ -40,6 +40,16 @@ function main.set_state(new_state)
 	end
 end
 
+function main.new_game()
+	game.reset()
+	objects.reset()
+	game_map.reset("entry")
+	game_menu.reset()
+	particle_sys.clear()
+	objects.spawn("Player", 59, 1, nil, "entry")
+	items.types.water_flask:add(20)
+end
+
 function _update(dt)
 	for i = 1, 7 do
 		buttons_down[i] = false
