@@ -17,6 +17,7 @@ function Mob:initialize(x,y,aSet)
 	self.sx,self.sy = x*8,y*8
 
 	self.t_disable = game.Timer:new(self.move_speed)
+	self.t_disable:trigger()
 
 	self.updates = {}
 	self.draws = {}

@@ -51,10 +51,10 @@ rooms.slime = {
 	cx = 51, cy = 15,
 
 	 objects = {
-		{"Chest", 50, 12, {"health_flask", }},
-		{"Table", 56, 12, {}},
-		{"Slime", 51, 13, {}},
-		{"Slime", 52, 13, {}},
+		{"Chest", 52, 12, {"health_flask", }},
+		{"Table", 50, 12, {}},
+		{"Slime", 53, 12, {}},
+		{"Slime", 57, 16, {}},
 	}
 }
 
