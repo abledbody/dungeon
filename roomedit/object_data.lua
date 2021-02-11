@@ -88,3 +88,6 @@ object_data.objects.Bag = {
 	sprite = 147,
 }
 object_data.objects.ExTile = {}
+object_data.objects.Fire = {
+	sprite = 105,
+}

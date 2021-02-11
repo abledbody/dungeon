@@ -23,6 +23,8 @@ objects.types = {
 	Bag = dofile(THINGS_PATH.."Bag.lua"),
 	ItemPreview = dofile(THINGS_PATH.."ItemPreview.lua"),
 	FlyingFlask = dofile(THINGS_PATH.."FlyingFlask.lua"),
+	Fire = dofile(THINGS_PATH.."Fire.lua"),
+	FlitterSpike = dofile(THINGS_PATH.."FlitterSpike.lua"),
 }
 
 	--Variables--
