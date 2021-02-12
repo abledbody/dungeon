@@ -26,7 +26,7 @@ local anim_set = {
 	throw = {
 		spr =		{217,	218},
 		offX =		{-3,	1},
-		timing =	{0.05,	0.1}
+		timing =	{0,	0.1}
 	}
 }
 

@@ -1,5 +1,7 @@
 local Fire = class("Fire", objects.Thing)
 
+Fire.layer = 1 --[1] Floor Things
+
 local anim_set = {
 	fire = {
 		spr =		{104,	105,	106},

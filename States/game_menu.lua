@@ -212,7 +212,8 @@ function game_menu.draw()
 
 		--print(category.index, 3, y)
 
-		for j = 1, #category.slots do
+		--Items are drawn in reverse order so that the numbers always appear on top.
+		for j = #category.slots, 1, -1 do
 			local slot = category.slots[j]
 
 			local x = (j - category.selected) * (SLOT_SIZE + SLOT_H_PADDING) + HW - SLOT_SIZE / 2
@@ -230,8 +231,10 @@ function game_menu.draw()
 			
 			--Count
 			if slot.count > 1 then
+				local countWidth = tostring(slot.count):len() * 5
+				
 				color(0)
-				rect(x + SLOT_COUNT_X - 1, y + SLOT_COUNT_Y - 1, SLOT_SIZE - SLOT_COUNT_X + 2, SLOT_SIZE - SLOT_COUNT_Y + 2)
+				rect(x + SLOT_COUNT_X - 1, y + SLOT_COUNT_Y - 1, SLOT_SIZE - SLOT_COUNT_X + countWidth, SLOT_SIZE - SLOT_COUNT_Y + 2)
 				color(1)
 				print(slot.count, x + SLOT_COUNT_X + 1, y + SLOT_COUNT_Y + 1)
 				color(7)

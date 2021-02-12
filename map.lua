@@ -35,7 +35,6 @@ local loading_room = nil
 --Their position indeces are written as [x.." "..y]
 local gridData
 
-
 	--Functions--
 function game_map.dist(x1,y1,x2,y2)
 	local dx = abs(x2-x1)
@@ -148,12 +147,14 @@ local function inBounds(test_x, test_y, room_index)
 	return test_y >= y1 and test_x >= x1 and test_y < y2 and test_x < x2
 end
 
-function game_map.setSquare(x,y,value)
-	gridData[x.." "..y] = value
+function game_map.setSquare(x, y, value, layer)
+	layer = layer or 1
+	gridData[layer][x.." "..y] = value
 end
 
-function game_map.getSquare(x, y)
-	return gridData[x.." "..y]
+function game_map.getSquare(x, y, layer)
+	layer = layer or 1
+	return gridData[layer][x.." "..y]
 end
 
 function game_map.bulk(obj,x,y,w,h,action)
@@ -250,7 +251,10 @@ function game_map.reset(room)
 		unload_room(k)
 	end
 	
-	gridData = {}
+	gridData = {
+		{}, --[1] Colliders
+		{},	--[2] Triggers
+	}
 	
 	game_map.switchRoom(room)
 end

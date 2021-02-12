@@ -1,14 +1,17 @@
 local FlitterSpike = class("FlitterSpike", objects.Thing)
 
+
+FlitterSpike.layer = 1 --[1] Floor Things
+
 local anim_set = {
 	FlitterSpike = {
-		spr =		{109,	107,	108,	109,	110},
-		timing =	{0.15,	0.1,	1,	0.2,	1},
+		spr =		{109,	107,	108,	109},
+		timing =	{0.15,	0.1,	1,	0.2},
 	}
 }
 
 function FlitterSpike:initialize(x, y)
-	self.animator = game.Animator:new(anim_set, "FlitterSpike")
+	self.animator = game.Animator:new(anim_set, "FlitterSpike", {})
 	
 	objects.Thing.initialize(self, x, y)
 end
