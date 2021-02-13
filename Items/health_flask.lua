@@ -16,6 +16,7 @@ function health_flask:select()
 	self:remove()
 	game_menu.close()
 	game.player:heal(5)
+	objects.spawn("BuffSparkles", game.player.x, game.player.y, {1}, game.player.room)
 end
 
 return health_flask

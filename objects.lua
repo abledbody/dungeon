@@ -25,6 +25,7 @@ objects.types = {
 	FlyingFlask = dofile(THINGS_PATH.."FlyingFlask.lua"),
 	Fire = dofile(THINGS_PATH.."Fire.lua"),
 	FlitterSpike = dofile(THINGS_PATH.."FlitterSpike.lua"),
+	BuffSparkles = dofile(THINGS_PATH.."BuffSparkles.lua"),
 }
 
 	--Variables--
