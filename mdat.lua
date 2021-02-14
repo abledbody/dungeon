@@ -25,7 +25,7 @@ rooms.entry = {
 }
 
 rooms.entry_hall = {
-	next = "slime",
+	next = "table",
 
 	x1 = 58, y1 = 11,
 	x2 = 62, y2 = 18,
@@ -39,7 +39,7 @@ rooms.entry_hall = {
 	}
 }
 
-rooms.slime = {
+rooms.table = {
 	next = "text",
 
 	x1 = 44, y1 = 11,
@@ -94,7 +94,7 @@ rooms.lava_bridge = {
 }
 
 rooms.lava_cave = {
-	next = "lavapool",
+	next = "lava_pool",
 
 	x1 = 44, y1 = 18,
 	x2 = 52, y2 = 26,
@@ -108,8 +108,8 @@ rooms.lava_cave = {
 	}
 }
 
-rooms.lavapool = {
-	next = "emptylavaroom",
+rooms.lava_pool = {
+	next = "empty_lava",
 
 	x1 = 62, y1 = 25,
 	x2 = 72, y2 = 35,
@@ -123,8 +123,8 @@ rooms.lavapool = {
 	}
 }
 
-rooms.emptylavaroom = {
-	next = "greentransition",
+rooms.empty_lava = {
+	next = "green_transition",
 
 	x1 = 61, y1 = 35,
 	x2 = 72, y2 = 44,
@@ -139,8 +139,8 @@ rooms.emptylavaroom = {
 	}
 }
 
-rooms.greentransition = {
-	next = "greenroom",
+rooms.green_transition = {
+	next = "green_room",
 
 	x1 = 70, y1 = 18,
 	x2 = 81, y2 = 23,
@@ -154,8 +154,8 @@ rooms.greentransition = {
 	}
 }
 
-rooms.greenroom = {
-	next = nil,
+rooms.green_room = {
+	next = "first_secret_cave",
 
 	x1 = 72, y1 = 23,
 	x2 = 78, y2 = 34,
@@ -169,19 +169,35 @@ rooms.greenroom = {
 	}
 }
 
+rooms.first_secret_cave = {
+	next = nil,
+
+	x1 = 46, y1 = 5,
+	x2 = 54, y2 = 11,
+
+	rx1 = 46, ry1 = 5,
+	rx2 = 55, ry2 = 12,
+
+	cx = 50, cy = 8,
+
+	 objects = {
+	}
+}
+
 --Connections
 mdat.connections = {
 	{"entry", "entry_hall"},
 	{"entry_hall", "text"},
-	{"entry_hall", "slime"},
+	{"entry_hall", "table"},
 	{"entry_hall", "lava_bridge"},
-	{"slime", "lava_cave"},
+	{"table", "lava_cave"},
 	{"lava_bridge", "lava_cave"},
-	{"text", "greentransition"},
-	{"lavapool", "emptylavaroom"},
-	{"lavapool", "lava_bridge"},
-	{"lavapool", "greenroom"},
-	{"greentransition", "greenroom"},
+	{"text", "green_transition"},
+	{"lava_pool", "empty_lava"},
+	{"lava_pool", "lava_bridge"},
+	{"lava_pool", "green_room"},
+	{"green_transition", "green_room"},
+	{"first_secret_cave", "table"},
 }
 
 for _, v in ipairs(mdat.connections) do

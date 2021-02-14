@@ -179,9 +179,7 @@ local function _keypressed(key)
 	if state.editing_room_name then
 		local active_string = state.active_string
 		
-		if key:len() == 1 then
-			active_string = active_string..key
-		elseif key == "backspace" then
+		if key == "backspace" then
 			if active_string ~= "" then
 				active_string = active_string:sub(1, active_string:len() - 1)
 			end
@@ -207,6 +205,15 @@ local keyrelease_actions = {
 local function _keyreleased(key)
 	if keyrelease_actions[key] then
 		keyrelease_actions[key]()
+	end
+end
+
+local function _textinput(text, b, c)
+	if state.editing_room_name then
+		local active_string = state.active_string
+		active_string = active_string..text
+		
+		state.active_string = active_string
 	end
 end
 
@@ -337,6 +344,7 @@ local events = {
 	mousemoved = mouse.moved,
 	wheelmoved = mouse.wheel_moved,
 	keypressed = _keypressed,
+	textinput = _textinput,
 	keyreleased = _keyreleased,
 }
 

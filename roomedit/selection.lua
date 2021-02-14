@@ -5,6 +5,7 @@ local ROOM_HANDLE_SIZE = 5
 
 selection = {
 	handle_grabbed = nil,
+	object_grabbed = nil,
 	
 	room = nil,
 	room_name = nil,
@@ -66,7 +67,7 @@ function this.handle_clicked(x, y, x1, y1, x2, y2)
 			local is_bottom = y >= bottom_handle_y
 			--If we're on the left side
 			if x < left_handle_x + ROOM_HANDLE_SIZE then
-				if is_top then return 1 --UR
+				if is_top then return 1 --UL
 				elseif is_bottom then return 3 end --BL
 			--If we're on the right side
 			elseif x >= right_handle_x then

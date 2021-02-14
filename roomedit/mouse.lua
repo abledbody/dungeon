@@ -51,6 +51,7 @@ function mouse.released(x, y, button)
 	
 	if button == 1 then
 		selection.handle_grabbed = false
+		selection.object_grabbed = false
 		if state.active_mode.unpress_screen then
 			state.active_mode.unpress_screen(world_x, world_y)
 		end
@@ -84,6 +85,10 @@ function mouse.moved(x, y, dx, dy)
 		end
 		
 		selection.select_room_bounds(room)
+	end
+	
+	if selection.object_grabbed then
+		local world_x, world_y = mouse.screen_to_world(x, y)
 	end
 end
 
