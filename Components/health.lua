@@ -20,6 +20,7 @@ local function heal(self, dmg)
 	local health = self.health
 	health.hp = clamp(health.hp + dmg, 0, health.max_hp)
 	SFX(22)
+	objects.spawn("BuffSparkles", self.x, self.y, {1}, self.room)
 end
 
 local function draw(self)

@@ -11,7 +11,8 @@ local palettes = {
 	{8, 14, 2}, --[1] Health Red
 	{1, 3, 11}, --[2] Poison Green
 	{2, 5, 13}, --[3] Magic Purple
-	{5, 6, 7}, --[4] Plain grey
+	{5, 6, 7}, --[4] Plain Grey
+	{9, 10, 15}, --[5] Speed Gold
 }
 
 function BuffSparkles:initialize(x, y, palette)
@@ -26,6 +27,7 @@ end
 
 function BuffSparkles:update(dt)
 	self.animator:update(dt)
+	self.y = self.y - dt
 end
 
 function BuffSparkles:draw()

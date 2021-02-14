@@ -42,6 +42,9 @@ function speed_flask:apply_effect(mob)
 		mob.status_effects.speed.timer:trigger()
 		mob.updates.speed_effect = effect_update
 	end
+	
+	SFX(22)
+	objects.spawn("BuffSparkles", mob.x, mob.y, {5}, mob.room)
 end
 
 function speed_flask:select()
