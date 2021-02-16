@@ -13,6 +13,6 @@ function this.press_screen(x, y)
 	selection.deselect()
 
 	if rooms.try_select(gx, gy) and state.objects_selectable then
-		objects.try_select(gx, gy)
+		selection.object_grabbed = objects.try_select(gx, gy)
 	end
 end

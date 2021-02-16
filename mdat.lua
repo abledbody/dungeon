@@ -11,16 +11,16 @@ rooms.entry = {
 	rx1 = 54, ry1 = 0,
 	rx2 = 66, ry2 = 12,
 
-	cx = 60, cy = 6,
+	cx = 60, cy = 5,
 
 	 objects = {
-		{"RobeStat", 59, 4, {}},
 		{"Chest", 55, 1, {"health_flask", }},
 		{"Chest", 56, 1, {"health_flask", }},
 		{"Chest", 64, 1, {"speed_flask", }},
 		{"Chest", 63, 1, {"speed_flask", }},
-		{"Barrel", 64, 10, {"water_flask", }},
 		{"Barrel", 64, 9, {"water_flask", }},
+		{"Barrel", 64, 10, {"water_flask", }},
+		{"RobeStat", 59, 4, {}},
 	}
 }
 
@@ -53,8 +53,8 @@ rooms.table = {
 	 objects = {
 		{"Chest", 52, 12, {"health_flask", }},
 		{"Table", 50, 12, {}},
-		{"Slime", 53, 12, {}},
 		{"Slime", 57, 16, {}},
+		{"Slime", 53, 12, {}},
 	}
 }
 
@@ -72,8 +72,8 @@ rooms.text = {
 	 objects = {
 		{"ExTile", 63, 15, {{"Note to Joffrey: Please do not let\nthe slimes roam the dungeon. They\nneed to be kept in the traps where\nthey will not attack the staff.", "It's been physically\nchiseled into the wall.", "Note to Joffrey: Please do not let\nthe slimes roam the dungeon. They\nneed to be kept in the traps where\nthey will not attack the staff.", }}},
 		{"Barrel", 68, 16, {"water_flask", }},
-		{"Barrel", 67, 16, {"water_flask", }},
 		{"Slime", 68, 19, {}},
+		{"Barrel", 67, 16, {"water_flask", }},
 	}
 }
 
@@ -112,12 +112,12 @@ rooms.lava_pool = {
 	next = "empty_lava",
 
 	x1 = 62, y1 = 25,
-	x2 = 72, y2 = 35,
+	x2 = 71, y2 = 35,
 
 	rx1 = 61, ry1 = 25,
 	rx2 = 72, ry2 = 36,
 
-	cx = 67, cy = 30,
+	cx = 66, cy = 30,
 
 	 objects = {
 	}
@@ -157,13 +157,13 @@ rooms.green_transition = {
 rooms.green_room = {
 	next = "first_secret_cave",
 
-	x1 = 72, y1 = 23,
+	x1 = 71, y1 = 23,
 	x2 = 78, y2 = 34,
 
 	rx1 = 71, ry1 = 23,
 	rx2 = 78, ry2 = 34,
 
-	cx = 75, cy = 28,
+	cx = 74, cy = 28,
 
 	 objects = {
 	}

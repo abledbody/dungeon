@@ -1,5 +1,7 @@
 local BuffSparkles = class("BuffSparkles", objects.Thing)
 
+local RAISE_RATE = 1
+
 local anim_set = {
 	sparkles = {
 		spr =		{205,	206,	207,	208,	209,	210,	211},
@@ -27,7 +29,7 @@ end
 
 function BuffSparkles:update(dt)
 	self.animator:update(dt)
-	self.y = self.y - dt
+	self.y = self.y - dt * RAISE_RATE
 end
 
 function BuffSparkles:draw()

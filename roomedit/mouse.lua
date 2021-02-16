@@ -1,15 +1,18 @@
 local abs, floor = math.abs, math.floor
 
 local DOUBLE_CLICK_THRESHOLD = 0.5
-local MOUSE_MOVE_THRESHOLD = 2
+local MOUSE_MOVE_THRESHOLD = 4
 
 mouse = {}
 
 local double_click_time = 0
 local last_click_x, last_click_y = 0, 0
+local has_moved = true
 
 function mouse.unmoved(x, y)
-	return abs(last_click_x - x) < MOUSE_MOVE_THRESHOLD and abs(last_click_y - y) < MOUSE_MOVE_THRESHOLD
+	local in_threshold = abs(last_click_x - x) < MOUSE_MOVE_THRESHOLD and abs(last_click_y - y) < MOUSE_MOVE_THRESHOLD
+	has_moved = has_moved or not in_threshold
+	return in_threshold
 end
 
 function mouse.double_clicked(x, y)
@@ -55,6 +58,8 @@ function mouse.released(x, y, button)
 		if state.active_mode.unpress_screen then
 			state.active_mode.unpress_screen(world_x, world_y)
 		end
+		
+		has_moved = false
 	end
 	
     if button == 2 then
@@ -89,6 +94,28 @@ function mouse.moved(x, y, dx, dy)
 	
 	if selection.object_grabbed then
 		local world_x, world_y = mouse.screen_to_world(x, y)
+		
+		if has_moved or not mouse.unmoved(world_x, world_y) then
+			local gx, gy = floor(world_x / 8), floor(world_y / 8)
+			
+			local new_room_index = rooms.find_room(gx, gy)
+			
+			if new_room_index and selection.room_name ~= new_room_index then
+				local prev_room = mdat.rooms[selection.room_name]
+				local new_room = mdat.rooms[new_room_index]
+				
+				table.remove(prev_room.objects, selection.object_index)
+				table.insert(new_room.objects, selection.object_grabbed)
+				
+				rooms.try_select(gx, gy)
+				selection.select_object(#new_room.objects, selection.object_grabbed)
+			else
+				selection.select_object(selection.object_index, selection.object_grabbed)
+			end
+			
+			selection.object_grabbed[2] = gx
+			selection.object_grabbed[3] = gy
+		end
 	end
 end
 
