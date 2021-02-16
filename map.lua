@@ -257,6 +257,12 @@ function game_map.reset(room)
 	}
 	
 	game_map.switchRoom(room)
+	game.steady_camera()
+end
+
+function game_map.cell(x, y, index)
+	TileMap:cell(x, y, index)
+	reload_batch()
 end
 
 function game_map.draw()

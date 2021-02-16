@@ -64,6 +64,10 @@ local function setCamTarget(x,y)
 	xCamTarget,yCamTarget = x,y
 end
 
+function game.steady_camera()
+	xCam, yCam = xCamTarget * 8, yCamTarget * 8
+end
+
 function game.camera_smoove(dt)
 	local _roomX, _roomY =
 		xCamTarget*8, yCamTarget*8

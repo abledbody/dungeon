@@ -279,7 +279,7 @@ local function _draw()
 			if not rooms.in_room(room, object[2], object[3]) then
 				red_tint()
 			end
-			object_data.draw_object(object[1], object[2], object[3])
+			object_data.draw_object(unpack(object))
 			pal()
 		end
 

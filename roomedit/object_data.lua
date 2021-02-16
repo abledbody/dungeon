@@ -2,12 +2,12 @@ NO_SPRITE = 384
 
 object_data = {}
 
-function object_data.draw_object(object_name, x, y)
+function object_data.draw_object(object_name, x, y, spawn_dat)
 	local object = object_data.objects[object_name]
 	
 	if object then
 		if object.draw then
-			object:draw(x * 8, y * 8)
+			object:draw(x * 8, y * 8, spawn_dat)
 		else
 			f.Sprite(object.sprite or NO_SPRITE, x * 8, y * 8)
 		end
@@ -90,4 +90,12 @@ object_data.objects.Bag = {
 object_data.objects.ExTile = {}
 object_data.objects.Fire = {
 	sprite = 105,
+}
+object_data.objects.DTile = {
+	sprite = 61,
+	draw = function(self, x, y, spawn_dat)
+		palt(0, false)
+		f.Sprite(spawn_dat[1] or self.sprite, x, y)
+		palt()
+	end,
 }

@@ -11,7 +11,7 @@ rooms.entry = {
 	rx1 = 54, ry1 = 0,
 	rx2 = 66, ry2 = 12,
 
-	cx = 60, cy = 5,
+	cx = 60, cy = 6,
 
 	 objects = {
 		{"Chest", 55, 1, {"health_flask", }},
@@ -48,13 +48,14 @@ rooms.table = {
 	rx1 = 44, ry1 = 11,
 	rx2 = 59, ry2 = 18,
 
-	cx = 51, cy = 15,
+	cx = 51, cy = 14,
 
 	 objects = {
 		{"Chest", 52, 12, {"health_flask", }},
 		{"Table", 50, 12, {}},
 		{"Slime", 57, 16, {}},
 		{"Slime", 53, 12, {}},
+		{"DTile", 51, 11, {}},
 	}
 }
 
