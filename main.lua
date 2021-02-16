@@ -47,7 +47,7 @@ function main.new_game()
 	game_menu.reset()
 	particle_sys.clear()
 	objects.spawn("Player", 59, 1, nil, "entry")
-	items.types.water_flask:add(20)
+	items.types.water_flask:add(1)
 end
 
 function _update(dt)

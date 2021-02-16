@@ -14,12 +14,10 @@ rooms.entry = {
 	cx = 60, cy = 6,
 
 	 objects = {
-		{"Chest", 55, 1, {"health_flask", }},
-		{"Chest", 56, 1, {"health_flask", }},
-		{"Chest", 64, 1, {"speed_flask", }},
-		{"Chest", 63, 1, {"speed_flask", }},
-		{"Barrel", 64, 9, {"water_flask", }},
+		{"Chest", 58, 1, {"health_flask", }},
+		{"Chest", 61, 1, {"health_flask", }},
 		{"Barrel", 64, 10, {"water_flask", }},
+		{"Barrel", 64, 9, {"water_flask", }},
 		{"RobeStat", 59, 4, {}},
 	}
 }
@@ -137,6 +135,7 @@ rooms.empty_lava = {
 
 	 objects = {
 		{"Skull", 64, 42, {}},
+		{"Chest", 66, 39, {"speed_flask", }},
 	}
 }
 
@@ -182,6 +181,7 @@ rooms.first_secret_cave = {
 	cx = 50, cy = 8,
 
 	 objects = {
+		{"Chest", 49, 7, {"speed_flask", }},
 	}
 }
 

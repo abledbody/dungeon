@@ -22,7 +22,7 @@
 	
 	local Skull = class("Slime", Mob)
 	Skull.move_speed = 0.8
-	Skull.smoove_rate = 0.7
+	Skull.smoove_rate = 0.5
 	Skull.hit_sound = 13
 	Skull.blood_color = 7
 	Skull.walk_sound = 24
