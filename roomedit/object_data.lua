@@ -102,3 +102,12 @@ object_data.objects.DTile = {
 object_data.objects.Lever = {
 	sprite = 101
 }
+object_data.objects.FlameHole = {
+	sprite = 124,
+	draw = function(self, x, y) 
+		palt(1, true)
+		palt(0, false)
+		f.Sprite(self.sprite, x, y)
+		palt()
+	end
+}

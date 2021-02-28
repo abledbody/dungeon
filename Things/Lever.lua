@@ -62,7 +62,7 @@ function Lever:interact()
 	if self.target_x and self.target_y then
 		local target = game_map.getSquare(self.target_x, self.target_y)
 		if target.set_activated then
-			target.set_activated()
+			target:set_activated(not on)
 		end
 	end
 end

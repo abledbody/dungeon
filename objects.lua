@@ -28,6 +28,7 @@ objects.types = {
 	BuffSparkles = dofile(THINGS_PATH.."BuffSparkles.lua"),
 	DTile = dofile(THINGS_PATH.."DTile.lua"),
 	Lever = dofile(THINGS_PATH.."Lever.lua"),
+	FlameHole = dofile(THINGS_PATH.."FlameHole.lua"),
 }
 
 	--Variables--
