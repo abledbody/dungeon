@@ -99,3 +99,6 @@ object_data.objects.DTile = {
 		palt()
 	end,
 }
+object_data.objects.Lever = {
+	sprite = 101
+}

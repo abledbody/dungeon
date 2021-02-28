@@ -18,6 +18,7 @@ rooms.entry = {
 		{"Chest", 61, 1, {"health_flask", }},
 		{"Barrel", 64, 10, {"water_flask", }},
 		{"Barrel", 64, 9, {"water_flask", }},
+		{"Lever", 64, 2, {}},
 		{"RobeStat", 59, 4, {}},
 	}
 }

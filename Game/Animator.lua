@@ -1,13 +1,13 @@
 local Animator = class("Animator")
 
-function Animator:initialize(animSet,initialState,endCalls)
+function Animator:initialize(animSet, initialState, endCalls)
 	self.animSet = animSet or error("Animator:new requires a set of animations to operate")
 	self.endCalls = endCalls or {}
 	self:setState(initialState or error("Animator:new requires an initial state to operate"))
 end
 
 function Animator:update(dt)
-	local timing,frame = self.anim.timing,self.frame
+	local timing, frame = self.anim.timing, self.frame
 	local fCount = #timing
 	
 	--Offset is measured in "Seconds before the next frame"
@@ -27,7 +27,7 @@ function Animator:update(dt)
 		offset = offset+timing[frame]
 	end
 	
-	self.offset,self.frame = offset,frame
+	self.offset, self.frame = offset, frame
 
 	if ended then
 		local call = self.endCalls[self.state]
@@ -49,7 +49,7 @@ function Animator:check()
 end
 
 function Animator:fetch(key)
-	local anim,frame = self.anim,self.frame
+	local anim,frame = self.anim, self.frame
 
 	local set = anim[key]
 	if set then
